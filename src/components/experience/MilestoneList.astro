@@ -1,0 +1,66 @@
+---
+import { ArrowUpRight, Award, BookOpen, GraduationCap, Mic, Users } from "lucide-astro";
+import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
+import { milestoneLabels, type Milestone } from "@lib/content";
+import { formatMonthYear } from "@lib/utils";
+
+interface Props {
+  type: Milestone["data"]["type"];
+  items: Milestone[];
+}
+const { type, items } = Astro.props;
+const Icon = {
+  education: GraduationCap,
+  certification: BookOpen,
+  speaking: Mic,
+  award: Award,
+  community: Users,
+}[type];
+---
+
+{items.length > 0 && (
+  <section aria-labelledby={`milestone-${type}`} class="card p-5 sm:p-6">
+    <h3 id={`milestone-${type}`} class="flex items-center gap-2.5 text-base font-semibold">
+      <span class="bg-accent-soft text-accent-strong inline-flex size-8 items-center justify-center rounded-lg">
+        <Icon size={16} aria-hidden="true" />
+      </span>
+      {milestoneLabels[type].plural}
+    </h3>
+    <ul class="divide-border mt-4 divide-y">
+      {items.map(({ data }) => (
+        <li class="py-3 first:pt-0 last:pb-0">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+            <p class="text-fg font-medium">
+              {data.url ? (
+                <a
+                  href={data.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="link-underline inline-flex items-center gap-1"
+                >
+                  {data.title}
+                  <ArrowUpRight size={14} aria-hidden="true" />
+                </a>
+              ) : (
+                data.title
+              )}
+            </p>
+            <p class="text-fg-subtle font-mono text-xs">
+              {formatMonthYear(data.date)}
+              {data.endDate && ` — ${formatMonthYear(data.endDate)}`}
+            </p>
+          </div>
+          {(data.organization || data.location) && (
+            <p class="text-fg-muted mt-0.5 text-sm">
+              {data.organization}
+              {data.organization && data.location && " · "}
+              {data.location}
+            </p>
+          )}
+          {data.description && <p class="text-fg-muted mt-1 text-sm">{data.description}</p>}
+          {data.placeholder && <PlaceholderBadge class="mt-2" />}
+        </li>
+      ))}
+    </ul>
+  </section>
+)}

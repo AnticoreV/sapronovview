@@ -1,0 +1,44 @@
+---
+/**
+ * Closing call-to-action used on most pages.
+ */
+import Button from "@components/ui/Button.astro";
+import { siteConfig } from "@config";
+
+interface Props {
+  title?: string;
+  description?: string;
+  primaryLabel?: string;
+  primaryHref?: string;
+  secondaryLabel?: string;
+  secondaryHref?: string;
+}
+const {
+  title = "Let's build something worth talking about.",
+  description = "I'm open to conversations about backend systems, product ideas and anything that involves an engine or a runway.",
+  primaryLabel = "Get in touch",
+  primaryHref = "/contact",
+  secondaryLabel = `Email ${siteConfig.email}`,
+  secondaryHref = `mailto:${siteConfig.email}`,
+} = Astro.props;
+---
+
+<section class="container-site section reveal">
+  <div class="card relative isolate overflow-hidden px-6 py-12 text-center sm:px-12 sm:py-16">
+    <div class="accent-glow pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
+    <div
+      class="grid-bg pointer-events-none absolute inset-0 -z-10 opacity-60"
+      aria-hidden="true"
+    ></div>
+    <h2 class="mx-auto max-w-2xl text-3xl sm:text-4xl">{title}</h2>
+    <p class="text-fg-muted mx-auto mt-4 max-w-xl text-base sm:text-lg">{description}</p>
+    <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+      <Button href={primaryHref} size="lg" arrow>
+        {primaryLabel}
+      </Button>
+      <Button href={secondaryHref} variant="secondary" size="lg">
+        {secondaryLabel}
+      </Button>
+    </div>
+  </div>
+</section>

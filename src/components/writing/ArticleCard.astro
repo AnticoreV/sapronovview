@@ -1,0 +1,87 @@
+---
+import { Image } from "astro:assets";
+import { ArrowRight, Clock } from "lucide-astro";
+import FormattedDate from "@components/ui/FormattedDate.astro";
+import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
+import TechBadge from "@components/ui/TechBadge.astro";
+import type { Post } from "@lib/content";
+import { readingTime } from "@lib/utils";
+
+interface Props {
+  post: Post;
+  variant?: "default" | "row";
+  showImage?: boolean;
+}
+const { post, variant = "default", showImage = true } = Astro.props;
+const { data } = post;
+const href = `/writing/${post.id}`;
+const { minutes } = readingTime(post.body ?? "");
+const isRow = variant === "row";
+---
+
+<article
+  class:list={[
+    "group relative",
+    isRow
+      ? "border-border grid gap-2 border-b py-6 sm:grid-cols-[150px_1fr] sm:gap-8 first:pt-0"
+      : "card card-hover flex flex-col overflow-hidden",
+  ]}
+>
+  {!isRow && showImage && data.cover && (
+    <Image
+      src={data.cover}
+      alt={data.coverAlt ?? ""}
+      width={800}
+      height={450}
+      widths={[400, 800]}
+      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+      class="aspect-video w-full object-cover"
+    />
+  )}
+
+  {isRow && (
+    <p class="text-fg-subtle font-mono text-xs sm:pt-1">
+      <FormattedDate date={data.pubDate} />
+    </p>
+  )}
+
+  <div class:list={[!isRow && "flex flex-1 flex-col p-5 sm:p-6"]}>
+    {!isRow && (
+      <p class="text-fg-subtle flex items-center gap-2 font-mono text-[0.7rem] tracking-wider uppercase">
+        <FormattedDate date={data.pubDate} />
+        <span aria-hidden="true">·</span>
+        <span class="inline-flex items-center gap-1">
+          <Clock size={12} aria-hidden="true" /> {minutes} min
+        </span>
+        {data.placeholder && <PlaceholderBadge label="Sample" class="ml-auto" />}
+      </p>
+    )}
+    <h3 class:list={["leading-snug", isRow ? "text-xl" : "mt-3 text-lg sm:text-xl"]}>
+      <a
+        href={href}
+        class="group-hover:text-accent-strong transition-colors after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
+      >
+        {data.title}
+      </a>
+    </h3>
+    <p class="text-fg-muted mt-2 text-sm leading-relaxed sm:text-[0.95rem]">{data.description}</p>
+    <div class="mt-4 flex flex-wrap items-center gap-1.5">
+      {data.tags.slice(0, 3).map((t) => (
+        <TechBadge label={t} />
+      ))}
+      {isRow && (
+        <span class="text-fg-subtle ml-auto inline-flex items-center gap-1 font-mono text-xs">
+          {minutes} min read
+          {data.placeholder && <PlaceholderBadge label="Sample" class="ml-2" />}
+        </span>
+      )}
+      {!isRow && (
+        <ArrowRight
+          size={16}
+          aria-hidden="true"
+          class="text-fg-subtle group-hover:text-accent-strong ml-auto transition-all group-hover:translate-x-0.5"
+        />
+      )}
+    </div>
+  </div>
+</article>

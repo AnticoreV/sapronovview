@@ -1,0 +1,102 @@
+---
+import { ArrowUpRight, MapPin } from "lucide-astro";
+import { render } from "astro:content";
+import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
+import TechBadge from "@components/ui/TechBadge.astro";
+import { employmentLabels, type Position } from "@lib/content";
+import { formatDuration, formatMonthYear } from "@lib/utils";
+
+interface Props {
+  position: Position;
+  compact?: boolean;
+}
+const { position, compact = false } = Astro.props;
+const { data } = position;
+const { Content } = await render(position);
+const isCurrent = !data.endDate;
+const range = `${formatMonthYear(data.startDate)} — ${isCurrent ? "Present" : formatMonthYear(data.endDate)}`;
+const duration = formatDuration(data.startDate, data.endDate);
+---
+
+<article class="relative grid gap-4 md:grid-cols-[180px_1fr] md:gap-10">
+  <div class="md:pt-1">
+    <p class="text-fg font-mono text-sm">{range}</p>
+    <p class="text-fg-subtle mt-1 font-mono text-xs">
+      {duration}
+      {data.placeholder && " · dates TBC"}
+    </p>
+  </div>
+
+  <div class="relative md:border-border md:border-l md:pl-8">
+    <span
+      class:list={[
+        "absolute top-1.5 -left-[5px] hidden size-[9px] rounded-full ring-4 ring-bg md:block",
+        isCurrent ? "bg-accent" : "bg-border-strong",
+      ]}
+      aria-hidden="true"
+    ></span>
+
+    <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+      <div>
+        <h3 class="text-xl leading-tight sm:text-2xl">{data.role}</h3>
+        <p class="text-fg-muted mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+          {data.companyUrl ? (
+            <a
+              href={data.companyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="link-underline text-fg inline-flex items-center gap-1 font-medium"
+            >
+              {data.company}
+              <ArrowUpRight size={14} aria-hidden="true" />
+            </a>
+          ) : (
+            <span class="text-fg font-medium">{data.company}</span>
+          )}
+          <span aria-hidden="true">·</span>
+          <span>{employmentLabels[data.employmentType]}</span>
+          {data.workplace && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span>{data.workplace}</span>
+            </>
+          )}
+          {data.location && (
+            <span class="inline-flex items-center gap-1">
+              <MapPin size={13} aria-hidden="true" />
+              {data.location}
+            </span>
+          )}
+        </p>
+      </div>
+      {data.placeholder && <PlaceholderBadge />}
+    </div>
+
+    {!compact && (
+      <div class="text-fg-muted mt-4 max-w-2xl text-[0.95rem] leading-relaxed [&_strong]:text-fg">
+        <Content />
+      </div>
+    )}
+
+    {data.achievements.length > 0 && (
+      <ul class="mt-4 max-w-2xl space-y-2">
+        {data.achievements.map((a) => (
+          <li class="text-fg-muted flex gap-3 text-[0.95rem] leading-relaxed">
+            <span class="bg-accent mt-[0.6em] size-1.5 shrink-0 rounded-full" aria-hidden="true" />
+            <span>{a}</span>
+          </li>
+        ))}
+      </ul>
+    )}
+
+    {data.technologies.length > 0 && (
+      <ul class="mt-5 flex flex-wrap gap-1.5" aria-label="Technologies">
+        {data.technologies.map((t) => (
+          <li>
+            <TechBadge label={t} />
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+</article>

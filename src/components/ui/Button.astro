@@ -1,0 +1,81 @@
+---
+/**
+ * Link styled as a button. Renders <a> when `href` is given, otherwise <button>.
+ */
+import { ArrowRight, ArrowUpRight } from "lucide-astro";
+
+interface Props {
+  href?: string;
+  variant?: "primary" | "secondary" | "ghost";
+  size?: "sm" | "md" | "lg";
+  /** Show a trailing arrow (external links get a diagonal arrow). */
+  arrow?: boolean;
+  external?: boolean;
+  type?: "button" | "submit";
+  class?: string;
+  [key: string]: unknown;
+}
+const {
+  href,
+  variant = "primary",
+  size = "md",
+  arrow = false,
+  external,
+  type = "button",
+  class: className,
+  ...rest
+} = Astro.props;
+
+const isExternal = external ?? (href ? /^https?:\/\//.test(href) : false);
+
+const base =
+  "group inline-flex items-center justify-center gap-2 rounded-pill font-medium whitespace-nowrap transition-[background-color,color,border-color,transform,box-shadow] duration-300 ease-(--ease-out-soft) select-none active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50";
+const sizes = {
+  sm: "h-9 px-4 text-sm",
+  md: "h-11 px-5 text-sm sm:text-[0.95rem]",
+  lg: "h-12 px-6 text-base",
+};
+const variants = {
+  primary:
+    "bg-fg text-bg hover:bg-accent hover:text-on-accent shadow-[0_1px_0_0_rgb(255_255_255/0.08)_inset] hover:shadow-[0_8px_24px_-8px_var(--accent-glow)]",
+  secondary:
+    "border border-border-strong bg-surface text-fg hover:border-fg/40 hover:bg-surface-muted",
+  ghost: "text-fg-muted hover:text-fg hover:bg-surface-muted",
+};
+const classes = [base, sizes[size], variants[variant], className];
+const Icon = isExternal ? ArrowUpRight : ArrowRight;
+---
+
+{href ? (
+  <a
+    href={href}
+    class:list={classes}
+    {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+    {...rest}
+  >
+    <slot />
+    {arrow && (
+      <Icon
+        size={16}
+        aria-hidden="true"
+        class:list={[
+          "transition-transform duration-300",
+          isExternal
+            ? "group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+            : "group-hover:translate-x-0.5",
+        ]}
+      />
+    )}
+  </a>
+) : (
+  <button type={type} class:list={classes} {...rest}>
+    <slot />
+    {arrow && (
+      <ArrowRight
+        size={16}
+        aria-hidden="true"
+        class="transition-transform duration-300 group-hover:translate-x-0.5"
+      />
+    )}
+  </button>
+)}

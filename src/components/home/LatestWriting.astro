@@ -1,0 +1,29 @@
+---
+import ArticleCard from "@components/writing/ArticleCard.astro";
+import Button from "@components/ui/Button.astro";
+import SectionHeading from "@components/ui/SectionHeading.astro";
+import type { Post } from "@lib/content";
+
+interface Props {
+  posts: Post[];
+}
+const { posts } = Astro.props;
+---
+
+<section class="container-site section reveal" aria-labelledby="writing-heading">
+  <SectionHeading
+    id="writing-heading"
+    eyebrow="Writing"
+    title="Latest notes"
+    description="Engineering notes, lessons from the cockpit and the garage."
+  >
+    <Button slot="action" href="/writing" variant="secondary" size="sm" arrow>
+      All writing
+    </Button>
+  </SectionHeading>
+  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    {posts.map((post) => (
+      <ArticleCard post={post} />
+    ))}
+  </div>
+</section>

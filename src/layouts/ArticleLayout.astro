@@ -1,0 +1,165 @@
+---
+/**
+ * Layout for /writing/[slug]: article header, body, prev/next and related.
+ */
+import { Image } from "astro:assets";
+import { ArrowLeft, ArrowRight, Clock } from "lucide-astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
+import CTASection from "@components/ui/CTASection.astro";
+import FormattedDate from "@components/ui/FormattedDate.astro";
+import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
+import TechBadge from "@components/ui/TechBadge.astro";
+import ArticleCard from "@components/writing/ArticleCard.astro";
+import JsonLd from "@components/seo/JsonLd.astro";
+import type { Post } from "@lib/content";
+import { cleanPath, readingTime } from "@lib/utils";
+import { siteConfig } from "@config";
+
+interface Props {
+  post: Post;
+  prev?: Post;
+  next?: Post;
+  related: Post[];
+}
+const { post, prev, next, related } = Astro.props;
+const { data } = post;
+const { minutes, words } = readingTime(post.body ?? "");
+const site = Astro.site ?? new URL("http://localhost:4321");
+const url = new URL(cleanPath(Astro.url.pathname), site).toString();
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: data.title,
+  description: data.description,
+  datePublished: data.pubDate.toISOString(),
+  dateModified: (data.updatedDate ?? data.pubDate).toISOString(),
+  author: { "@type": "Person", name: siteConfig.name, url: site.origin },
+  publisher: { "@type": "Person", name: siteConfig.name },
+  mainEntityOfPage: url,
+  url,
+  keywords: data.tags.join(", "),
+  wordCount: words,
+  ...(data.cover ? { image: new URL(data.cover.src, site).toString() } : {}),
+  inLanguage: siteConfig.locale,
+};
+---
+
+<BaseLayout
+  title={data.title}
+  description={data.description}
+  type="article"
+  image={data.cover ? data.cover.src : undefined}
+  imageAlt={data.coverAlt}
+  publishedTime={data.pubDate}
+  modifiedTime={data.updatedDate}
+  tags={data.tags}
+  noindex={data.draft}
+>
+  <article>
+    <header class="container-prose pt-10 sm:pt-14">
+      <Breadcrumbs items={[{ label: "Writing", href: "/writing" }, { label: data.title }]} />
+      <div class="text-fg-subtle mt-8 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-xs">
+        <FormattedDate
+          date={data.pubDate}
+          format={{ year: "numeric", month: "long", day: "numeric" }}
+        />
+        <span aria-hidden="true">·</span>
+        <span class="inline-flex items-center gap-1">
+          <Clock size={12} aria-hidden="true" /> {minutes} min read
+        </span>
+        {data.updatedDate && (
+          <>
+            <span aria-hidden="true">·</span>
+            <span>
+              Updated <FormattedDate date={data.updatedDate} />
+            </span>
+          </>
+        )}
+        {data.draft && <PlaceholderBadge label="Draft" />}
+        {data.placeholder && <PlaceholderBadge label="Sample" />}
+      </div>
+      <h1
+        class="mt-4 text-4xl leading-[1.08] sm:text-5xl"
+        transition:name={`post-title-${post.id}`}
+      >
+        {data.title}
+      </h1>
+      <p class="text-fg-muted mt-5 text-lg leading-relaxed sm:text-xl">{data.description}</p>
+      {data.tags.length > 0 && (
+        <ul class="mt-6 flex flex-wrap gap-2" aria-label="Tags">
+          {data.tags.map((t) => (
+            <li>
+              <TechBadge label={t} size="md" href={`/writing/tags/${t}`} />
+            </li>
+          ))}
+        </ul>
+      )}
+      {data.cover && (
+        <Image
+          src={data.cover}
+          alt={data.coverAlt ?? ""}
+          width={1200}
+          height={675}
+          widths={[600, 900, 1200]}
+          sizes="(min-width: 768px) 720px, 100vw"
+          loading="eager"
+          class="border-border mt-10 aspect-video w-full rounded-card border object-cover"
+        />
+      )}
+    </header>
+
+    <div class="container-prose prose-site py-10 sm:py-12">
+      <slot />
+    </div>
+
+    <footer class="container-prose">
+      <nav
+        aria-label="Adjacent articles"
+        class="border-border grid gap-4 border-t pt-8 sm:grid-cols-2"
+      >
+        {prev ? (
+          <a href={`/writing/${prev.id}`} class="card card-hover group p-5">
+            <span class="text-fg-subtle inline-flex items-center gap-1 font-mono text-xs">
+              <ArrowLeft size={12} aria-hidden="true" /> Previous
+            </span>
+            <span class="text-fg group-hover:text-accent-strong mt-2 block font-medium leading-snug transition-colors">
+              {prev.data.title}
+            </span>
+          </a>
+        ) : (
+          <div />
+        )}
+        {next && (
+          <a href={`/writing/${next.id}`} class="card card-hover group p-5 text-right">
+            <span class="text-fg-subtle inline-flex items-center gap-1 font-mono text-xs">
+              Next <ArrowRight size={12} aria-hidden="true" />
+            </span>
+            <span class="text-fg group-hover:text-accent-strong mt-2 block font-medium leading-snug transition-colors">
+              {next.data.title}
+            </span>
+          </a>
+        )}
+      </nav>
+    </footer>
+
+    {related.length > 0 && (
+      <section class="container-site section" aria-labelledby="related-posts">
+        <h2 id="related-posts" class="mb-8 text-2xl sm:text-3xl">
+          Related posts
+        </h2>
+        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {related.map((p) => (
+            <ArticleCard post={p} />
+          ))}
+        </div>
+      </section>
+    )}
+  </article>
+  <CTASection
+    title="Enjoyed this? Say hello."
+    description="I write when I learn something worth keeping. If a post helped, or you disagree with it, I'd like to hear from you."
+  />
+  <JsonLd data={jsonLd} />
+</BaseLayout>

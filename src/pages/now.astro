@@ -1,0 +1,133 @@
+---
+import { getCollection, render } from "astro:content";
+import { BookOpen, Compass, FlaskConical, Hammer, MapPin, Sparkles } from "lucide-astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
+import CTASection from "@components/ui/CTASection.astro";
+import FormattedDate from "@components/ui/FormattedDate.astro";
+import { getProjects } from "@lib/content";
+
+const [entry] = await getCollection("now");
+if (!entry) throw new Error("Add a file to src/content/now/ to populate the Now page.");
+const { Content } = await render(entry);
+const { data } = entry;
+const projects = await getProjects();
+const sideProjects = data.sideProjects
+  .map((ref) => projects.find((p) => p.id === ref.id))
+  .filter(Boolean);
+---
+
+<BaseLayout
+  title="Now"
+  description="What I'm working on, learning and reading right now."
+  type="profile"
+>
+  <div class="container-prose pt-10 pb-16 sm:pt-14">
+    <Breadcrumbs items={[{ label: "Now" }]} />
+    <p class="eyebrow mt-8 mb-3">Now</p>
+    <h1 class="text-4xl sm:text-5xl">What I'm doing now</h1>
+    <p class="text-fg-subtle mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs">
+      <span>
+        Updated{" "}
+        <FormattedDate
+          date={data.updated}
+          format={{ year: "numeric", month: "long", day: "numeric" }}
+        />
+      </span>
+      {data.location && (
+        <span class="inline-flex items-center gap-1">
+          <MapPin size={12} aria-hidden="true" /> {data.location}
+        </span>
+      )}
+    </p>
+    <div class="text-fg-muted mt-6 text-lg leading-relaxed [&_a]:link-accent">
+      <Content />
+    </div>
+
+    <div class="mt-12 grid gap-5 sm:grid-cols-2">
+      <section class="card p-5 sm:col-span-2" aria-labelledby="now-working">
+        <h2 id="now-working" class="flex items-center gap-2 text-lg">
+          <Hammer size={18} aria-hidden="true" class="text-accent-strong" /> Working on
+        </h2>
+        <ul class="mt-3 space-y-2">
+          {data.working.map((w) => (
+            <li class="text-fg-muted flex gap-3">
+              <span
+                class="bg-accent mt-[0.6em] size-1.5 shrink-0 rounded-full"
+                aria-hidden="true"
+              />
+              {w}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="card p-5" aria-labelledby="now-learning">
+        <h2 id="now-learning" class="flex items-center gap-2 text-lg">
+          <Sparkles size={18} aria-hidden="true" class="text-accent-strong" /> Learning
+        </h2>
+        <ul class="mt-3 space-y-2">
+          {data.learning.map((l) => (
+            <li class="text-fg-muted flex gap-3">
+              <span
+                class="bg-accent mt-[0.6em] size-1.5 shrink-0 rounded-full"
+                aria-hidden="true"
+              />
+              {l}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="card p-5" aria-labelledby="now-reading">
+        <h2 id="now-reading" class="flex items-center gap-2 text-lg">
+          <BookOpen size={18} aria-hidden="true" class="text-accent-strong" /> Reading
+        </h2>
+        <ul class="mt-3 space-y-3">
+          {data.reading.map((r) => (
+            <li>
+              <p class="text-fg font-medium">{r.title}</p>
+              {r.author && <p class="text-fg-subtle text-sm">{r.author}</p>}
+              {r.note && <p class="text-fg-muted mt-1 text-sm">{r.note}</p>}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {sideProjects.length > 0 && (
+        <section class="card p-5" aria-labelledby="now-projects">
+          <h2 id="now-projects" class="flex items-center gap-2 text-lg">
+            <FlaskConical size={18} aria-hidden="true" class="text-accent-strong" /> Side projects
+          </h2>
+          <ul class="mt-3 space-y-2">
+            {sideProjects.map(
+              (p) =>
+                p && (
+                  <li>
+                    <a href={`/projects/${p.id}`} class="link-underline text-fg font-medium">
+                      {p.data.title}
+                    </a>
+                    <p class="text-fg-muted text-sm">{p.data.description}</p>
+                  </li>
+                ),
+            )}
+          </ul>
+        </section>
+      )}
+
+      <section class="card p-5" aria-labelledby="now-interests">
+        <h2 id="now-interests" class="flex items-center gap-2 text-lg">
+          <Compass size={18} aria-hidden="true" class="text-accent-strong" /> Interests
+        </h2>
+        <ul class="mt-3 flex flex-wrap gap-2">
+          {data.interests.map((i) => (
+            <li class="border-border bg-surface-muted text-fg-muted rounded-pill border px-3 py-1 text-sm">
+              {i}
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  </div>
+  <CTASection />
+</BaseLayout>

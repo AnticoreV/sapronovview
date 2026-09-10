@@ -1,0 +1,239 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
+import Button from "@components/ui/Button.astro";
+import CTASection from "@components/ui/CTASection.astro";
+import PlaceholderImage from "@components/ui/PlaceholderImage.astro";
+import SectionHeading from "@components/ui/SectionHeading.astro";
+import SocialLinks from "@components/ui/SocialLinks.astro";
+import TechBadge from "@components/ui/TechBadge.astro";
+import { getIcon } from "@lib/icons";
+import { getHobbies } from "@lib/content";
+import { currentInterests, enjoys, facts, philosophy, values } from "@data/about";
+import { siteConfig } from "@config";
+
+const hobbies = await getHobbies();
+const gallery = [
+  { label: "Portrait", ratio: "4/5", hint: "public/images/about/portrait.jpg" },
+  { label: "In the cockpit", ratio: "4/3", hint: "public/images/about/cockpit.jpg" },
+  { label: "On the road", ratio: "4/3", hint: "public/images/about/road.jpg" },
+  { label: "Somewhere new", ratio: "1/1", hint: "public/images/about/travel.jpg" },
+  { label: "Training", ratio: "1/1", hint: "public/images/about/sport.jpg" },
+];
+---
+
+<BaseLayout
+  title="About"
+  description={`Who ${siteConfig.name} is: career story, how I like to work, what I value, and the hobbies that keep the balance.`}
+  type="profile"
+>
+  <div class="container-site pt-10 sm:pt-14">
+    <Breadcrumbs items={[{ label: "About" }]} />
+  </div>
+
+  <section
+    class="container-site grid gap-10 pt-8 pb-16 lg:grid-cols-[1.2fr_1fr] lg:gap-16"
+    aria-labelledby="about-heading"
+  >
+    <div>
+      <p class="eyebrow mb-3">About</p>
+      <h1 id="about-heading" class="text-4xl leading-[1.05] sm:text-5xl lg:text-6xl">
+        Engineer, pilot in progress, professional passenger of new places.
+      </h1>
+      <div class="text-fg-muted mt-6 space-y-4 text-lg leading-relaxed">
+        <p>
+          I'm {siteConfig.name}, a fullstack software engineer with more than four years in backend
+          and web development. I spend most of my time on the JVM — Java and Kotlin, Spring, and the
+          ecosystem of brokers, caches and identity providers that real systems are made of.
+        </p>
+        <p>
+          The rest of my time goes to things with engines and horizons: ultralight aircraft,
+          motorcycles, and a steadily growing list of countries. None of it is unrelated. Flying
+          rewards preparation and checklists; riding rewards attention; travel rewards curiosity.
+          Those are the same traits I try to bring to a codebase.
+        </p>
+        <p>
+          Right now I'm building{" "}
+          <a href="/projects/ownira" class="link-accent">
+            Ownira
+          </a>{" "}
+          and researching the market possibilities of the{" "}
+          <a href="/projects/apex-line-market-research" class="link-accent">
+            Apex line
+          </a>
+          .
+        </p>
+      </div>
+      <div class="mt-8 flex flex-wrap items-center gap-4">
+        <Button href="/experience" variant="secondary" arrow>
+          Career timeline
+        </Button>
+        <SocialLinks />
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3 self-start">
+      <PlaceholderImage
+        label={gallery[0].label}
+        ratio="4/5"
+        hint={gallery[0].hint}
+        class="col-span-2"
+      />
+      <PlaceholderImage label={gallery[1].label} ratio="4/3" hint={gallery[1].hint} />
+      <PlaceholderImage label={gallery[2].label} ratio="4/3" hint={gallery[2].hint} />
+    </div>
+  </section>
+
+  <section class="border-border bg-surface-muted/60 border-y" aria-labelledby="story-heading">
+    <div class="container-site section reveal grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
+      <div>
+        <p class="eyebrow mb-3">Career story</p>
+        <h2 id="story-heading" class="text-3xl sm:text-4xl">
+          How I got here
+        </h2>
+      </div>
+      <div class="text-fg-muted space-y-4 text-lg leading-relaxed">
+        <p>
+          I started in Java — designing application infrastructure, defining business logic and
+          wiring Hibernate to real databases. Early work included parsers, messenger bots and admin
+          panels: unglamorous, but the fastest way to learn how data actually moves through a
+          company.
+        </p>
+        <p>
+          From there the problems got more distributed. I integrated Redis caching, built custom
+          Kafka and RabbitMQ connectors so services could talk to each other reliably, and
+          implemented OAuth 2.0 authorisation with Spring Security and Keycloak — the identity layer
+          (CIAM, SSO) that every product eventually needs and nobody wants to get wrong. Along the
+          way I picked up performance testing, Dockerising systems and analysing infrastructure that
+          other people had built.
+        </p>
+        <p>
+          On the client side I've shipped an Angular wallet for multi-currency accounts and
+          contributed a kanban board to Faradey, a Matrix-based Android messenger — a reminder that
+          the backend only matters if the thing on the screen works.
+        </p>
+        <p class="border-border-strong bg-surface text-fg-muted rounded-lg border border-dashed px-4 py-3 text-base">
+          [Add the personal part of the story: where you grew up, what got you into computers, the
+          first thing you flew or rode, and where you're based now.]
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="container-site section reveal" aria-labelledby="philosophy-heading">
+    <SectionHeading id="philosophy-heading" eyebrow="How I work" title="Professional philosophy" />
+    <div class="grid gap-4 sm:grid-cols-2">
+      {philosophy.map((p, i) => (
+        <div class="card p-6">
+          <p class="text-fg-subtle font-mono text-xs">0{i + 1}</p>
+          <h3 class="mt-2 text-xl">{p.title}</h3>
+          <p class="text-fg-muted mt-2 leading-relaxed">{p.text}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section
+    class="container-site pb-16 reveal grid gap-10 lg:grid-cols-2 lg:gap-16"
+    aria-label="Areas and values"
+  >
+    <div>
+      <SectionHeading eyebrow="Areas I enjoy" title="What I like working on" />
+      <ul class="flex flex-wrap gap-2">
+        {enjoys.map((e) => (
+          <li>
+            <TechBadge label={e} size="md" />
+          </li>
+        ))}
+      </ul>
+    </div>
+    <div>
+      <SectionHeading eyebrow="Principles" title="What I value" />
+      <dl class="divide-border divide-y">
+        {values.map((v) => (
+          <div class="grid gap-1 py-3 sm:grid-cols-[150px_1fr] sm:gap-4">
+            <dt class="text-fg font-medium">{v.label}</dt>
+            <dd class="text-fg-muted">{v.text}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  <section
+    class="border-border bg-surface-muted/60 border-y"
+    aria-labelledby="hobbies-about-heading"
+  >
+    <div class="container-site section reveal">
+      <SectionHeading
+        id="hobbies-about-heading"
+        eyebrow="Off duty"
+        title="Current interests & hobbies"
+        description="A short version — the full stories and photos live on the hobbies page."
+      >
+        <Button slot="action" href="/hobbies" variant="secondary" size="sm" arrow>
+          Hobbies page
+        </Button>
+      </SectionHeading>
+      <div class="grid gap-8 lg:grid-cols-[1fr_1.4fr]">
+        <ul class="flex flex-wrap gap-2 self-start">
+          {currentInterests.map((i) => (
+            <li class="border-border bg-surface text-fg-muted rounded-pill border px-3.5 py-1.5 text-sm">
+              {i}
+            </li>
+          ))}
+        </ul>
+        <ul class="grid gap-3 sm:grid-cols-2">
+          {hobbies.map((h) => {
+            const Icon = getIcon(h.data.icon);
+            return (
+              <li>
+                <a href={`/hobbies#${h.id}`} class="card card-hover flex items-start gap-3 p-4">
+                  <span class="bg-accent-soft text-accent-strong inline-flex size-9 shrink-0 items-center justify-center rounded-lg">
+                    <Icon size={18} aria-hidden="true" />
+                  </span>
+                  <span>
+                    <span class="text-fg block font-medium">{h.data.title}</span>
+                    <span class="text-fg-muted block text-sm">{h.data.tagline}</span>
+                  </span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="container-site section reveal" aria-labelledby="gallery-heading">
+    <SectionHeading
+      id="gallery-heading"
+      eyebrow="Gallery"
+      title="A few photos"
+      description="Placeholders for now. Drop images into public/images/about/ and swap these frames for <Image /> components."
+    />
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      {gallery.map((g) => (
+        <PlaceholderImage label={g.label} ratio={g.ratio} hint={g.hint} />
+      ))}
+    </div>
+  </section>
+
+  <section class="container-site pb-16 reveal" aria-labelledby="facts-heading">
+    <SectionHeading id="facts-heading" eyebrow="Trivia" title="Interesting facts" />
+    <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {facts.map((f) => {
+        const Icon = getIcon(f.icon);
+        return (
+          <li class="card flex items-start gap-3 p-4">
+            <span class="bg-accent-soft text-accent-strong inline-flex size-9 shrink-0 items-center justify-center rounded-lg">
+              <Icon size={18} aria-hidden="true" />
+            </span>
+            <p class="text-fg-muted">{f.text}</p>
+          </li>
+        );
+      })}
+    </ul>
+  </section>
+
+  <CTASection />
+</BaseLayout>

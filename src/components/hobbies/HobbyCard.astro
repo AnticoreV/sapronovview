@@ -1,0 +1,127 @@
+---
+import { Image } from "astro:assets";
+import { ArrowUpRight } from "lucide-astro";
+import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
+import PlaceholderImage from "@components/ui/PlaceholderImage.astro";
+import { hobbyCategoryLabels, type Hobby } from "@lib/content";
+import { getIcon } from "@lib/icons";
+import { render } from "astro:content";
+
+interface Props {
+  hobby: Hobby;
+  index?: number;
+}
+const { hobby, index = 0 } = Astro.props;
+const { data } = hobby;
+const Icon = getIcon(data.icon);
+const { Content } = await render(hobby);
+const flip = index % 2 === 1;
+---
+
+<article id={hobby.id} class="scroll-mt-24 grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
+  <div class:list={["grid grid-cols-2 gap-3", flip && "lg:order-2"]}>
+    {(data.images.length
+      ? data.images
+      : [{ alt: "Photo placeholder", caption: undefined, src: undefined }]
+    )
+      .slice(0, 4)
+      .map((img, i) => (
+        <figure class:list={[i === 0 && data.images.length !== 2 && "col-span-2"]}>
+          {img.src ? (
+            <Image
+              src={img.src}
+              alt={img.alt}
+              width={i === 0 ? 1200 : 600}
+              height={i === 0 ? 750 : 450}
+              widths={[400, 800, 1200]}
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              class:list={[
+                "border-border w-full rounded-xl border object-cover",
+                i === 0 ? "aspect-[16/10]" : "aspect-[4/3]",
+              ]}
+            />
+          ) : (
+            <PlaceholderImage
+              label={img.alt}
+              ratio={i === 0 ? "16/10" : "4/3"}
+              hint={img.caption}
+            />
+          )}
+          {img.src && img.caption && (
+            <figcaption class="text-fg-subtle mt-1.5 text-xs">{img.caption}</figcaption>
+          )}
+        </figure>
+      ))}
+  </div>
+
+  <div class:list={[flip && "lg:order-1"]}>
+    <div class="flex items-center gap-3">
+      <span class="bg-accent-soft text-accent-strong inline-flex size-11 items-center justify-center rounded-xl">
+        <Icon size={22} aria-hidden="true" />
+      </span>
+      <div>
+        <p class="eyebrow">{hobbyCategoryLabels[data.category]}</p>
+      </div>
+      {data.placeholder && <PlaceholderBadge class="ml-auto" />}
+    </div>
+    <h2 class="mt-4 text-3xl sm:text-4xl">{data.title}</h2>
+    <p class="text-fg-muted mt-2 text-lg">{data.tagline}</p>
+
+    <div class="text-fg-muted mt-5 space-y-3 text-[0.95rem] leading-relaxed [&_a]:link-accent">
+      <Content />
+    </div>
+
+    {data.stats.length > 0 && (
+      <dl class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {data.stats.map((s) => (
+          <div class="border-border bg-surface rounded-xl border px-4 py-3">
+            <dt class="text-fg-subtle font-mono text-[0.68rem] tracking-wider uppercase">
+              {s.label}
+            </dt>
+            <dd class="text-fg mt-1 font-display text-lg font-semibold">{s.value}</dd>
+          </div>
+        ))}
+      </dl>
+    )}
+
+    {data.favorites.length > 0 && (
+      <div class="mt-6">
+        <p class="eyebrow mb-2">Favourites</p>
+        <ul class="text-fg-muted flex flex-wrap gap-x-4 gap-y-1 text-sm">
+          {data.favorites.map((f) => (
+            <li class="flex items-center gap-2">
+              <span class="bg-accent size-1.5 rounded-full" aria-hidden="true" />
+              {f}
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    {(data.relatedProjects.length > 0 || data.links.length > 0) && (
+      <ul class="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+        {data.relatedProjects.map((ref) => (
+          <li>
+            <a href={`/projects/${ref.id}`} class="link-underline text-fg font-medium">
+              Related project ↗
+            </a>
+          </li>
+        ))}
+        {data.links.map((l) => (
+          <li>
+            <a
+              href={l.href}
+              class="link-underline text-fg inline-flex items-center gap-1 font-medium"
+              {...(l.href.startsWith("http")
+                ? { target: "_blank", rel: "noopener noreferrer" }
+                : {})}
+            >
+              {l.label}
+              <ArrowUpRight size={14} aria-hidden="true" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+</article>

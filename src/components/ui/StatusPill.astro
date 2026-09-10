@@ -1,0 +1,36 @@
+---
+/**
+ * Coloured dot + label, used for availability and project status.
+ */
+interface Props {
+  label: string;
+  tone?: "green" | "amber" | "gray" | "accent";
+  pulse?: boolean;
+  class?: string;
+}
+const { label, tone = "green", pulse = false, class: className } = Astro.props;
+const dot = {
+  green: "bg-[oklch(70%_0.17_150)]",
+  amber: "bg-[oklch(78%_0.16_80)]",
+  gray: "bg-fg-subtle",
+  accent: "bg-accent",
+}[tone];
+---
+
+<span
+  class:list={[
+    "border-border bg-surface text-fg-muted inline-flex items-center gap-2 rounded-pill border px-3 py-1 text-xs font-medium",
+    className,
+  ]}
+>
+  <span class="relative flex size-2">
+    {pulse && (
+      <span
+        class:list={["absolute inline-flex size-full animate-ping rounded-full opacity-60", dot]}
+        aria-hidden="true"
+      ></span>
+    )}
+    <span class:list={["relative inline-flex size-2 rounded-full", dot]}></span>
+  </span>
+  {label}
+</span>

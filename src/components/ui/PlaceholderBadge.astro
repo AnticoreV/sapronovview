@@ -1,0 +1,21 @@
+---
+/**
+ * Tiny dashed pill that marks content still containing placeholder text.
+ * Remove `placeholder: true` from the entry's frontmatter to hide it.
+ */
+interface Props {
+  label?: string;
+  class?: string;
+}
+const { label = "Placeholder", class: className } = Astro.props;
+---
+
+<span
+  class:list={[
+    "border-border-strong text-fg-subtle inline-flex items-center gap-1 rounded-pill border border-dashed px-2 py-0.5 font-mono text-[0.65rem] tracking-wider uppercase",
+    className,
+  ]}
+  title="This entry still contains placeholder text"
+>
+  {label}
+</span>

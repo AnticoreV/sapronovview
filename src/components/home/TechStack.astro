@@ -1,0 +1,30 @@
+---
+import SectionHeading from "@components/ui/SectionHeading.astro";
+import TechBadge from "@components/ui/TechBadge.astro";
+import { techStack } from "@config";
+---
+
+<section class="container-site section reveal" aria-labelledby="stack-heading">
+  <SectionHeading
+    id="stack-heading"
+    eyebrow="Toolbox"
+    title="Technologies I reach for"
+    description="Not an exhaustive list — the tools I'm productive with today and would pick for a new project."
+  />
+  <div class="grid gap-4 sm:grid-cols-2">
+    {techStack.map((group) => (
+      <div class="card p-5">
+        <h3 class="text-fg-subtle font-mono text-[0.72rem] tracking-[0.14em] uppercase">
+          {group.group}
+        </h3>
+        <ul class="mt-3 flex flex-wrap gap-2">
+          {group.items.map((item) => (
+            <li>
+              <TechBadge label={item} size="md" />
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+</section>

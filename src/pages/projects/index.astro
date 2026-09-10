@@ -1,0 +1,46 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
+import CTASection from "@components/ui/CTASection.astro";
+import SectionHeading from "@components/ui/SectionHeading.astro";
+import ProjectCard from "@components/projects/ProjectCard.astro";
+import ProjectFilters from "@components/projects/ProjectFilters.astro";
+import { getProjects } from "@lib/content";
+
+const projects = await getProjects();
+---
+
+<BaseLayout
+  title="Projects"
+  description="An archive of professional work, open-source contributions, personal builds and experiments — each written up as an engineering case study."
+>
+  <div class="container-site pt-10 sm:pt-14">
+    <Breadcrumbs items={[{ label: "Projects" }]} />
+    <SectionHeading
+      level={1}
+      eyebrow="Projects"
+      title="Work, experiments and side quests"
+      description="Professional builds, open source, personal projects and the odd research rabbit hole. Filter by category or just scroll."
+      class="mt-8"
+    />
+    <ProjectFilters projects={projects} />
+  </div>
+
+  <section class="container-site pt-8 pb-16" aria-labelledby="all-projects-heading">
+    <h2 id="all-projects-heading" class="sr-only">
+      All projects
+    </h2>
+    <div class="grid gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3" data-project-grid>
+      {projects.map((p, i) => (
+        <ProjectCard project={p} eager={i < 3} />
+      ))}
+    </div>
+    <p class="text-fg-muted py-16 text-center" data-filter-empty hidden>
+      No projects in this category yet.
+    </p>
+  </section>
+  <CTASection
+    title="Have a project in mind?"
+    description="Whether it's a greenfield backend, an identity integration or something that doesn't fit a category yet — let's talk."
+  />
+</BaseLayout>

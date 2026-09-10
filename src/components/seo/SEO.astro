@@ -1,0 +1,122 @@
+---
+/**
+ * All <head> metadata: title, description, canonical, Open Graph, Twitter
+ * cards, RSS discovery, and Person / WebSite structured data.
+ */
+import JsonLd from "@components/seo/JsonLd.astro";
+import { siteConfig } from "@config";
+import { cleanPath } from "@lib/utils";
+
+export interface Props {
+  title: string;
+  description?: string;
+  /** Path or absolute URL of the social image. */
+  image?: string;
+  imageAlt?: string;
+  type?: "website" | "article" | "profile";
+  /** Set to true to prevent indexing (e.g. drafts). */
+  noindex?: boolean;
+  publishedTime?: Date;
+  modifiedTime?: Date;
+  tags?: string[];
+  /** Override the canonical URL (defaults to the current page). */
+  canonical?: string;
+  /** Skip the site-name suffix (used on the homepage). */
+  titleTemplate?: boolean;
+}
+
+const {
+  title,
+  description = siteConfig.description,
+  image = siteConfig.ogImage,
+  imageAlt = `${siteConfig.name} — ${siteConfig.title}`,
+  type = "website",
+  noindex = false,
+  publishedTime,
+  modifiedTime,
+  tags = [],
+  canonical,
+  titleTemplate = true,
+} = Astro.props;
+
+const site = Astro.site ?? new URL("http://localhost:4321");
+const pathname = cleanPath(Astro.url.pathname);
+const canonicalUrl = canonical ?? new URL(pathname, site).toString();
+const imageUrl = new URL(image, site).toString();
+const fullTitle = titleTemplate ? `${title} · ${siteConfig.name}` : title;
+
+const isHome = pathname === "/";
+
+const personLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": `${site.origin}/#person`,
+  name: siteConfig.name,
+  jobTitle: siteConfig.title,
+  description: siteConfig.description,
+  url: site.origin,
+  email: `mailto:${siteConfig.email}`,
+  image: new URL("/images/about/portrait.jpg", site).toString(),
+  sameAs: Object.values(siteConfig.social).filter(Boolean),
+  ...(siteConfig.location && !siteConfig.location.startsWith("[")
+    ? { address: { "@type": "PostalAddress", addressLocality: siteConfig.location } }
+    : {}),
+};
+
+const websiteLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${site.origin}/#website`,
+  name: siteConfig.name,
+  url: site.origin,
+  description: siteConfig.description,
+  inLanguage: siteConfig.locale,
+  publisher: { "@id": `${site.origin}/#person` },
+};
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonicalUrl} />
+<meta name="author" content={siteConfig.name} />
+{noindex ? (
+  <meta name="robots" content="noindex, nofollow" />
+) : (
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+)}
+
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={siteConfig.name} />
+<meta property="og:locale" content={siteConfig.ogLocale} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:image" content={imageUrl} />
+<meta property="og:image:alt" content={imageAlt} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+{publishedTime && <meta property="article:published_time" content={publishedTime.toISOString()} />}
+{modifiedTime && <meta property="article:modified_time" content={modifiedTime.toISOString()} />}
+{type === "article" && <meta property="article:author" content={siteConfig.name} />}
+{tags.map((tag) => (
+  <meta property="article:tag" content={tag} />
+))}
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl} />
+<meta name="twitter:image:alt" content={imageAlt} />
+{siteConfig.twitterHandle && <meta name="twitter:creator" content={siteConfig.twitterHandle} />}
+{siteConfig.twitterHandle && <meta name="twitter:site" content={siteConfig.twitterHandle} />}
+
+<link
+  rel="alternate"
+  type="application/rss+xml"
+  title={`${siteConfig.name} — Writing`}
+  href={new URL("/rss.xml", site).toString()}
+/>
+<link rel="sitemap" href="/sitemap-index.xml" />
+
+{isHome && <JsonLd data={personLd} />}
+{isHome && <JsonLd data={websiteLd} />}

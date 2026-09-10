@@ -1,0 +1,30 @@
+---
+/**
+ * Small pill for a technology / tag name.
+ */
+interface Props {
+  label: string;
+  size?: "sm" | "md";
+  tone?: "neutral" | "accent";
+  href?: string;
+  class?: string;
+}
+const { label, size = "sm", tone = "neutral", href, class: className } = Astro.props;
+const classes = [
+  "inline-flex items-center rounded-pill border font-mono leading-none whitespace-nowrap transition-colors",
+  size === "sm" ? "px-2.5 py-1 text-[0.7rem]" : "px-3 py-1.5 text-xs",
+  tone === "accent"
+    ? "border-accent/30 bg-accent-soft text-accent-strong"
+    : "border-border bg-surface-muted text-fg-muted",
+  href && "hover:border-border-strong hover:text-fg",
+  className,
+];
+---
+
+{href ? (
+  <a href={href} class:list={classes}>
+    {label}
+  </a>
+) : (
+  <span class:list={classes}>{label}</span>
+)}

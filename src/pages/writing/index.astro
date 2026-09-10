@@ -1,0 +1,72 @@
+---
+import { Rss } from "lucide-astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
+import CTASection from "@components/ui/CTASection.astro";
+import SectionHeading from "@components/ui/SectionHeading.astro";
+import ArticleCard from "@components/writing/ArticleCard.astro";
+import TagList from "@components/writing/TagList.astro";
+import { getAllTags, getPosts } from "@lib/content";
+
+const posts = await getPosts();
+const tags = await getAllTags(posts);
+const featured = posts.filter((p) => p.data.featured).slice(0, 2);
+const rest = posts.filter((p) => !featured.includes(p));
+---
+
+<BaseLayout
+  title="Writing"
+  description="Engineering notes on the JVM, identity and messaging — plus lessons from ultralight flying, motorcycles and the road."
+>
+  <div class="container-site pt-10 sm:pt-14">
+    <Breadcrumbs items={[{ label: "Writing" }]} />
+    <SectionHeading
+      level={1}
+      eyebrow="Writing"
+      title="Notes & articles"
+      description="Things I learned the hard way, written down so I don't have to learn them twice."
+      class="mt-8"
+    >
+      <a
+        slot="action"
+        href="/rss.xml"
+        class="text-fg-muted hover:text-fg inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+      >
+        <Rss size={16} aria-hidden="true" /> RSS
+      </a>
+    </SectionHeading>
+    <TagList tags={tags} />
+  </div>
+
+  {featured.length > 0 && (
+    <section class="container-site pt-10" aria-labelledby="featured-posts">
+      <h2 id="featured-posts" class="sr-only">
+        Featured
+      </h2>
+      <div class="grid gap-5 sm:grid-cols-2">
+        {featured.map((post) => (
+          <ArticleCard post={post} />
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="container-site pt-12 pb-16" aria-labelledby="all-posts">
+    <h2 id="all-posts" class="eyebrow mb-6">
+      All posts
+    </h2>
+    {rest.length > 0 ? (
+      <div class="max-w-3xl">
+        {rest.map((post) => (
+          <ArticleCard post={post} variant="row" />
+        ))}
+      </div>
+    ) : (
+      <p class="text-fg-muted">More soon.</p>
+    )}
+  </section>
+  <CTASection
+    title="Got a topic in mind?"
+    description="If there's something you'd like me to write about, or a post you want to argue with, my inbox is open."
+  />
+</BaseLayout>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" role="img" aria-label="Placeholder architecture diagram">
+  <rect width="1200" height="600" rx="24" fill="#f4f2ef"/>
+  <rect x="1" y="1" width="1198" height="598" rx="23" fill="none" stroke="#c9c3bb" stroke-width="2" stroke-dasharray="10 8"/>
+  <g font-family="Menlo, Consolas, monospace" fill="#8a837b" text-anchor="middle">
+    <text x="600" y="280" font-size="22" letter-spacing="4">ARCHITECTURE DIAGRAM PLACEHOLDER</text>
+    <text x="600" y="320" font-size="16">Replace public/images/projects/placeholder-architecture.svg</text>
+  </g>
+  <g fill="none" stroke="#c9c3bb" stroke-width="2">
+    <rect x="180" y="420" width="200" height="70" rx="12"/>
+    <rect x="500" y="420" width="200" height="70" rx="12"/>
+    <rect x="820" y="420" width="200" height="70" rx="12"/>
+    <path d="M380 455h120M700 455h120" stroke-dasharray="6 6"/>
+  </g>
+  <g font-family="Menlo, Consolas, monospace" font-size="14" fill="#8a837b" text-anchor="middle">
+    <text x="280" y="460">client</text><text x="600" y="460">api</text><text x="920" y="460">database</text>
+  </g>
+</svg>

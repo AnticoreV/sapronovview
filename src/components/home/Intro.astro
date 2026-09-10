@@ -1,0 +1,46 @@
+---
+import { Sparkles } from "lucide-astro";
+import Button from "@components/ui/Button.astro";
+import { siteConfig } from "@config";
+---
+
+<section class="container-site section reveal" aria-labelledby="intro-heading">
+  <div class="grid gap-10 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
+    <div>
+      <p class="eyebrow mb-3">About</p>
+      <h2 id="intro-heading" class="text-3xl sm:text-4xl">
+        Backend by trade, builder by habit.
+      </h2>
+    </div>
+    <div class="text-fg-muted space-y-4 text-lg leading-relaxed">
+      <p>
+        I'm a fullstack engineer with 4+ years in backend and web development. Most of that time has
+        gone into distributed systems on the JVM — REST APIs, identity with OAuth and Keycloak,
+        Kafka and RabbitMQ connectors, Redis caching, and the Docker plumbing that makes it all run
+        the same way on every laptop.
+      </p>
+      <p>
+        I like problems that sit between disciplines: a messenger that needs a task board, a wallet
+        that needs to be correct to the cent, a routing service that has to work on real roads.
+        Lately that has meant building{" "}
+        <a href="/projects/ownira" class="link-accent">
+          Ownira
+        </a>{" "}
+        and researching the{" "}
+        <a href="/projects/apex-line-market-research" class="link-accent">
+          Apex line
+        </a>
+        .
+      </p>
+      <div class="card flex items-start gap-3 p-4 text-base">
+        <Sparkles size={18} aria-hidden="true" class="text-accent-strong mt-0.5 shrink-0" />
+        <p>
+          <span class="text-fg font-medium">Current focus:</span> {siteConfig.currentFocus}
+        </p>
+      </div>
+      <Button href="/about" variant="ghost" size="sm" arrow class="-ml-3">
+        More about me
+      </Button>
+    </div>
+  </div>
+</section>

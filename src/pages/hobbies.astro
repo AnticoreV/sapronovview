@@ -1,0 +1,53 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
+import CTASection from "@components/ui/CTASection.astro";
+import SectionHeading from "@components/ui/SectionHeading.astro";
+import HobbyCard from "@components/hobbies/HobbyCard.astro";
+import { getHobbies } from "@lib/content";
+import { getIcon } from "@lib/icons";
+
+const hobbies = await getHobbies();
+---
+
+<BaseLayout
+  title="Hobbies"
+  description="Sport, ultralight aviation, motorcycles, adventures and country visiting — the part of the site that isn't a résumé."
+>
+  <div class="container-site pt-10 sm:pt-14">
+    <Breadcrumbs items={[{ label: "Hobbies" }]} />
+    <SectionHeading
+      level={1}
+      eyebrow="Off duty"
+      title="Wings, wheels and wanderlust"
+      description="The things I do when the laptop is closed. Photos are placeholders for now — real ones coming soon."
+      class="mt-8"
+    />
+    <nav aria-label="Jump to hobby" class="flex flex-wrap gap-2">
+      {hobbies.map((h) => {
+        const Icon = getIcon(h.data.icon);
+        return (
+          <a
+            href={`#${h.id}`}
+            class="border-border bg-surface text-fg-muted hover:border-border-strong hover:text-fg inline-flex items-center gap-2 rounded-pill border px-3.5 py-2 text-sm font-medium transition-colors"
+          >
+            <Icon size={15} aria-hidden="true" /> {h.data.title}
+          </a>
+        );
+      })}
+    </nav>
+  </div>
+
+  <div class="container-site space-y-20 py-16 sm:space-y-28 sm:py-20">
+    {hobbies.map((hobby, i) => (
+      <div class="reveal">
+        <HobbyCard hobby={hobby} index={i} />
+      </div>
+    ))}
+  </div>
+  <CTASection
+    title="Fly, ride or travel together?"
+    description="If you're a pilot, a rider or just planning a trip somewhere I haven't been — I'd genuinely like to hear about it."
+    primaryLabel="Say hello"
+  />
+</BaseLayout>

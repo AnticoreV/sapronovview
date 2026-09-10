@@ -1,0 +1,65 @@
+---
+import { Rss } from "lucide-astro";
+import SocialLinks from "@components/ui/SocialLinks.astro";
+import { navigation, siteConfig } from "@config";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="border-border mt-auto border-t">
+  <div class="container-site py-12 sm:py-16">
+    <div class="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+      <div>
+        <p class="font-display text-lg font-semibold tracking-tight">{siteConfig.name}</p>
+        <p class="text-fg-muted mt-2 max-w-sm text-sm leading-relaxed">
+          {siteConfig.title}. Part portfolio, part résumé, part logbook.
+        </p>
+        <SocialLinks class="mt-5" />
+      </div>
+      <nav aria-label="Footer">
+        <p class="eyebrow mb-4">Pages</p>
+        <ul class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+          {navigation.map((item) => (
+            <li>
+              <a href={item.href} class="link-underline text-fg-muted hover:text-fg">
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <div>
+        <p class="eyebrow mb-4">Elsewhere</p>
+        <ul class="space-y-2 text-sm">
+          <li>
+            <a
+              href={`mailto:${siteConfig.email}`}
+              class="link-underline text-fg-muted hover:text-fg break-all"
+            >
+              {siteConfig.email}
+            </a>
+          </li>
+          <li>
+            <a
+              href="/rss.xml"
+              class="link-underline text-fg-muted hover:text-fg inline-flex items-center gap-1.5"
+            >
+              <Rss size={14} aria-hidden="true" /> RSS feed
+            </a>
+          </li>
+          <li>
+            <a href="/now" class="link-underline text-fg-muted hover:text-fg">
+              What I'm doing now
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-border text-fg-subtle mt-12 flex flex-col gap-2 border-t pt-6 text-xs sm:flex-row sm:items-center sm:justify-between">
+      <p>
+        © {year} {siteConfig.name}. All rights reserved.
+      </p>
+      <p class="font-mono">Built with Astro · No trackers · Minimal JavaScript</p>
+    </div>
+  </div>
+</footer>

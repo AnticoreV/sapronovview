@@ -1,0 +1,199 @@
+---
+import { Copy, Mail } from "lucide-astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
+import Button from "@components/ui/Button.astro";
+import SocialLinks from "@components/ui/SocialLinks.astro";
+import { siteConfig } from "@config";
+
+/**
+ * Contact form provider.
+ * The form is fully functional markup that posts to `FORM_ACTION`.
+ * - Formspree: set FORM_ACTION to "https://formspree.io/f/<your-id>"
+ * - Netlify Forms: keep action="/contact", add `data-netlify="true"` on the form
+ * - Cloudflare / custom: point to your endpoint
+ * Until configured, the form renders but submissions go nowhere.
+ */
+const FORM_ACTION = "https://formspree.io/f/YOUR_FORM_ID";
+const formConfigured = !FORM_ACTION.includes("YOUR_FORM_ID");
+
+const reasons = [
+  {
+    title: "Backend & platform work",
+    text: "JVM services, identity (OAuth / Keycloak), messaging, Docker-first infrastructure.",
+  },
+  {
+    title: "Product collaboration",
+    text: "You have an idea that needs an engineer who cares about the whole thing, not just the API.",
+  },
+  {
+    title: "Ownira & the Apex line",
+    text: "Partners, customers or fellow researchers — I'd love to compare notes.",
+  },
+  {
+    title: "Flying, riding, travelling",
+    text: "Pilots, riders and travellers are always welcome. Route recommendations doubly so.",
+  },
+];
+---
+
+<BaseLayout
+  title="Contact"
+  description={`Get in touch with ${siteConfig.name} about backend work, product collaboration, Ownira, or a shared love of aircraft and motorcycles.`}
+>
+  <div class="container-site pt-10 pb-16 sm:pt-14">
+    <Breadcrumbs items={[{ label: "Contact" }]} />
+    <div class="mt-8 grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+      <div>
+        <p class="eyebrow mb-3">Contact</p>
+        <h1 class="text-4xl sm:text-5xl">Let's talk.</h1>
+        <p class="text-fg-muted mt-5 max-w-md text-lg leading-relaxed">
+          The fastest way to reach me is email. I read everything and reply to most things within a
+          couple of days.
+        </p>
+
+        <div class="card mt-8 flex flex-wrap items-center gap-3 p-4">
+          <span class="bg-accent-soft text-accent-strong inline-flex size-10 shrink-0 items-center justify-center rounded-lg">
+            <Mail size={18} aria-hidden="true" />
+          </span>
+          <a
+            href={`mailto:${siteConfig.email}`}
+            class="link-underline text-fg min-w-0 flex-1 truncate font-medium"
+          >
+            {siteConfig.email}
+          </a>
+          <button
+            type="button"
+            data-copy-email={siteConfig.email}
+            class="text-fg-muted hover:bg-surface-muted hover:text-fg inline-flex h-9 items-center gap-1.5 rounded-pill px-3 text-sm transition-colors"
+            aria-label="Copy email address"
+          >
+            <Copy size={14} aria-hidden="true" /> <span data-copy-label>Copy</span>
+          </button>
+        </div>
+
+        <p class="eyebrow mt-10 mb-3">Elsewhere</p>
+        <SocialLinks labels />
+
+        <p class="eyebrow mt-10 mb-4">Good reasons to reach out</p>
+        <ul class="space-y-4">
+          {reasons.map((r) => (
+            <li class="flex gap-3">
+              <span class="bg-accent mt-2 size-1.5 shrink-0 rounded-full" aria-hidden="true" />
+              <div>
+                <p class="text-fg font-medium">{r.title}</p>
+                <p class="text-fg-muted text-sm">{r.text}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="card p-6 sm:p-8">
+        <h2 class="text-2xl">Send a message</h2>
+        {!formConfigured && (
+          <p class="border-border-strong bg-surface-muted text-fg-muted mt-3 rounded-lg border border-dashed px-3 py-2 text-sm">
+            <strong class="text-fg">Form not connected yet.</strong> Set{" "}
+            <code class="font-mono text-xs">FORM_ACTION</code> in{" "}
+            <code class="font-mono text-xs">src/pages/contact.astro</code> to a Formspree / Netlify
+            endpoint. Until then, please use email.
+          </p>
+        )}
+        <form action={FORM_ACTION} method="POST" class="mt-6 grid gap-5" data-contact-form>
+          <div class="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label for="name" class="text-fg mb-1.5 block text-sm font-medium">
+                Name
+              </label>
+              <input id="name" name="name" type="text" required autocomplete="name" class="field" />
+            </div>
+            <div>
+              <label for="email" class="text-fg mb-1.5 block text-sm font-medium">
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                autocomplete="email"
+                class="field"
+              />
+            </div>
+          </div>
+          <div>
+            <label for="reason" class="text-fg mb-1.5 block text-sm font-medium">
+              What is this about?
+            </label>
+            <select id="reason" name="reason" class="field">
+              <option value="work">Backend / platform work</option>
+              <option value="product">Product collaboration</option>
+              <option value="ownira">Ownira / Apex line</option>
+              <option value="hobbies">Flying, riding or travel</option>
+              <option value="other">Something else</option>
+            </select>
+          </div>
+          <div>
+            <label for="message" class="text-fg mb-1.5 block text-sm font-medium">
+              Message
+            </label>
+            <textarea
+              id="message"
+              name="message"
+              rows="6"
+              required
+              class="field resize-y"
+            ></textarea>
+          </div>
+          {/* Honeypot for bots — hidden from users and screen readers. */}
+          <div class="hidden" aria-hidden="true">
+            <label for="_gotcha">Leave this empty</label>
+            <input id="_gotcha" name="_gotcha" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <p class="text-fg-subtle text-xs">
+              No newsletter, no tracking. Just a message to my inbox.
+            </p>
+            <Button type="submit" arrow>
+              Send message
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  @reference "@styles/global.css";
+  .field {
+    @apply w-full rounded-lg border border-border bg-bg px-3.5 py-2.5 text-sm text-fg transition-colors placeholder:text-fg-subtle;
+  }
+  .field:hover {
+    @apply border-border-strong;
+  }
+  .field:focus {
+    @apply border-accent ring-2 ring-accent/30 outline-none;
+  }
+</style>
+
+<script>
+  function setupCopyEmail() {
+    document.querySelectorAll<HTMLButtonElement>("[data-copy-email]").forEach((button) => {
+      if (button.dataset.bound) return;
+      button.dataset.bound = "true";
+      const label = button.querySelector<HTMLElement>("[data-copy-label]");
+      button.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(button.dataset.copyEmail ?? "");
+          if (label) label.textContent = "Copied";
+          setTimeout(() => label && (label.textContent = "Copy"), 1800);
+        } catch {
+          if (label) label.textContent = "Select & copy";
+        }
+      });
+    });
+  }
+  setupCopyEmail();
+  document.addEventListener("astro:page-load", setupCopyEmail);
+</script>

@@ -1,0 +1,37 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Hero from "@components/home/Hero.astro";
+import SelectedProjects from "@components/home/SelectedProjects.astro";
+import Intro from "@components/home/Intro.astro";
+import CareerHighlights from "@components/home/CareerHighlights.astro";
+import TechStack from "@components/home/TechStack.astro";
+import LatestWriting from "@components/home/LatestWriting.astro";
+import HobbiesStrip from "@components/home/HobbiesStrip.astro";
+import CTASection from "@components/ui/CTASection.astro";
+import { getFeaturedProjects, getHobbies, getPositions, getPosts } from "@lib/content";
+import { siteConfig } from "@config";
+
+const [projects, positions, posts, hobbies] = await Promise.all([
+  getFeaturedProjects(4),
+  getPositions(),
+  getPosts(),
+  getHobbies(),
+]);
+const highlights = positions.filter((p) => p.data.highlight).slice(0, 3);
+---
+
+<BaseLayout
+  title={`${siteConfig.name} — ${siteConfig.title}`}
+  titleTemplate={false}
+  description={siteConfig.description}
+  type="profile"
+>
+  <Hero />
+  <SelectedProjects projects={projects} />
+  <Intro />
+  <CareerHighlights positions={highlights.length ? highlights : positions.slice(0, 3)} />
+  <TechStack />
+  <LatestWriting posts={posts.slice(0, 3)} />
+  <HobbiesStrip hobbies={hobbies.filter((h) => h.data.featured).slice(0, 4)} />
+  <CTASection />
+</BaseLayout>

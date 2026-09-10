@@ -1,0 +1,346 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* ------------------------------------------------------------------ */
+/* Dark mode: class-based so the toggle wins over the OS preference.   */
+/* ------------------------------------------------------------------ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ------------------------------------------------------------------ */
+/* Design tokens                                                        */
+/*                                                                      */
+/* Raw values live on :root / .dark. Tailwind reads them through the   */
+/* `@theme inline` block below, so utilities like `bg-surface` or      */
+/* `text-accent` automatically follow the active theme.                */
+/*                                                                      */
+/* To change the accent colour, edit --accent-* in both blocks.        */
+/* ------------------------------------------------------------------ */
+:root {
+  color-scheme: light;
+
+  --bg: oklch(98.6% 0.004 80);
+  --surface: oklch(100% 0 0);
+  --surface-muted: oklch(96.4% 0.006 75);
+  --surface-strong: oklch(93% 0.008 75);
+
+  --fg: oklch(21% 0.012 55);
+  --fg-muted: oklch(46% 0.016 55);
+  --fg-subtle: oklch(53% 0.014 55);
+
+  --border: oklch(90.5% 0.008 70);
+  --border-strong: oklch(83% 0.012 70);
+
+  /* Signal orange — a nod to aviation and the open road. */
+  --accent: oklch(58% 0.19 40);
+  --accent-strong: oklch(50% 0.18 40);
+  --accent-soft: oklch(95.5% 0.03 55);
+  --accent-glow: oklch(75% 0.16 50 / 0.35);
+  --on-accent: oklch(99% 0 0);
+
+  --ring: oklch(58% 0.19 40);
+  --selection: oklch(90% 0.07 55);
+
+  --shadow-color: oklch(30% 0.02 55 / 0.08);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --bg: oklch(15.5% 0.008 60);
+  --surface: oklch(19% 0.009 60);
+  --surface-muted: oklch(23% 0.01 60);
+  --surface-strong: oklch(28% 0.012 60);
+
+  --fg: oklch(94.5% 0.006 80);
+  --fg-muted: oklch(71% 0.012 70);
+  --fg-subtle: oklch(65% 0.012 70);
+
+  --border: oklch(27% 0.01 60);
+  --border-strong: oklch(35% 0.012 60);
+
+  --accent: oklch(75% 0.17 48);
+  --accent-strong: oklch(81% 0.15 58);
+  --accent-soft: oklch(27% 0.05 45);
+  --accent-glow: oklch(70% 0.17 48 / 0.3);
+  --on-accent: oklch(16% 0.02 45);
+
+  --ring: oklch(75% 0.17 48);
+  --selection: oklch(38% 0.08 45);
+
+  --shadow-color: oklch(0% 0 0 / 0.45);
+}
+
+@theme inline {
+  --color-*: initial;
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-strong: var(--surface-strong);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-ring: var(--ring);
+  --color-white: #fff;
+  --color-black: #000;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --font-display: var(--font-family-display);
+  --font-sans: var(--font-family-sans);
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+
+  --radius-card: 1.25rem;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 1px 2px var(--shadow-color), 0 8px 24px -12px var(--shadow-color);
+  --shadow-card-hover: 0 2px 4px var(--shadow-color), 0 18px 40px -16px var(--shadow-color);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-fade-up: fade-up 0.7s var(--ease-out-soft) both;
+  --animate-fade-in: fade-in 0.6s ease-out both;
+
+  --breakpoint-xs: 30rem;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Base                                                                 */
+/* ------------------------------------------------------------------ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-bg font-sans text-fg antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+    text-rendering: optimizeLegibility;
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease;
+  }
+
+  ::selection {
+    background: var(--selection);
+    color: var(--fg);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display font-semibold tracking-tight text-fg;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    @apply ring-2 ring-ring ring-offset-2 ring-offset-bg outline-none;
+    border-radius: 0.375rem;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+    border: 2px solid var(--bg);
+  }
+
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Components                                                           */
+/* ------------------------------------------------------------------ */
+@layer components {
+  .container-site {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
+  }
+
+  .container-prose {
+    @apply mx-auto w-full max-w-3xl px-5 sm:px-8;
+  }
+
+  .section {
+    @apply py-16 sm:py-20 lg:py-24;
+  }
+
+  .eyebrow {
+    @apply font-mono text-[0.72rem] font-medium tracking-[0.16em] text-accent-strong uppercase;
+  }
+
+  .card {
+    @apply rounded-card border border-border bg-surface shadow-card;
+    transition:
+      transform 0.35s var(--ease-out-soft),
+      box-shadow 0.35s var(--ease-out-soft),
+      border-color 0.25s ease;
+  }
+
+  .card-hover:hover {
+    @apply border-border-strong shadow-card-hover;
+    transform: translateY(-3px);
+  }
+
+  .link-underline {
+    @apply relative inline-block;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.3s var(--ease-out-soft);
+  }
+  .link-underline:hover,
+  .link-underline:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  .link-accent {
+    @apply text-accent-strong underline decoration-accent/50 decoration-1 underline-offset-4 transition-colors hover:decoration-accent-strong;
+  }
+
+  .grid-bg {
+    background-image:
+      linear-gradient(to right, var(--border) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 30%, transparent 100%);
+  }
+
+  .accent-glow {
+    background: radial-gradient(60% 50% at 50% 0%, var(--accent-glow), transparent 70%);
+  }
+
+  /* Prose: map Tailwind Typography onto our tokens. */
+  .prose-site {
+    @apply prose prose-lg max-w-none;
+    --tw-prose-body: var(--fg-muted);
+    --tw-prose-headings: var(--fg);
+    --tw-prose-lead: var(--fg-muted);
+    --tw-prose-links: var(--accent-strong);
+    --tw-prose-bold: var(--fg);
+    --tw-prose-counters: var(--fg-subtle);
+    --tw-prose-bullets: var(--border-strong);
+    --tw-prose-hr: var(--border);
+    --tw-prose-quotes: var(--fg);
+    --tw-prose-quote-borders: var(--accent);
+    --tw-prose-captions: var(--fg-subtle);
+    --tw-prose-code: var(--fg);
+    --tw-prose-pre-code: var(--fg);
+    --tw-prose-pre-bg: var(--surface-muted);
+    --tw-prose-th-borders: var(--border-strong);
+    --tw-prose-td-borders: var(--border);
+  }
+  .prose-site :where(h2, h3, h4) {
+    @apply font-display tracking-tight;
+    scroll-margin-top: 6rem;
+  }
+  .prose-site :where(a) {
+    @apply decoration-accent/40 underline-offset-4 transition-colors hover:text-accent;
+  }
+  .prose-site :where(code):not(pre code) {
+    @apply rounded-md border border-border bg-surface-muted px-1.5 py-0.5 font-mono text-[0.85em] font-normal;
+  }
+  .prose-site :where(code):not(pre code)::before,
+  .prose-site :where(code):not(pre code)::after {
+    content: none;
+  }
+  .prose-site :where(pre) {
+    @apply rounded-xl border border-border text-sm;
+  }
+  .prose-site :where(img) {
+    @apply rounded-xl border border-border;
+  }
+  .prose-site :where(blockquote p:first-of-type)::before,
+  .prose-site :where(blockquote p:last-of-type)::after {
+    content: none;
+  }
+}
+
+/* Shiki dual themes */
+.dark .astro-code,
+.dark .astro-code span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* Motion                                                               */
+/*                                                                      */
+/* Section reveal uses CSS scroll-driven animations — zero JavaScript. */
+/* Browsers without support simply show the content.                   */
+/* ------------------------------------------------------------------ */
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: fade-up linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 28%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    animation: none;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* View transitions: keep the header pinned during page swaps. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.22s;
+}

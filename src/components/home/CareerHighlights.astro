@@ -1,0 +1,38 @@
+---
+import Button from "@components/ui/Button.astro";
+import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
+import SectionHeading from "@components/ui/SectionHeading.astro";
+import type { Position } from "@lib/content";
+import { formatMonthYear } from "@lib/utils";
+
+interface Props {
+  positions: Position[];
+}
+const { positions } = Astro.props;
+---
+
+<section class="border-border bg-surface-muted/60 border-y">
+  <div class="container-site section reveal" aria-labelledby="career-heading">
+    <SectionHeading id="career-heading" eyebrow="Career" title="Where I've worked">
+      <Button slot="action" href="/experience" variant="secondary" size="sm" arrow>
+        Full timeline
+      </Button>
+    </SectionHeading>
+    <ol class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {positions.map(({ data }) => (
+        <li class="card p-5">
+          <p class="text-fg-subtle font-mono text-xs">
+            {formatMonthYear(data.startDate)} —{" "}
+            {data.endDate ? formatMonthYear(data.endDate) : "Present"}
+          </p>
+          <h3 class="mt-2 text-lg">{data.role}</h3>
+          <p class="text-fg-muted text-sm">{data.company}</p>
+          {data.achievements[0] && (
+            <p class="text-fg-muted mt-3 text-sm leading-relaxed">{data.achievements[0]}</p>
+          )}
+          {data.placeholder && <PlaceholderBadge class="mt-3" />}
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>

@@ -1,0 +1,88 @@
+---
+/**
+ * Category filter for the project archive. Works without JavaScript (all
+ * projects are visible), and a small script hides non-matching cards
+ * when a filter is chosen. The chosen filter is reflected in the URL hash.
+ */
+import { categoryLabels, type Project } from "@lib/content";
+
+interface Props {
+  projects: Project[];
+}
+const { projects } = Astro.props;
+const counts = new Map<string, number>();
+for (const p of projects) counts.set(p.data.category, (counts.get(p.data.category) ?? 0) + 1);
+const categories = (Object.keys(categoryLabels) as Array<keyof typeof categoryLabels>).filter((c) =>
+  counts.has(c),
+);
+---
+
+<div
+  class="flex flex-wrap items-center gap-2"
+  role="group"
+  aria-label="Filter projects by category"
+  data-project-filters
+>
+  <button type="button" data-filter="all" aria-pressed="true" class="filter-chip">
+    All <span class="text-fg-subtle ml-1 font-mono text-[0.7rem]">{projects.length}</span>
+  </button>
+  {categories.map((c) => (
+    <button type="button" data-filter={c} aria-pressed="false" class="filter-chip">
+      {categoryLabels[c]}{" "}
+      <span class="text-fg-subtle ml-1 font-mono text-[0.7rem]">{counts.get(c)}</span>
+    </button>
+  ))}
+  <p class="sr-only" aria-live="polite" data-filter-status></p>
+</div>
+
+<style>
+  @reference "@styles/global.css";
+  .filter-chip {
+    @apply inline-flex h-9 items-center rounded-pill border border-border bg-surface px-3.5 text-sm font-medium text-fg-muted transition-colors;
+  }
+  .filter-chip:hover {
+    @apply border-border-strong text-fg;
+  }
+  .filter-chip[aria-pressed="true"] {
+    @apply border-fg bg-fg text-bg;
+  }
+</style>
+
+<script>
+  function setupProjectFilters() {
+    const root = document.querySelector<HTMLElement>("[data-project-filters]");
+    const grid = document.querySelector<HTMLElement>("[data-project-grid]");
+    if (!root || !grid || root.dataset.bound) return;
+    root.dataset.bound = "true";
+
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>("[data-filter]")];
+    const status = root.querySelector<HTMLElement>("[data-filter-status]");
+    const cards = [...grid.querySelectorAll<HTMLElement>("[data-category]")];
+
+    const apply = (filter: string) => {
+      let shown = 0;
+      cards.forEach((card) => {
+        const match = filter === "all" || card.dataset.category === filter;
+        card.hidden = !match;
+        if (match) shown++;
+      });
+      buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.filter === filter)));
+      if (status) status.textContent = `${shown} project${shown === 1 ? "" : "s"} shown`;
+      const empty = grid.parentElement?.querySelector<HTMLElement>("[data-filter-empty]");
+      if (empty) empty.hidden = shown !== 0;
+    };
+
+    buttons.forEach((b) =>
+      b.addEventListener("click", () => {
+        const filter = b.dataset.filter ?? "all";
+        history.replaceState(null, "", filter === "all" ? location.pathname : `#${filter}`);
+        apply(filter);
+      }),
+    );
+
+    const initial = location.hash.slice(1);
+    if (initial && buttons.some((b) => b.dataset.filter === initial)) apply(initial);
+  }
+  setupProjectFilters();
+  document.addEventListener("astro:page-load", setupProjectFilters);
+</script>

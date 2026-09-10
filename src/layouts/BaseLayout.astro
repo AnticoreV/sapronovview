@@ -1,0 +1,70 @@
+---
+/**
+ * Root layout: <head> (fonts, SEO, theme bootstrap), header, footer,
+ * skip link and view transitions.
+ */
+import { ClientRouter } from "astro:transitions";
+import { Font } from "astro:assets";
+import SEO, { type Props as SEOProps } from "@components/seo/SEO.astro";
+import Header from "@components/layout/Header.astro";
+import Footer from "@components/layout/Footer.astro";
+import { siteConfig } from "@config";
+import "@styles/global.css";
+
+interface Props extends SEOProps {
+  /** Extra classes for <main>. */
+  class?: string;
+}
+const { class: className, ...seo } = Astro.props;
+---
+
+<!doctype html>
+<html lang={siteConfig.locale} class="scroll-pt-24">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#fbfaf8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#151311" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    {/* Theme bootstrap — runs before paint to avoid a flash of the wrong theme. */}
+    <script is:inline>
+      (() => {
+        const applyTheme = () => {
+          try {
+            const stored = localStorage.getItem("theme");
+            const dark = stored
+              ? stored === "dark"
+              : window.matchMedia("(prefers-color-scheme: dark)").matches;
+            document.documentElement.classList.toggle("dark", dark);
+          } catch {
+            /* storage unavailable */
+          }
+        };
+        applyTheme();
+        document.addEventListener("astro:after-swap", applyTheme);
+      })();
+    </script>
+    <Font cssVariable="--font-family-display" preload />
+    <Font cssVariable="--font-family-sans" preload />
+
+    <SEO {...seo} />
+    <ClientRouter fallback="swap" />
+  </head>
+  <body class="flex min-h-dvh flex-col">
+    <a
+      href="#main"
+      class="bg-accent text-on-accent sr-only rounded-pill px-4 py-2 font-medium focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50"
+    >
+      Skip to content
+    </a>
+    <Header />
+    <main id="main" class:list={["flex-1", className]} tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

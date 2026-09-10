@@ -1,0 +1,58 @@
+---
+/**
+ * Icon links to the profiles configured in `siteConfig.social`.
+ * Entries with an empty URL are skipped automatically.
+ */
+import { Github, Instagram, Linkedin, Mail, Send, Twitter, Youtube } from "lucide-astro";
+import { siteConfig, type SocialKey } from "@config";
+
+interface Props {
+  size?: number;
+  /** Show the text label next to the icon. */
+  labels?: boolean;
+  includeEmail?: boolean;
+  class?: string;
+}
+const { size = 18, labels = false, includeEmail = true, class: className } = Astro.props;
+
+const meta: Record<SocialKey, { label: string; icon: typeof Github }> = {
+  github: { label: "GitHub", icon: Github },
+  linkedin: { label: "LinkedIn", icon: Linkedin },
+  twitter: { label: "X (Twitter)", icon: Twitter },
+  instagram: { label: "Instagram", icon: Instagram },
+  telegram: { label: "Telegram", icon: Send },
+  youtube: { label: "YouTube", icon: Youtube },
+};
+
+type Link = { key: string; href: string; label: string; icon: typeof Github };
+
+const links: Link[] = (Object.keys(meta) as SocialKey[])
+  .filter((key) => siteConfig.social[key])
+  .map((key) => ({ key, href: siteConfig.social[key] as string, ...meta[key] }));
+
+if (includeEmail && siteConfig.email) {
+  links.push({ key: "email", href: `mailto:${siteConfig.email}`, label: "Email", icon: Mail });
+}
+---
+
+<ul class:list={["flex flex-wrap items-center gap-2", className]}>
+  {links.map(({ href, label, icon: Icon }) => (
+    <li>
+      <a
+        href={href}
+        class:list={[
+          "text-fg-muted hover:border-border-strong hover:bg-surface-muted hover:text-fg inline-flex items-center gap-2 rounded-pill border border-transparent transition-colors",
+          labels ? "px-3 py-1.5 text-sm" : "size-10 justify-center",
+        ]}
+        {...(href.startsWith("http")
+          ? { target: "_blank", rel: "me noopener noreferrer" }
+          : { rel: "me" })}
+        aria-label={labels ? undefined : label}
+        title={label}
+      >
+        <Icon size={size} aria-hidden="true" />
+        {labels && <span>{label}</span>}
+      </a>
+    </li>
+  ))}
+</ul>

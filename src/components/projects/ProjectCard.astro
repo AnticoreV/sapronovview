@@ -1,0 +1,132 @@
+---
+import { Image } from "astro:assets";
+import { ArrowUpRight, Github } from "lucide-astro";
+import PlaceholderImage from "@components/ui/PlaceholderImage.astro";
+import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
+import StatusPill from "@components/ui/StatusPill.astro";
+import TechBadge from "@components/ui/TechBadge.astro";
+import { categoryLabels, statusLabels, type Project } from "@lib/content";
+
+interface Props {
+  project: Project;
+  /** "feature" renders a larger, horizontal card. */
+  variant?: "default" | "feature";
+  /** Priority images (above the fold) load eagerly. */
+  eager?: boolean;
+}
+const { project, variant = "default", eager = false } = Astro.props;
+const { data } = project;
+const href = `/projects/${project.id}`;
+const status = statusLabels[data.status];
+const year = data.date.getUTCFullYear();
+const isFeature = variant === "feature";
+---
+
+<article
+  class:list={[
+    "card card-hover group relative flex overflow-hidden",
+    isFeature ? "flex-col md:flex-row" : "flex-col",
+  ]}
+  data-category={data.category}
+  data-status={data.status}
+  data-year={year}
+>
+  <div class:list={["relative shrink-0 overflow-hidden", isFeature ? "md:w-[46%]" : ""]}>
+    {data.cover ? (
+      <Image
+        src={data.cover}
+        alt={data.coverAlt ?? `${data.title} cover image`}
+        width={960}
+        height={600}
+        widths={[480, 720, 960]}
+        sizes={
+          isFeature
+            ? "(min-width: 768px) 46vw, 100vw"
+            : "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+        }
+        loading={eager ? "eager" : "lazy"}
+        class="aspect-[16/10] h-full w-full object-cover transition-transform duration-700 ease-(--ease-out-soft) group-hover:scale-[1.03]"
+      />
+    ) : (
+      <PlaceholderImage
+        label="Cover image"
+        hint={`src/content/projects/${project.id}.md`}
+        class="h-full rounded-none border-0 border-b"
+        ratio="16/10"
+      />
+    )}
+    <div class="absolute top-3 left-3 flex flex-wrap gap-2">
+      <StatusPill
+        label={status.label}
+        tone={status.tone}
+        pulse={data.status === "in-progress" || data.status === "active"}
+      />
+    </div>
+  </div>
+
+  <div class="flex flex-1 flex-col p-5 sm:p-6">
+    <div class="text-fg-subtle flex items-center gap-2 font-mono text-[0.7rem] tracking-wider uppercase">
+      <span>{categoryLabels[data.category]}</span>
+      <span aria-hidden="true">·</span>
+      <span>{year}</span>
+      {data.placeholder && <PlaceholderBadge class="ml-auto" />}
+    </div>
+    <h3 class:list={["mt-3 leading-tight", isFeature ? "text-2xl sm:text-3xl" : "text-xl"]}>
+      <a
+        href={href}
+        class="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
+      >
+        {data.title}
+      </a>
+    </h3>
+    <p class="text-fg-muted mt-2 text-sm leading-relaxed sm:text-[0.95rem]">{data.description}</p>
+
+    <ul class="mt-4 flex flex-wrap gap-1.5" aria-label="Technologies">
+      {data.technologies.slice(0, isFeature ? 6 : 4).map((t) => (
+        <li>
+          <TechBadge label={t} />
+        </li>
+      ))}
+      {data.technologies.length > (isFeature ? 6 : 4) && (
+        <li class="text-fg-subtle self-center font-mono text-[0.7rem]">
+          +{data.technologies.length - (isFeature ? 6 : 4)}
+        </li>
+      )}
+    </ul>
+
+    <div class="mt-auto flex items-center justify-between pt-5">
+      <span class="text-fg-muted group-hover:text-accent-strong inline-flex items-center gap-1 text-sm font-medium transition-colors">
+        Read case study
+        <ArrowUpRight
+          size={16}
+          aria-hidden="true"
+          class="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+        />
+      </span>
+      <div class="relative z-10 flex items-center gap-1">
+        {data.github && (
+          <a
+            href={data.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-fg-subtle hover:bg-surface-muted hover:text-fg inline-flex size-9 items-center justify-center rounded-pill transition-colors"
+            aria-label={`${data.title} on GitHub`}
+          >
+            <Github size={16} aria-hidden="true" />
+          </a>
+        )}
+        {data.website && (
+          <a
+            href={data.website}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-fg-subtle hover:bg-surface-muted hover:text-fg inline-flex size-9 items-center justify-center rounded-pill transition-colors"
+            aria-label={`${data.title} live site`}
+          >
+            <ArrowUpRight size={16} aria-hidden="true" />
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+</article>

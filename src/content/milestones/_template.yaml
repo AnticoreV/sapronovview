@@ -1,0 +1,10 @@
+# Copy and rename this file. One milestone per file.
+type: education # education | certification | speaking | award | community
+title: "[DEGREE / CERTIFICATE / TALK / AWARD]"
+organization: "[INSTITUTION / EVENT]"
+location: "[CITY, COUNTRY]"
+date: 2026-01-01
+# endDate: 2026-12-31
+description: "[Optional one-line description]"
+# url: https://example.com
+placeholder: true

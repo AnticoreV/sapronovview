@@ -1,0 +1,85 @@
+---
+import { MapPin } from "lucide-astro";
+import Button from "@components/ui/Button.astro";
+import SocialLinks from "@components/ui/SocialLinks.astro";
+import StatusPill from "@components/ui/StatusPill.astro";
+import PlaceholderImage from "@components/ui/PlaceholderImage.astro";
+import { siteConfig } from "@config";
+
+const tone = { open: "green", limited: "amber", closed: "gray" }[siteConfig.availability.status] as
+  "green" | "amber" | "gray";
+---
+
+<section class="relative isolate overflow-hidden">
+  <div class="grid-bg pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
+  <div
+    class="accent-glow pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px]"
+    aria-hidden="true"
+  ></div>
+
+  <div class="container-site grid items-center gap-12 pt-16 pb-16 sm:pt-24 sm:pb-20 lg:grid-cols-[1.25fr_1fr] lg:pt-28 lg:pb-28">
+    <div class="animate-fade-up">
+      <div class="flex flex-wrap items-center gap-2">
+        <StatusPill
+          label={siteConfig.availability.label}
+          tone={tone}
+          pulse={siteConfig.availability.status === "open"}
+        />
+        <span class="text-fg-subtle inline-flex items-center gap-1 text-xs font-medium">
+          <MapPin size={13} aria-hidden="true" />
+          {siteConfig.location}
+        </span>
+      </div>
+
+      <h1 class="mt-6 text-[2.6rem] leading-[1.02] font-bold sm:text-6xl lg:text-[4.4rem]">
+        {siteConfig.name.split(" ")[0]}
+        <span class="text-fg-subtle font-medium">
+          {siteConfig.name.split(" ").slice(1).join(" ")}
+        </span>
+        <br />
+        <span class="text-accent-strong">{siteConfig.title}.</span>
+      </h1>
+
+      <p class="text-fg-muted mt-6 max-w-xl text-lg leading-relaxed sm:text-xl">
+        I build distributed backends in Java and Kotlin, ship the web frontends that sit on them,
+        and keep a hand in identity, messaging and infrastructure. Off-duty I fly ultralights, ride
+        motorcycles and collect countries.
+      </p>
+
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <Button href="/projects" size="lg" arrow>
+          View projects
+        </Button>
+        <Button href="/contact" variant="secondary" size="lg">
+          Get in touch
+        </Button>
+      </div>
+
+      <div class="mt-8 flex items-center gap-4">
+        <SocialLinks />
+      </div>
+    </div>
+
+    <div
+      class="animate-fade-in relative mx-auto w-full max-w-sm lg:max-w-none"
+      style="animation-delay: 120ms"
+    >
+      <div class="card relative overflow-hidden p-3">
+        <PlaceholderImage
+          label="Portrait photo"
+          ratio="4/5"
+          hint="Add /public/images/about/portrait.jpg and swap in Hero.astro"
+          class="rounded-[0.9rem]"
+        />
+        <div class="border-border bg-surface/90 absolute right-6 bottom-6 left-6 rounded-xl border p-4 backdrop-blur">
+          <p class="eyebrow">Currently</p>
+          <p class="text-fg mt-1 text-sm font-medium leading-snug">{siteConfig.currentFocus}</p>
+        </div>
+      </div>
+      <div
+        class="bg-accent/20 absolute -top-6 -right-6 -z-10 size-40 rounded-full blur-3xl"
+        aria-hidden="true"
+      ></div>
+    </div>
+  </div>
+</section>

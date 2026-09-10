@@ -1,0 +1,42 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
+import SectionHeading from "@components/ui/SectionHeading.astro";
+import ArticleCard from "@components/writing/ArticleCard.astro";
+import TagList from "@components/writing/TagList.astro";
+import { getAllTags, getPosts } from "@lib/content";
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  const tags = await getAllTags(posts);
+  return tags.map(({ tag }) => ({
+    params: { tag },
+    props: { tag, posts: posts.filter((p) => p.data.tags.includes(tag)), tags },
+  }));
+}
+
+const { tag, posts, tags } = Astro.props;
+---
+
+<BaseLayout
+  title={`Posts tagged “${tag}”`}
+  description={`${posts.length} article${posts.length === 1 ? "" : "s"} tagged ${tag}.`}
+>
+  <div class="container-site pt-10 pb-16 sm:pt-14">
+    <Breadcrumbs items={[{ label: "Writing", href: "/writing" }, { label: `#${tag}` }]} />
+    <SectionHeading
+      level={1}
+      eyebrow="Tag"
+      title={`#${tag}`}
+      description={`${posts.length} article${posts.length === 1 ? "" : "s"}`}
+      class="mt-8"
+    />
+    <TagList tags={tags} active={tag} />
+    <h2 class="sr-only">Articles</h2>
+    <div class="mt-10 max-w-3xl">
+      {posts.map((post) => (
+        <ArticleCard post={post} variant="row" />
+      ))}
+    </div>
+  </div>
+</BaseLayout>

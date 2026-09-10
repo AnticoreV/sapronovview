@@ -1,0 +1,50 @@
+---
+/**
+ * Breadcrumb trail. Also emits BreadcrumbList JSON-LD.
+ */
+import { ChevronRight } from "lucide-astro";
+import JsonLd from "@components/seo/JsonLd.astro";
+
+export interface Crumb {
+  label: string;
+  href?: string;
+}
+interface Props {
+  items: Crumb[];
+  class?: string;
+}
+const { items, class: className } = Astro.props;
+const site = Astro.site ?? new URL("http://localhost");
+const all = [{ label: "Home", href: "/" }, ...items];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: all.map((item, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: item.label,
+    ...(item.href ? { item: new URL(item.href, site).toString() } : {}),
+  })),
+};
+---
+
+<nav aria-label="Breadcrumb" class:list={["text-fg-subtle text-sm", className]}>
+  <ol class="flex flex-wrap items-center gap-1.5">
+    {all.map((item, i) => (
+      <li class="flex items-center gap-1.5">
+        {i > 0 && <ChevronRight size={14} aria-hidden="true" class="opacity-60" />}
+        {item.href && i < all.length - 1 ? (
+          <a href={item.href} class="hover:text-fg transition-colors">
+            {item.label}
+          </a>
+        ) : (
+          <span class="text-fg-muted" aria-current="page">
+            {item.label}
+          </span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+<JsonLd data={jsonLd} />

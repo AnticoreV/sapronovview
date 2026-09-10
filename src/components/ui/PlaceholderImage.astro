@@ -1,0 +1,35 @@
+---
+/**
+ * Visual placeholder for a photo you have not added yet.
+ * Renders a clearly-labelled frame so placeholders are never mistaken
+ * for real content. Swap it for <Image /> once the file exists.
+ */
+interface Props {
+  label?: string;
+  /** CSS aspect ratio, e.g. "16/10" */
+  ratio?: string;
+  class?: string;
+  hint?: string;
+}
+const { label = "Photo coming soon", ratio = "16/10", class: className, hint } = Astro.props;
+---
+
+<div
+  class:list={[
+    "border-border-strong bg-surface-muted text-fg-subtle relative flex items-center justify-center overflow-hidden rounded-xl border border-dashed",
+    className,
+  ]}
+  style={`aspect-ratio:${ratio}`}
+  role="img"
+  aria-label={`Placeholder: ${label}`}
+>
+  <div
+    class="absolute inset-0 opacity-[0.35]"
+    style="background-image: repeating-linear-gradient(135deg, transparent 0 14px, var(--border) 14px 15px);"
+    aria-hidden="true"
+  ></div>
+  <div class="relative px-4 text-center">
+    <p class="font-mono text-[0.7rem] tracking-[0.14em] uppercase">{label}</p>
+    {hint && <p class="mt-1 text-xs">{hint}</p>}
+  </div>
+</div>

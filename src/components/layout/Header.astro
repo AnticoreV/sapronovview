@@ -1,0 +1,160 @@
+---
+/**
+ * Sticky site header with desktop nav, active-page indicator, theme toggle
+ * and an accessible mobile drawer (native <dialog>, so focus trapping,
+ * Escape handling and inert-ing the page come for free).
+ */
+import { Menu, X } from "lucide-astro";
+import ThemeToggle from "@components/ui/ThemeToggle.astro";
+import SocialLinks from "@components/ui/SocialLinks.astro";
+import { navigation, siteConfig } from "@config";
+import { cleanPath } from "@lib/utils";
+
+const pathname = cleanPath(Astro.url.pathname);
+const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+const initials = siteConfig.name
+  .split(" ")
+  .map((n) => n[0])
+  .join("")
+  .slice(0, 2);
+---
+
+<header
+  class="border-border/80 bg-bg/80 sticky top-0 z-40 border-b backdrop-blur-md supports-[backdrop-filter]:bg-bg/70"
+  transition:name="site-header"
+  transition:persist
+>
+  <div class="container-site flex h-16 items-center justify-between gap-4">
+    <a href="/" class="group flex items-center gap-2.5 rounded-pill">
+      <span
+        class="bg-fg text-bg group-hover:bg-accent group-hover:text-on-accent flex size-8 items-center justify-center rounded-lg font-display text-sm font-bold tracking-tight transition-colors"
+        aria-hidden="true"
+      >
+        {initials}
+      </span>
+      <span class="font-display text-[0.95rem] font-semibold tracking-tight">
+        {siteConfig.name}
+      </span>
+    </a>
+
+    <nav aria-label="Primary" class="hidden lg:block">
+      <ul class="flex items-center gap-1">
+        {navigation.map((item) => {
+          const active = isActive(item.href);
+          return (
+            <li>
+              <a
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                class:list={[
+                  "relative rounded-pill px-3 py-2 text-sm font-medium transition-colors",
+                  active ? "text-fg" : "text-fg-muted hover:text-fg",
+                ]}
+              >
+                {item.label}
+                {active && (
+                  <span
+                    class="bg-accent absolute inset-x-3 -bottom-[1px] h-0.5 rounded-full"
+                    aria-hidden="true"
+                  />
+                )}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-1">
+      <ThemeToggle />
+      <button
+        type="button"
+        class="text-fg-muted hover:bg-surface-muted hover:text-fg inline-flex size-10 items-center justify-center rounded-pill transition-colors lg:hidden"
+        aria-label="Open menu"
+        aria-haspopup="dialog"
+        aria-controls="mobile-nav"
+        data-open-menu
+      >
+        <Menu size={20} aria-hidden="true" />
+      </button>
+    </div>
+  </div>
+
+  <dialog
+    id="mobile-nav"
+    class="bg-bg text-fg m-0 h-dvh max-h-none w-full max-w-none p-0 backdrop:bg-black/40 open:flex open:flex-col lg:hidden"
+    aria-label="Site navigation"
+  >
+    <div class="container-site flex h-16 shrink-0 items-center justify-between">
+      <span class="font-display font-semibold tracking-tight">{siteConfig.name}</span>
+      <button
+        type="button"
+        class="text-fg-muted hover:bg-surface-muted hover:text-fg inline-flex size-10 items-center justify-center rounded-pill transition-colors"
+        aria-label="Close menu"
+        data-close-menu
+      >
+        <X size={20} aria-hidden="true" />
+      </button>
+    </div>
+    <nav aria-label="Mobile" class="container-site flex-1 overflow-y-auto py-6">
+      <ul class="flex flex-col">
+        {navigation.map((item, i) => {
+          const active = isActive(item.href);
+          return (
+            <li>
+              <a
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                class:list={[
+                  "border-border flex items-center justify-between border-b py-4 font-display text-2xl font-semibold tracking-tight transition-colors",
+                  active ? "text-accent-strong" : "text-fg hover:text-accent-strong",
+                ]}
+              >
+                <span>{item.label}</span>
+                <span class="text-fg-subtle font-mono text-xs">0{i + 1}</span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+      <div class="mt-8">
+        <p class="eyebrow mb-3">Elsewhere</p>
+        <SocialLinks labels />
+      </div>
+    </nav>
+  </dialog>
+</header>
+
+<script>
+  function setupMobileNav() {
+    const dialog = document.getElementById("mobile-nav") as HTMLDialogElement | null;
+    if (!dialog || dialog.dataset.bound) return;
+    dialog.dataset.bound = "true";
+
+    const open = () => {
+      dialog.showModal();
+      document.documentElement.style.overflow = "hidden";
+    };
+    const close = () => {
+      dialog.close();
+    };
+    document.querySelectorAll("[data-open-menu]").forEach((b) => b.addEventListener("click", open));
+    dialog.querySelectorAll("[data-close-menu]").forEach((b) => b.addEventListener("click", close));
+    dialog.addEventListener("close", () => {
+      document.documentElement.style.overflow = "";
+    });
+    // Close when navigating via a link inside the drawer.
+    dialog.querySelectorAll("a").forEach((a) => a.addEventListener("click", close));
+    // Close if the viewport grows past the mobile breakpoint.
+    const mq = window.matchMedia("(min-width: 64rem)");
+    mq.addEventListener("change", (e) => {
+      if (e.matches && dialog.open) close();
+    });
+  }
+  setupMobileNav();
+  document.addEventListener("astro:after-swap", setupMobileNav);
+  document.addEventListener("astro:before-preparation", () => {
+    const dialog = document.getElementById("mobile-nav") as HTMLDialogElement | null;
+    if (dialog?.open) dialog.close();
+  });
+</script>

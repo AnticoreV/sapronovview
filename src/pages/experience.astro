@@ -1,0 +1,68 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
+import Button from "@components/ui/Button.astro";
+import CTASection from "@components/ui/CTASection.astro";
+import SectionHeading from "@components/ui/SectionHeading.astro";
+import ExperienceItem from "@components/experience/ExperienceItem.astro";
+import MilestoneList from "@components/experience/MilestoneList.astro";
+import { getMilestones, getPositions, milestoneLabels } from "@lib/content";
+import { siteConfig } from "@config";
+
+const [positions, milestones] = await Promise.all([getPositions(), getMilestones()]);
+const types = Object.keys(milestoneLabels) as Array<keyof typeof milestoneLabels>;
+const byType = (t: (typeof types)[number]) => milestones.filter((m) => m.data.type === t);
+---
+
+<BaseLayout
+  title="Experience"
+  description={`Career timeline of ${siteConfig.name}: positions, achievements, education, certifications, talks and community work.`}
+>
+  <div class="container-site pt-10 sm:pt-14">
+    <Breadcrumbs items={[{ label: "Experience" }]} />
+    <SectionHeading
+      level={1}
+      eyebrow="Experience"
+      title="Career timeline"
+      description="Where I've worked, what I owned and what changed because of it. Entries marked as placeholders are still waiting on real company names and dates."
+      class="mt-8"
+    >
+      <Button slot="action" href="/contact" variant="secondary" size="sm" arrow>
+        Request a CV
+      </Button>
+    </SectionHeading>
+  </div>
+
+  <section class="container-site pb-16" aria-labelledby="positions-heading">
+    <h2 id="positions-heading" class="sr-only">
+      Positions
+    </h2>
+    <ol class="space-y-12 sm:space-y-16">
+      {positions.map((position) => (
+        <li class="reveal">
+          <ExperienceItem position={position} />
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="border-border bg-surface-muted/60 border-t" aria-labelledby="milestones-heading">
+    <div class="container-site section">
+      <SectionHeading
+        id="milestones-heading"
+        eyebrow="Beyond the job titles"
+        title="Education, credentials & community"
+      />
+      <div class="grid gap-5 md:grid-cols-2">
+        {types.map((t) => (
+          <MilestoneList type={t} items={byType(t)} />
+        ))}
+      </div>
+    </div>
+  </section>
+  <CTASection
+    title="Want the full story?"
+    description="I'm happy to share a CV, references or walk through any of these roles in detail."
+    primaryLabel="Get in touch"
+  />
+</BaseLayout>

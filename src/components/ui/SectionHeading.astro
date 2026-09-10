@@ -1,0 +1,57 @@
+---
+/**
+ * Consistent section header: eyebrow label + heading + optional lede,
+ * with an optional action link (e.g. "View all →") on the right.
+ */
+interface Props {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  /** Heading level. Defaults to h2. */
+  level?: 1 | 2 | 3;
+  align?: "left" | "center";
+  id?: string;
+  class?: string;
+}
+const {
+  eyebrow,
+  title,
+  description,
+  level = 2,
+  align = "left",
+  id,
+  class: className,
+} = Astro.props;
+const Heading = `h${level}` as "h1" | "h2" | "h3";
+const hasAction = Astro.slots.has("action");
+---
+
+<div
+  class:list={[
+    "mb-8 flex flex-col gap-4 sm:mb-10",
+    hasAction && "sm:flex-row sm:items-end sm:justify-between",
+    align === "center" && "items-center text-center",
+    className,
+  ]}
+>
+  <div class:list={["max-w-2xl", align === "center" && "mx-auto"]}>
+    {eyebrow && <p class="eyebrow mb-3">{eyebrow}</p>}
+    <Heading
+      id={id}
+      class:list={[
+        level === 1 ? "text-4xl sm:text-5xl lg:text-6xl" : "text-2xl sm:text-3xl lg:text-[2.1rem]",
+        "leading-[1.1]",
+      ]}
+    >
+      {title}
+    </Heading>
+    {description && (
+      <p class="text-fg-muted mt-3 text-base leading-relaxed sm:text-lg">{description}</p>
+    )}
+  </div>
+  {hasAction && (
+    <div class="shrink-0">
+      <slot name="action" />
+    </div>
+  )}
+</div>

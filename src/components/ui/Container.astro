@@ -1,0 +1,15 @@
+---
+/**
+ * Page-width wrapper. `size="prose"` narrows to a comfortable reading width.
+ */
+export interface Props {
+  size?: "default" | "prose";
+  class?: string;
+  as?: "div" | "section" | "article" | "header" | "footer" | "nav";
+}
+const { size = "default", class: className, as: Tag = "div" } = Astro.props;
+---
+
+<Tag class:list={[size === "prose" ? "container-prose" : "container-site", className]}>
+  <slot />
+</Tag>
