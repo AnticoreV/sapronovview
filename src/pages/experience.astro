@@ -46,20 +46,25 @@ const byType = (t: (typeof types)[number]) => milestones.filter((m) => m.data.ty
     </ol>
   </section>
 
-  <section class="border-border bg-surface-muted/60 border-t" aria-labelledby="milestones-heading">
-    <div class="container-site section">
-      <SectionHeading
-        id="milestones-heading"
-        eyebrow="Beyond the job titles"
-        title="Education, credentials & community"
-      />
-      <div class="grid gap-5 md:grid-cols-2">
-        {types.map((t) => (
-          <MilestoneList type={t} items={byType(t)} />
-        ))}
+  {milestones.length > 0 && (
+    <section
+      class="border-border bg-surface-muted/60 border-t"
+      aria-labelledby="milestones-heading"
+    >
+      <div class="container-site section">
+        <SectionHeading
+          id="milestones-heading"
+          eyebrow="Beyond the job titles"
+          title="Education, credentials & community"
+        />
+        <div class="grid gap-5 md:grid-cols-2">
+          {types.map((t) => (
+            <MilestoneList type={t} items={byType(t)} />
+          ))}
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  )}
   <CTASection
     title="Want the full story?"
     description="I'm happy to share a CV, references or walk through any of these roles in detail."

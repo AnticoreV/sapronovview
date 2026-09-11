@@ -2,7 +2,7 @@
 title: "Faradey for Android"
 description: "Secure messenger built on the Matrix protocol, combining private communication with project management. I contributed a kanban board for task management in Kotlin."
 date: 2024-01-01
-featured: true
+featured: false
 status: completed
 category: open-source
 technologies: ["Kotlin", "Android", "Matrix protocol", "Material Design"]
@@ -10,7 +10,7 @@ github: https://github.com/AnticoreV/Faradey-android
 role: "Android developer"
 organization: "[COMPANY / TEAM]"
 timeframe: "[YEAR]"
-order: 3
+order: 30
 placeholder: true
 ---
 

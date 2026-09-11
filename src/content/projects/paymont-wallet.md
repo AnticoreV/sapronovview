@@ -2,7 +2,7 @@
 title: "Paymont wallet"
 description: "Backend and web frontend for a payment wallet: a Java service packaged with Docker Compose, and a TypeScript client for account and transaction management."
 date: 2025-01-01
-featured: true
+featured: false
 status: paused
 category: personal
 technologies: ["Java", "Gradle", "Docker", "TypeScript"]
@@ -12,7 +12,7 @@ links:
     href: https://github.com/AnticoreV/paymont-wallet-fe
 role: "Fullstack engineer"
 timeframe: "[YEAR]"
-order: 4
+order: 40
 placeholder: true
 ---
 
