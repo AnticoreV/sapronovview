@@ -20,11 +20,9 @@ interface Props {
 const { locations, initialView = mapViews[0]?.id ?? "world" } = Astro.props;
 
 const numericToAlpha = new Map(Object.entries(countryNumericIds).map(([a2, num]) => [num, a2]));
-const activeCountries = new Map<string, { name: string; count: number }>();
+const activeCountries = new Map<string, { name: string }>();
 for (const l of locations) {
-  const entry = activeCountries.get(l.countryCode) ?? { name: l.country, count: 0 };
-  entry.count++;
-  activeCountries.set(l.countryCode, entry);
+  if (!activeCountries.has(l.countryCode)) activeCountries.set(l.countryCode, { name: l.country });
 }
 for (const code of activeCountries.keys()) {
   if (!countryNumericIds[code]) {
@@ -98,7 +96,7 @@ const markers = locations.map((l) => {
               data-country={code}
               role="button"
               tabindex="0"
-              aria-label={`${active.name}: ${active.count} ${active.count === 1 ? "place" : "places"}`}
+              aria-label={`${active.name} — show places`}
             >
               <title>{active.name}</title>
             </path>
