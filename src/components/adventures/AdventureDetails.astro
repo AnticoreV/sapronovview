@@ -14,8 +14,11 @@ import {
 
 interface Props {
   locations: AdventureLocation[];
+  /** Heading level for group titles and card titles (one below the section heading). */
+  headingLevel?: 2 | 3;
 }
-const { locations } = Astro.props;
+const { locations, headingLevel = 3 } = Astro.props;
+const H = `h${headingLevel}` as "h2" | "h3";
 const visited = locations.filter((l) => l.status === "visited");
 const wishlist = locations.filter((l) => l.status === "wishlist");
 const countries = groupByCountry(locations);
@@ -34,7 +37,7 @@ const statusLabel = (s: AdventureLocation["status"]) =>
       { key: "wishlist", title: "Want to visit", items: wishlist },
     ].map((group) => (
       <section aria-labelledby={`adv-group-${group.key}`}>
-        <h3 id={`adv-group-${group.key}`} class="adv-details__group-title">
+        <H id={`adv-group-${group.key}`} class="adv-details__group-title">
           <span
             class:list={[
               "adv-dot",
@@ -43,8 +46,7 @@ const statusLabel = (s: AdventureLocation["status"]) =>
             aria-hidden="true"
           />
           {group.title}
-          <span class="adv-details__group-count">{group.items.length}</span>
-        </h3>
+        </H>
         <ul class="adv-details__items">
           {group.items.map((a) => (
             <li>
@@ -94,9 +96,9 @@ const statusLabel = (s: AdventureLocation["status"]) =>
           <X size={16} aria-hidden="true" />
         </button>
       </div>
-      <h3 id={`adv-title-${a.id}`} class="adv-card__title">
+      <H id={`adv-title-${a.id}`} class="adv-card__title">
         {a.city ?? a.country}
-      </h3>
+      </H>
       {a.city && <p class="adv-card__country">{a.country}</p>}
       {a.image && (
         <img
@@ -140,16 +142,14 @@ const statusLabel = (s: AdventureLocation["status"]) =>
       hidden
     >
       <div class="adv-card__head">
-        <p class="adv-card__status">
-          {c.locations.length} {c.locations.length === 1 ? "place" : "places"}
-        </p>
+        <p class="adv-card__status">Country</p>
         <button type="button" class="adv-card__close" data-adv-close aria-label="Close details">
           <X size={16} aria-hidden="true" />
         </button>
       </div>
-      <h3 id={`adv-country-${c.countryCode}`} class="adv-card__title">
+      <H id={`adv-country-${c.countryCode}`} class="adv-card__title">
         {c.country}
-      </h3>
+      </H>
       <ul class="adv-details__items">
         {c.locations.map((a) => (
           <li>
@@ -191,9 +191,6 @@ const statusLabel = (s: AdventureLocation["status"]) =>
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--fg-muted);
-  }
-  .adv-details__group-count {
-    color: var(--fg-subtle);
   }
   .adv-details__items {
     display: grid;

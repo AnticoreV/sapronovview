@@ -4,23 +4,19 @@
  * not only by colour: visited = filled dot, wishlist = hollow ring.
  */
 interface Props {
-  visitedCount: number;
-  wishlistCount: number;
   class?: string;
 }
-const { visitedCount, wishlistCount, class: className } = Astro.props;
+const { class: className } = Astro.props;
 ---
 
 <ul class:list={["adv-legend", className]} aria-label="Map legend">
   <li>
     <span class="adv-legend__marker adv-legend__marker--visited" aria-hidden="true"></span>
     <span>Visited</span>
-    <span class="adv-legend__count">{visitedCount}</span>
   </li>
   <li>
     <span class="adv-legend__marker adv-legend__marker--wishlist" aria-hidden="true"></span>
     <span>Want to visit</span>
-    <span class="adv-legend__count">{wishlistCount}</span>
   </li>
 </ul>
 
@@ -54,10 +50,5 @@ const { visitedCount, wishlistCount, class: className } = Astro.props;
   .adv-legend__marker--wishlist {
     border: 2px solid var(--adventure-wishlist);
     background: var(--surface);
-  }
-  .adv-legend__count {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    color: var(--fg-subtle);
   }
 </style>

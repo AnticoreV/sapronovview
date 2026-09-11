@@ -7,6 +7,7 @@
  */
 import { geoNaturalEarth1, geoPath, type GeoProjection } from "d3-geo";
 import { feature } from "topojson-client";
+import { presimplify, quantile, simplify } from "topojson-simplify";
 import type { FeatureCollection, Geometry } from "geojson";
 import type { Topology, GeometryCollection } from "topojson-specification";
 import topology from "world-atlas/countries-110m.json";
@@ -15,10 +16,22 @@ export const MAP_WIDTH = 960;
 
 const ANTARCTICA = "010";
 
+/**
+ * How much of the source detail to keep (0–1). 0.3 keeps every country
+ * recognisable at the sizes used on this site while cutting the outline
+ * markup from ~25 KB to ~10 KB gzipped. Raise it if you add a close-up view.
+ */
+const SIMPLIFY_QUANTILE = 0.3;
+
 type CountryProps = { name: string };
 type CountriesTopology = Topology<{ countries: GeometryCollection<CountryProps> }>;
 
-const topo = topology as unknown as CountriesTopology;
+const raw = topology as unknown as CountriesTopology;
+const presimplified = presimplify(raw);
+const topo = simplify(
+  presimplified,
+  quantile(presimplified, SIMPLIFY_QUANTILE),
+) as CountriesTopology;
 const countries = feature(topo, topo.objects.countries) as FeatureCollection<
   Geometry,
   CountryProps

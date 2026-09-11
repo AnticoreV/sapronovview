@@ -62,6 +62,7 @@ export const navigation = [
   { label: "Experience", href: "/experience" },
   { label: "Writing", href: "/writing" },
   { label: "Hobbies", href: "/hobbies" },
+  { label: "Adventures", href: "/adventures" },
   { label: "Now", href: "/now" },
   { label: "Contact", href: "/contact" },
 ] as const;

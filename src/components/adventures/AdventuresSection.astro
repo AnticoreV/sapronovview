@@ -10,42 +10,52 @@ import SectionHeading from "@components/ui/SectionHeading.astro";
 import AdventureMap from "@components/adventures/AdventureMap.astro";
 import AdventureDetails from "@components/adventures/AdventureDetails.astro";
 import MapLegend from "@components/adventures/MapLegend.astro";
-import { adventures, getAdventuresByStatus } from "@data/adventures";
+import { adventures } from "@data/adventures";
 
 interface Props {
   id?: string;
   title?: string;
   description?: string;
   eyebrow?: string;
+  /** Heading level for the section title (1 on a dedicated page). */
+  level?: 1 | 2;
+  /** Show breadcrumbs slot / extra top padding when used as a page. */
+  class?: string;
 }
 const {
   id = "adventures",
   eyebrow = "Adventures",
   title = "Places I've been, places I'm going",
   description = "A map of the countries I've visited and the ones still on the list. Tap a marker for the story, or a highlighted country for everything in it.",
+  level = 2,
+  class: className,
 } = Astro.props;
-
-const visited = getAdventuresByStatus("visited");
-const wishlist = getAdventuresByStatus("wishlist");
 ---
 
 <section
   id={id}
-  class="adventures container-site section reveal"
+  class:list={["adventures container-site", className ?? "section reveal"]}
   aria-labelledby={`${id}-heading`}
   data-adventures
 >
-  <SectionHeading id={`${id}-heading`} eyebrow={eyebrow} title={title} description={description} />
+  <slot name="before" />
+  <SectionHeading
+    id={`${id}-heading`}
+    level={level}
+    eyebrow={eyebrow}
+    title={title}
+    description={description}
+  />
 
   <div class="adventures__layout">
     <div class="adventures__map card">
       <AdventureMap locations={adventures} />
       <div class="adventures__legend">
-        <MapLegend visitedCount={visited.length} wishlistCount={wishlist.length} />
+        <MapLegend />
       </div>
     </div>
     <aside class="adventures__details card" aria-label="Location details">
-      <AdventureDetails locations={adventures} />
+      <AdventureDetails locations={adventures} headingLevel={level === 1 ? 2 : 3} />
     </aside>
   </div>
 </section>

@@ -26,7 +26,7 @@ stats:
 relatedProjects: []
 links:
   - label: "See the map"
-    href: /#adventures
+    href: /adventures
 featured: true
 order: 3
 placeholder: true

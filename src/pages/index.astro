@@ -7,7 +7,7 @@ import CareerHighlights from "@components/home/CareerHighlights.astro";
 import TechStack from "@components/home/TechStack.astro";
 import LatestWriting from "@components/home/LatestWriting.astro";
 import HobbiesStrip from "@components/home/HobbiesStrip.astro";
-import AdventuresSection from "@components/adventures/AdventuresSection.astro";
+import AdventuresTeaser from "@components/adventures/AdventuresTeaser.astro";
 import CTASection from "@components/ui/CTASection.astro";
 import { getFeaturedProjects, getHobbies, getPositions, getPosts } from "@lib/content";
 import { siteConfig } from "@config";
@@ -34,6 +34,6 @@ const highlights = positions.filter((p) => p.data.highlight).slice(0, 3);
   <TechStack />
   <LatestWriting posts={posts.slice(0, 3)} />
   <HobbiesStrip hobbies={hobbies.filter((h) => h.data.featured).slice(0, 4)} />
-  <AdventuresSection />
+  <AdventuresTeaser />
   <CTASection />
 </BaseLayout>

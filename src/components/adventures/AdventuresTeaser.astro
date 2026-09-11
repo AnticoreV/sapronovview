@@ -1,0 +1,94 @@
+---
+/**
+ * Lightweight homepage teaser for the Adventures page.
+ * Renders a lazy-loaded static SVG snapshot (a separate, cacheable file)
+ * instead of the interactive map, so the landing page stays small.
+ */
+import Button from "@components/ui/Button.astro";
+import SectionHeading from "@components/ui/SectionHeading.astro";
+import { MAP_HEIGHT, MAP_WIDTH } from "@lib/world-map";
+---
+
+<section class="container-site section reveal" aria-labelledby="adventures-teaser-heading">
+  <SectionHeading
+    id="adventures-teaser-heading"
+    eyebrow="Adventures"
+    title="Places I've been, places I'm going"
+    description="An interactive map of the countries I've visited and the ones still on the list."
+  >
+    <Button slot="action" href="/adventures" variant="secondary" size="sm" arrow>
+      Explore the map
+    </Button>
+  </SectionHeading>
+
+  <a
+    href="/adventures"
+    class="adv-teaser card card-hover"
+    aria-label="Open the interactive adventures map"
+  >
+    <img
+      class="adv-teaser__img"
+      src="/images/adventures-map.svg"
+      width={MAP_WIDTH}
+      height={MAP_HEIGHT}
+      alt="World map with markers for visited places and places I want to visit"
+      loading="lazy"
+      decoding="async"
+    />
+    <ul class="adv-teaser__legend" aria-hidden="true">
+      <li>
+        <span class="adv-teaser__dot adv-teaser__dot--visited"></span> Visited
+      </li>
+      <li>
+        <span class="adv-teaser__dot adv-teaser__dot--wishlist"></span> Want to visit
+      </li>
+    </ul>
+  </a>
+</section>
+
+<style>
+  .adv-teaser {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    padding: 0.5rem;
+  }
+  .adv-teaser__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: calc(var(--radius-card) - 0.5rem);
+  }
+  .adv-teaser__legend {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    display: flex;
+    gap: 1rem;
+    margin: 0;
+    padding: 0.4rem 0.75rem;
+    list-style: none;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--surface) 90%, transparent);
+    font-size: 0.8rem;
+    color: var(--fg-muted);
+  }
+  .adv-teaser__legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .adv-teaser__dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 999px;
+    box-sizing: border-box;
+  }
+  .adv-teaser__dot--visited {
+    background: var(--accent);
+  }
+  .adv-teaser__dot--wishlist {
+    border: 2px solid var(--fg-muted);
+  }
+</style>
