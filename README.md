@@ -36,17 +36,21 @@ npm run dev        # http://localhost:4321
 
 ## Scripts
 
-| Command                | What it does                                             |
-| ---------------------- | -------------------------------------------------------- |
-| `npm run dev`          | Start the dev server with hot reload                     |
-| `npm run build`        | Production build to `dist/`                              |
-| `npm run preview`      | Serve the production build locally                       |
-| `npm run check`        | Type-check `.astro` and `.ts` files (`astro check`)      |
-| `npm run lint`         | ESLint (TypeScript + Astro rules)                        |
-| `npm run format`       | Prettier (with Astro and Tailwind class-sorting plugins) |
-| `npm run format:check` | Verify formatting without writing                        |
+| Command                | What it does                                              |
+| ---------------------- | --------------------------------------------------------- |
+| `npm run dev`          | Start the dev server with hot reload                      |
+| `npm run build`        | Production build to `dist/`                               |
+| `npm run preview`      | Serve the production build locally                        |
+| `npm run clean`        | Delete `dist/` and Astro's content cache (see note below) |
+| `npm run check`        | Type-check `.astro` and `.ts` files (`astro check`)       |
+| `npm run lint`         | ESLint (TypeScript + Astro rules)                         |
+| `npm run format`       | Prettier (with Astro and Tailwind class-sorting plugins)  |
+| `npm run format:check` | Verify formatting without writing                         |
 
 Before pushing, run `npm run check && npm run lint && npm run build`.
+
+> **Deleted a content file but it still shows up?** Astro caches the content collections in
+> `node_modules/.astro`. Run `npm run clean` and rebuild.
 
 ## Project structure
 

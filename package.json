@@ -11,6 +11,7 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "clean": "node -e \"for (const p of ['dist','.astro','node_modules/.astro']) require('fs').rmSync(p,{recursive:true,force:true})\"",
     "astro": "astro",
     "check": "astro check",
     "lint": "eslint .",
