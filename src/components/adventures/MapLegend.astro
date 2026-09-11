@@ -1,0 +1,63 @@
+---
+/**
+ * Legend for the adventures map. Status is conveyed by shape and label,
+ * not only by colour: visited = filled dot, wishlist = hollow ring.
+ */
+interface Props {
+  visitedCount: number;
+  wishlistCount: number;
+  class?: string;
+}
+const { visitedCount, wishlistCount, class: className } = Astro.props;
+---
+
+<ul class:list={["adv-legend", className]} aria-label="Map legend">
+  <li>
+    <span class="adv-legend__marker adv-legend__marker--visited" aria-hidden="true"></span>
+    <span>Visited</span>
+    <span class="adv-legend__count">{visitedCount}</span>
+  </li>
+  <li>
+    <span class="adv-legend__marker adv-legend__marker--wishlist" aria-hidden="true"></span>
+    <span>Want to visit</span>
+    <span class="adv-legend__count">{wishlistCount}</span>
+  </li>
+</ul>
+
+<style>
+  .adv-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.875rem;
+    color: var(--fg-muted);
+  }
+  .adv-legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .adv-legend__marker {
+    width: var(--adventure-marker-size);
+    height: var(--adventure-marker-size);
+    border-radius: 999px;
+    box-sizing: border-box;
+    flex: none;
+  }
+  .adv-legend__marker--visited {
+    background: var(--adventure-visited);
+    box-shadow: 0 0 0 2px var(--surface);
+  }
+  .adv-legend__marker--wishlist {
+    border: 2px solid var(--adventure-wishlist);
+    background: var(--surface);
+  }
+  .adv-legend__count {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--fg-subtle);
+  }
+</style>

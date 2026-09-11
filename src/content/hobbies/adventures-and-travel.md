@@ -24,7 +24,9 @@ stats:
   - label: "Next on the list"
     value: "[COUNTRY]"
 relatedProjects: []
-links: []
+links:
+  - label: "See the map"
+    href: /#adventures
 featured: true
 order: 3
 placeholder: true

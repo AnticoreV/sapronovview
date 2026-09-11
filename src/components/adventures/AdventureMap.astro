@@ -1,0 +1,545 @@
+---
+/**
+ * Interactive world map.
+ *
+ * - Country outlines: inline SVG generated at build time (src/lib/world-map.ts).
+ * - Markers: real <button> elements positioned over the SVG, so they get
+ *   native focus, keyboard and touch behaviour for free.
+ * - A small vanilla script handles selection, country highlighting and
+ *   the World / Europe zoom. Nothing else ships to the browser.
+ */
+import { mapViews, placeLabel, type AdventureLocation } from "@data/adventures";
+import { countryNumericIds } from "@data/country-ids";
+import { countryPaths, project, spherePath, viewBoxForBounds, worldViewBox } from "@lib/world-map";
+
+interface Props {
+  locations: AdventureLocation[];
+  /** id of the view to start in (see mapViews in adventures.ts) */
+  initialView?: string;
+}
+const { locations, initialView = mapViews[0]?.id ?? "world" } = Astro.props;
+
+const numericToAlpha = new Map(Object.entries(countryNumericIds).map(([a2, num]) => [num, a2]));
+const activeCountries = new Map<string, { name: string; count: number }>();
+for (const l of locations) {
+  const entry = activeCountries.get(l.countryCode) ?? { name: l.country, count: 0 };
+  entry.count++;
+  activeCountries.set(l.countryCode, entry);
+}
+for (const code of activeCountries.keys()) {
+  if (!countryNumericIds[code]) {
+    console.warn(
+      `[adventures] No numeric id for country code "${code}" — add it to src/data/country-ids.ts to highlight it on the map.`,
+    );
+  }
+}
+
+const views = mapViews.map((v) => ({
+  id: v.id,
+  label: v.label,
+  box: v.bounds ? viewBoxForBounds(v.bounds) : worldViewBox,
+}));
+const startView = views.find((v) => v.id === initialView) ?? views[0]!;
+const vb = startView.box;
+
+const markers = locations.map((l) => {
+  const { x, y } = project(l.coordinates.lat, l.coordinates.lng);
+  return {
+    ...l,
+    x,
+    y,
+    // Percentages for the initial (server-rendered) view; the script recomputes on zoom.
+    left: (((x - vb.x) / vb.w) * 100).toFixed(2),
+    top: (((y - vb.y) / vb.h) * 100).toFixed(2),
+    label: placeLabel(l),
+  };
+});
+---
+
+<div
+  class="adv-map"
+  data-adv-map
+  data-view={startView.id}
+  style={`--map-aspect:${worldViewBox.w}/${worldViewBox.h}`}
+>
+  {views.length > 1 && (
+    <div class="adv-map__views" role="group" aria-label="Map zoom">
+      {views.map((v) => (
+        <button
+          type="button"
+          class="adv-map__view"
+          data-adv-view-btn={v.id}
+          data-box={`${v.box.x} ${v.box.y} ${v.box.w} ${v.box.h}`}
+          aria-pressed={v.id === startView.id ? "true" : "false"}
+        >
+          {v.label}
+        </button>
+      ))}
+    </div>
+  )}
+
+  <div class="adv-map__stage">
+    <svg
+      class="adv-map__svg"
+      viewBox={`${vb.x} ${vb.y} ${vb.w} ${vb.h}`}
+      role="group"
+      aria-label="World map with visited places and places I want to visit"
+      data-adv-svg
+    >
+      <path class="adv-map__sphere" d={spherePath}></path>
+      <g class="adv-map__countries">
+        {countryPaths.map((c) => {
+          const code = numericToAlpha.get(c.id);
+          const active = code ? activeCountries.get(code) : undefined;
+          return active ? (
+            <path
+              class="adv-map__country adv-map__country--active"
+              d={c.d}
+              data-country={code}
+              role="button"
+              tabindex="0"
+              aria-label={`${active.name}: ${active.count} ${active.count === 1 ? "place" : "places"}`}
+            >
+              <title>{active.name}</title>
+            </path>
+          ) : (
+            <path class="adv-map__country" d={c.d} aria-hidden="true" />
+          );
+        })}
+      </g>
+    </svg>
+
+    <ul class="adv-map__markers" aria-label="Places">
+      {markers.map((m) => (
+        <li
+          class="adv-map__marker-item"
+          style={`left:${m.left}%;top:${m.top}%`}
+          data-x={m.x}
+          data-y={m.y}
+        >
+          <button
+            type="button"
+            class:list={["adv-marker", `adv-marker--${m.status}`]}
+            data-adv-marker={m.id}
+            data-country={m.countryCode}
+            aria-pressed="false"
+            aria-label={`${m.label} — ${m.status === "visited" ? "visited" : "want to visit"}`}
+          >
+            <span class="adv-marker__dot" aria-hidden="true" />
+            <span class="adv-marker__label" aria-hidden="true">
+              {m.city ?? m.country}
+            </span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
+
+<style>
+  .adv-map {
+    position: relative;
+  }
+  .adv-map__views {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 2;
+    display: inline-flex;
+    padding: 0.2rem;
+    gap: 0.2rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--surface) 88%, transparent);
+    backdrop-filter: blur(6px);
+  }
+  .adv-map__view {
+    padding: 0.3rem 0.8rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--fg-muted);
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+  .adv-map__view:hover {
+    color: var(--fg);
+  }
+  .adv-map__view[aria-pressed="true"] {
+    background: var(--fg);
+    color: var(--bg);
+  }
+
+  .adv-map__stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: var(--map-aspect);
+    overflow: hidden;
+    border-radius: inherit;
+    touch-action: manipulation;
+  }
+  .adv-map__svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .adv-map__sphere {
+    fill: var(--adventure-water);
+  }
+  .adv-map__country {
+    fill: var(--adventure-land);
+    stroke: var(--adventure-border);
+    stroke-width: 0.6;
+    vector-effect: non-scaling-stroke;
+    stroke-linejoin: round;
+    transition: fill 0.25s ease;
+  }
+  .adv-map__country--active {
+    fill: var(--adventure-land-active);
+    cursor: pointer;
+    outline: none;
+  }
+  .adv-map__country--active:hover,
+  .adv-map__country--active:focus-visible {
+    fill: color-mix(in oklab, var(--adventure-land-active) 60%, var(--accent));
+  }
+  .adv-map__country--active:focus-visible {
+    stroke: var(--ring);
+    stroke-width: 2;
+  }
+  .adv-map__country[data-selected="true"] {
+    fill: color-mix(in oklab, var(--adventure-land-active) 45%, var(--accent));
+  }
+
+  .adv-map__markers {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    pointer-events: none;
+  }
+  .adv-map__marker-item {
+    position: absolute;
+    width: 0;
+    height: 0;
+  }
+  .adv-marker {
+    --size: var(--adventure-marker-size);
+    --hit: var(--adventure-marker-hit);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--hit);
+    height: var(--hit);
+    margin: calc(var(--hit) / -2) 0 0 calc(var(--hit) / -2);
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+    pointer-events: auto;
+    display: grid;
+    place-items: center;
+  }
+  .adv-marker__dot {
+    width: var(--size);
+    height: var(--size);
+    border-radius: 999px;
+    box-sizing: border-box;
+    transition:
+      transform 0.25s var(--ease-out-soft, ease),
+      box-shadow 0.25s ease;
+  }
+  .adv-marker--visited .adv-marker__dot {
+    background: var(--adventure-visited);
+    box-shadow:
+      0 0 0 2px var(--surface),
+      0 1px 3px rgb(0 0 0 / 0.25);
+  }
+  .adv-marker--wishlist .adv-marker__dot {
+    background: var(--surface);
+    border: 2px solid var(--adventure-wishlist);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+  }
+  .adv-marker:hover .adv-marker__dot,
+  .adv-marker:focus-visible .adv-marker__dot {
+    transform: scale(1.35);
+  }
+  .adv-marker[aria-pressed="true"] .adv-marker__dot {
+    transform: scale(1.5);
+    box-shadow:
+      0 0 0 2px var(--surface),
+      0 0 0 5px color-mix(in oklab, var(--accent) 45%, transparent);
+  }
+  .adv-marker--wishlist[aria-pressed="true"] .adv-marker__dot {
+    background: var(--adventure-wishlist);
+    border-color: var(--surface);
+  }
+  .adv-marker:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  /* Selected / hovered markers sit above their neighbours in dense clusters. */
+  .adv-map__marker-item:has(.adv-marker[aria-pressed="true"]),
+  .adv-map__marker-item:has(.adv-marker:hover),
+  .adv-map__marker-item:has(.adv-marker:focus-visible) {
+    z-index: 3;
+  }
+
+  /* Lightweight hover / focus preview */
+  .adv-marker__label {
+    position: absolute;
+    bottom: calc(50% + var(--size) / 2 + 6px);
+    left: 50%;
+    transform: translate(-50%, 4px);
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 0.4rem;
+    background: var(--surface);
+    color: var(--fg);
+    font-size: 0.72rem;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity 0.15s ease,
+      transform 0.15s ease;
+  }
+  @media (hover: hover) {
+    .adv-marker:hover .adv-marker__label,
+    .adv-marker:focus-visible .adv-marker__label {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .adv-map__country,
+    .adv-marker__dot,
+    .adv-marker__label,
+    .adv-map__view {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Map interaction. State lives in the DOM (aria-pressed / hidden / data-*),
+   * so there is nothing to keep in sync and no re-rendering.
+   */
+  type ViewBox = { x: number; y: number; w: number; h: number };
+
+  function setupAdventureMap(root: HTMLElement) {
+    if (root.dataset.bound) return;
+    root.dataset.bound = "true";
+
+    const section = root.closest<HTMLElement>("[data-adventures]") ?? document;
+    const svg = root.querySelector<SVGSVGElement>("[data-adv-svg]")!;
+    const markerItems = [...root.querySelectorAll<HTMLElement>(".adv-map__marker-item")];
+    const markers = [...root.querySelectorAll<HTMLButtonElement>("[data-adv-marker]")];
+    const countries = [...root.querySelectorAll<SVGPathElement>("[data-country].adv-map__country")];
+    const viewButtons = [...root.querySelectorAll<HTMLButtonElement>("[data-adv-view-btn]")];
+    const details = section.querySelector<HTMLElement>("[data-adv-details]");
+    const announce = details?.querySelector<HTMLElement>("[data-adv-announce]");
+    const listButtons = [
+      ...(details?.querySelectorAll<HTMLButtonElement>("[data-adv-select]") ?? []),
+    ];
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let lastTrigger: HTMLElement | null = null;
+
+    /* ---------------------------------------------------------- views */
+    const showView = (name: "list" | "location" | "country", key?: string) => {
+      details?.querySelectorAll<HTMLElement>("[data-adv-view]").forEach((el) => {
+        const matches =
+          el.dataset.advView === name &&
+          (name === "list" || el.dataset.advId === key || el.dataset.advCountry === key);
+        el.hidden = !matches;
+      });
+    };
+
+    const setSelectedMarker = (id: string | null) => {
+      markers.forEach((m) => m.setAttribute("aria-pressed", String(m.dataset.advMarker === id)));
+      listButtons.forEach((b) => {
+        if (b.dataset.advSelect === id) b.setAttribute("aria-current", "true");
+        else b.removeAttribute("aria-current");
+      });
+    };
+
+    const setSelectedCountry = (code: string | null) => {
+      countries.forEach((c) => {
+        if (c.dataset.country === code) c.dataset.selected = "true";
+        else delete c.dataset.selected;
+      });
+    };
+
+    const selectLocation = (id: string, { focusCard = false } = {}) => {
+      const marker = markers.find((m) => m.dataset.advMarker === id);
+      if (!marker) return;
+      setSelectedMarker(id);
+      setSelectedCountry(marker.dataset.country ?? null);
+      showView("location", id);
+      history.replaceState(null, "", `#adventure-${id}`);
+      const card = details?.querySelector<HTMLElement>(`[data-adv-id="${id}"]`);
+      if (announce) announce.textContent = `${marker.getAttribute("aria-label")}. Details shown.`;
+      if (focusCard) card?.focus({ preventScroll: true });
+    };
+
+    const selectCountry = (code: string) => {
+      setSelectedMarker(null);
+      setSelectedCountry(code);
+      showView("country", code);
+      history.replaceState(null, "", location.pathname + location.search);
+      const c = countries.find((p) => p.dataset.country === code);
+      if (announce)
+        announce.textContent = `${c?.getAttribute("aria-label") ?? code}. Details shown.`;
+    };
+
+    const clearSelection = () => {
+      setSelectedMarker(null);
+      setSelectedCountry(null);
+      showView("list");
+      history.replaceState(null, "", location.pathname + location.search);
+      if (announce) announce.textContent = "Details closed.";
+      lastTrigger?.focus({ preventScroll: true });
+      lastTrigger = null;
+    };
+
+    /* ---------------------------------------------------------- events */
+    /**
+     * In dense clusters (think Europe at world zoom) hit boxes overlap and the
+     * top-most button catches the tap. Resolve pointer clicks to the marker
+     * whose centre is nearest the pointer; keyboard activation (detail === 0)
+     * keeps the focused marker.
+     */
+    const nearestMarker = (x: number, y: number) => {
+      let best = markers[0];
+      let bestDistance = Infinity;
+      for (const m of markers) {
+        const r = m.getBoundingClientRect();
+        const d = Math.hypot(r.left + r.width / 2 - x, r.top + r.height / 2 - y);
+        if (d < bestDistance) {
+          bestDistance = d;
+          best = m;
+        }
+      }
+      return best;
+    };
+
+    markers.forEach((m) =>
+      m.addEventListener("click", (e) => {
+        const target = (e.detail === 0 ? m : nearestMarker(e.clientX, e.clientY)) ?? m;
+        const id = target.dataset.advMarker!;
+        lastTrigger = target;
+        if (target !== m) target.focus({ preventScroll: true });
+        if (target.getAttribute("aria-pressed") === "true") clearSelection();
+        else selectLocation(id);
+      }),
+    );
+
+    listButtons.forEach((b) =>
+      b.addEventListener("click", () => {
+        lastTrigger = b;
+        selectLocation(b.dataset.advSelect!, { focusCard: true });
+      }),
+    );
+
+    countries.forEach((c) => {
+      const activate = () => {
+        lastTrigger = c as unknown as HTMLElement;
+        selectCountry(c.dataset.country!);
+      };
+      c.addEventListener("click", activate);
+      c.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          activate();
+        }
+      });
+    });
+
+    details
+      ?.querySelectorAll<HTMLButtonElement>("[data-adv-close]")
+      .forEach((b) => b.addEventListener("click", clearSelection));
+
+    section.addEventListener("keydown", (e: Event) => {
+      if ((e as KeyboardEvent).key !== "Escape") return;
+      const somethingSelected =
+        markers.some((m) => m.getAttribute("aria-pressed") === "true") ||
+        countries.some((c) => c.dataset.selected);
+      if (somethingSelected) clearSelection();
+    });
+
+    /* ------------------------------------------------------------ zoom */
+    const parseBox = (s: string): ViewBox => {
+      const [x, y, w, h] = s.split(" ").map(Number);
+      return { x: x!, y: y!, w: w!, h: h! };
+    };
+    let current = parseBox(svg.getAttribute("viewBox")!);
+    let frame = 0;
+
+    const applyBox = (b: ViewBox) => {
+      svg.setAttribute("viewBox", `${b.x} ${b.y} ${b.w} ${b.h}`);
+      for (const item of markerItems) {
+        const x = Number(item.dataset.x);
+        const y = Number(item.dataset.y);
+        item.style.left = `${((x - b.x) / b.w) * 100}%`;
+        item.style.top = `${((y - b.y) / b.h) * 100}%`;
+      }
+    };
+
+    const animateTo = (target: ViewBox) => {
+      cancelAnimationFrame(frame);
+      if (reduceMotion) {
+        current = target;
+        applyBox(target);
+        return;
+      }
+      const from = { ...current };
+      const start = performance.now();
+      const duration = 380;
+      const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / duration);
+        const k = ease(t);
+        current = {
+          x: from.x + (target.x - from.x) * k,
+          y: from.y + (target.y - from.y) * k,
+          w: from.w + (target.w - from.w) * k,
+          h: from.h + (target.h - from.h) * k,
+        };
+        applyBox(current);
+        if (t < 1) frame = requestAnimationFrame(step);
+      };
+      frame = requestAnimationFrame(step);
+    };
+
+    viewButtons.forEach((b) =>
+      b.addEventListener("click", () => {
+        viewButtons.forEach((o) => o.setAttribute("aria-pressed", String(o === b)));
+        root.dataset.view = b.dataset.advViewBtn;
+        animateTo(parseBox(b.dataset.box!));
+      }),
+    );
+
+    /* -------------------------------------------- deep link (#adventure-id) */
+    const hash = location.hash.match(/^#adventure-(.+)$/);
+    if (hash && markers.some((m) => m.dataset.advMarker === hash[1])) {
+      selectLocation(hash[1]!);
+    }
+  }
+
+  const init = () =>
+    document.querySelectorAll<HTMLElement>("[data-adv-map]").forEach(setupAdventureMap);
+  init();
+  document.addEventListener("astro:page-load", init);
+</script>

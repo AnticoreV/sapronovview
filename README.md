@@ -196,6 +196,41 @@ Schema: `src/content.config.ts` → `projects`.
 - **About:** copy lives in `src/pages/about.astro`; the philosophy, values, facts and
   interests lists live in `src/data/about.ts`.
 
+## Adventures map
+
+The homepage "Adventures" section (`src/components/adventures/`) is an interactive world
+map of places visited and places on the wish list. Country outlines are generated at build
+time from the `world-atlas` dataset with `d3-geo`, so no map library, tiles or API keys are
+shipped to the browser; the only client code is a ~2 KB script for selection and zoom.
+
+**Add a location:** append an object to `adventures` in `src/data/adventures.ts`:
+
+```ts
+{
+  id: "lisbon",                 // unique, URL-safe; deep link is /#adventure-lisbon
+  country: "Portugal",
+  countryCode: "PT",            // ISO alpha-2; must exist in src/data/country-ids.ts
+  city: "Lisbon",
+  coordinates: { lat: 38.7223, lng: -9.1393 },
+  status: "visited",            // or "wishlist"
+  visitedAt: "2025",            // visited only
+  description: "…",             // visited only
+  // reason: "…", priority: "bucket-list" | "someday"   // wishlist only
+  image: "/images/adventures/lisbon.jpg",  // optional, 16:10 works best
+  href: "/writing/lisbon-trip",             // optional
+}
+```
+
+If the country is not yet in `src/data/country-ids.ts`, add its ISO numeric id there so the
+outline is highlighted and clickable (the build prints a warning otherwise). Extra zoom
+presets live in `mapViews` in the same data file.
+
+**Use it on another page:** `import AdventuresSection from "@components/adventures/AdventuresSection.astro"`
+and render `<AdventuresSection />` (props: `id`, `eyebrow`, `title`, `description`).
+
+**Theme it:** override the custom properties on `.adventures` in `AdventuresSection.astro`
+(`--adventure-visited`, `--adventure-wishlist`, `--adventure-marker-size`, `--adventure-land`, …).
+
 ## Adding images
 
 Two options:

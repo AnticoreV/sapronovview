@@ -1,0 +1,342 @@
+---
+/**
+ * Details panel. Every location card and country card is rendered at build
+ * time and hidden; the map script reveals the selected one. Without
+ * JavaScript the grouped destination list stays visible and readable.
+ */
+import { ArrowUpRight, X } from "lucide-astro";
+import {
+  groupByCountry,
+  placeLabel,
+  priorityLabels,
+  type AdventureLocation,
+} from "@data/adventures";
+
+interface Props {
+  locations: AdventureLocation[];
+}
+const { locations } = Astro.props;
+const visited = locations.filter((l) => l.status === "visited");
+const wishlist = locations.filter((l) => l.status === "wishlist");
+const countries = groupByCountry(locations);
+const statusLabel = (s: AdventureLocation["status"]) =>
+  s === "visited" ? "Visited" : "Want to visit";
+---
+
+<div class="adv-details" data-adv-details>
+  <p class="sr-only" aria-live="polite" data-adv-announce></p>
+
+  {/* Default view: grouped list. Also the no-JS fallback. */}
+  <div class="adv-details__list" data-adv-view="list">
+    <p class="adv-details__hint">Select a marker on the map, or pick a place below.</p>
+    {[
+      { key: "visited", title: "Visited", items: visited },
+      { key: "wishlist", title: "Want to visit", items: wishlist },
+    ].map((group) => (
+      <section aria-labelledby={`adv-group-${group.key}`}>
+        <h3 id={`adv-group-${group.key}`} class="adv-details__group-title">
+          <span
+            class:list={[
+              "adv-dot",
+              group.key === "visited" ? "adv-dot--visited" : "adv-dot--wishlist",
+            ]}
+            aria-hidden="true"
+          />
+          {group.title}
+          <span class="adv-details__group-count">{group.items.length}</span>
+        </h3>
+        <ul class="adv-details__items">
+          {group.items.map((a) => (
+            <li>
+              <button type="button" class="adv-details__item" data-adv-select={a.id}>
+                <span class="adv-details__item-name">{a.city ?? a.country}</span>
+                <span class="adv-details__item-meta">
+                  {a.city ? a.country : ""}
+                  {a.visitedAt && ` · ${a.visitedAt}`}
+                  {a.priority && ` · ${priorityLabels[a.priority]}`}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+
+  {/* One card per location */}
+  {locations.map((a) => (
+    <article
+      class="adv-card"
+      data-adv-view="location"
+      data-adv-id={a.id}
+      aria-labelledby={`adv-title-${a.id}`}
+      tabindex="-1"
+      hidden
+    >
+      <div class="adv-card__head">
+        <p class="adv-card__status">
+          <span
+            class:list={[
+              "adv-dot",
+              a.status === "visited" ? "adv-dot--visited" : "adv-dot--wishlist",
+            ]}
+            aria-hidden="true"
+          />
+          {statusLabel(a.status)}
+          {a.status === "visited" && a.visitedAt && (
+            <span class="adv-card__meta">· {a.visitedAt}</span>
+          )}
+          {a.status === "wishlist" && a.priority && (
+            <span class="adv-card__meta">· {priorityLabels[a.priority]}</span>
+          )}
+        </p>
+        <button type="button" class="adv-card__close" data-adv-close aria-label="Close details">
+          <X size={16} aria-hidden="true" />
+        </button>
+      </div>
+      <h3 id={`adv-title-${a.id}`} class="adv-card__title">
+        {a.city ?? a.country}
+      </h3>
+      {a.city && <p class="adv-card__country">{a.country}</p>}
+      {a.image && (
+        <img
+          class="adv-card__image"
+          src={a.image}
+          alt={a.imageAlt ?? placeLabel(a)}
+          width="640"
+          height="400"
+          loading="lazy"
+          decoding="async"
+        />
+      )}
+      {a.status === "visited" && a.description && <p class="adv-card__text">{a.description}</p>}
+      {a.status === "wishlist" && a.reason && (
+        <p class="adv-card__text">
+          <span class="adv-card__label">Why: </span>
+          {a.reason}
+        </p>
+      )}
+      {a.href && (
+        <a
+          class="adv-card__link"
+          href={a.href}
+          {...(a.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+        >
+          {a.hrefLabel ?? "Read more"}
+          <ArrowUpRight size={14} aria-hidden="true" />
+        </a>
+      )}
+    </article>
+  ))}
+
+  {/* One card per country, shown when a country outline is clicked */}
+  {countries.map((c) => (
+    <article
+      class="adv-card"
+      data-adv-view="country"
+      data-adv-country={c.countryCode}
+      aria-labelledby={`adv-country-${c.countryCode}`}
+      tabindex="-1"
+      hidden
+    >
+      <div class="adv-card__head">
+        <p class="adv-card__status">
+          {c.locations.length} {c.locations.length === 1 ? "place" : "places"}
+        </p>
+        <button type="button" class="adv-card__close" data-adv-close aria-label="Close details">
+          <X size={16} aria-hidden="true" />
+        </button>
+      </div>
+      <h3 id={`adv-country-${c.countryCode}`} class="adv-card__title">
+        {c.country}
+      </h3>
+      <ul class="adv-details__items">
+        {c.locations.map((a) => (
+          <li>
+            <button type="button" class="adv-details__item" data-adv-select={a.id}>
+              <span
+                class:list={[
+                  "adv-dot",
+                  a.status === "visited" ? "adv-dot--visited" : "adv-dot--wishlist",
+                ]}
+                aria-hidden="true"
+              />
+              <span class="adv-details__item-name">{a.city ?? a.country}</span>
+              <span class="adv-details__item-meta">{statusLabel(a.status)}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </article>
+  ))}
+</div>
+
+<style>
+  .adv-details {
+    min-height: 100%;
+  }
+  .adv-details__hint {
+    margin: 0 0 1rem;
+    font-size: 0.875rem;
+    color: var(--fg-subtle);
+  }
+  .adv-details__group-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+  .adv-details__group-count {
+    color: var(--fg-subtle);
+  }
+  .adv-details__items {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .adv-details__item {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid transparent;
+    border-radius: 0.6rem;
+    background: transparent;
+    color: var(--fg);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+  }
+  .adv-details__item:hover {
+    background: var(--surface-muted);
+  }
+  .adv-details__item[aria-current="true"] {
+    background: var(--accent-soft);
+    border-color: color-mix(in oklab, var(--accent) 35%, transparent);
+  }
+  .adv-details__item-name {
+    font-weight: 500;
+  }
+  .adv-details__item-meta {
+    font-size: 0.8rem;
+    color: var(--fg-subtle);
+  }
+
+  .adv-dot {
+    display: inline-block;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 999px;
+    box-sizing: border-box;
+    flex: none;
+    align-self: center;
+  }
+  .adv-dot--visited {
+    background: var(--adventure-visited);
+  }
+  .adv-dot--wishlist {
+    border: 2px solid var(--adventure-wishlist);
+  }
+
+  .adv-card {
+    outline: none;
+  }
+  .adv-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+  .adv-card__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+  }
+  .adv-card__meta {
+    color: var(--fg-subtle);
+    letter-spacing: 0.06em;
+    text-transform: none;
+  }
+  .adv-card__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--fg-muted);
+    cursor: pointer;
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease;
+  }
+  .adv-card__close:hover {
+    color: var(--fg);
+    border-color: var(--border-strong);
+  }
+  .adv-card__title {
+    margin: 0.75rem 0 0;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+  .adv-card__country {
+    margin: 0.15rem 0 0;
+    color: var(--fg-muted);
+  }
+  .adv-card__image {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    margin-top: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+  }
+  .adv-card__text {
+    margin: 1rem 0 0;
+    color: var(--fg-muted);
+    line-height: 1.6;
+  }
+  .adv-card__label {
+    color: var(--fg);
+    font-weight: 500;
+  }
+  .adv-card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 1rem;
+    color: var(--accent-strong);
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--accent) 50%, transparent);
+    text-underline-offset: 4px;
+  }
+  .adv-card .adv-details__items {
+    margin-top: 1rem;
+  }
+</style>
