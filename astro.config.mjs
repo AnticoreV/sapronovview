@@ -4,10 +4,9 @@ import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 
-// Update `site` to your production URL. It is used for canonical URLs,
-// the sitemap, the RSS feed and Open Graph metadata.
-// The `.example` TLD is a placeholder — see README "Update personal details".
-const SITE_URL = "https://your-domain.example";
+// Production URL. Used for canonical URLs, the sitemap, the RSS feed and
+// Open Graph metadata.
+const SITE_URL = "https://ivansapronov.com";
 
 export default defineConfig({
   site: SITE_URL,
