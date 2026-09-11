@@ -1,6 +1,6 @@
 ---
 updated: 2026-09-10
-location: "[CITY, COUNTRY]"
+location: "Prague, Czech Republic"
 working:
   - "Building Ownira — [one line on the current milestone]"
   - "Researching the market possibilities of the Apex line"

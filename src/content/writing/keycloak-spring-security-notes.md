@@ -8,7 +8,7 @@ draft: false
 placeholder: true
 ---
 
-> **Sample article.** Written as an example of a technical post. Replace it with your own notes — the topic reflects real experience listed on your LinkedIn profile, but the details below are generic.
+> **Sample article.** Written as an example of a technical post. Replace it with your own notes — the topic reflects real experience from your CV, but the details below are generic.
 
 Most Spring applications I have worked on eventually need proper identity: single sign-on, roles that mean something, tokens that expire. Keycloak is a reasonable default, and Spring Security speaks OAuth 2.0 natively. The integration is simple once you know which half of Spring Security you are actually using.
 

@@ -23,12 +23,14 @@ export const philosophy = [
 ];
 
 export const enjoys = [
-  "Distributed systems on the JVM",
-  "Identity & access (OAuth 2.0, OIDC, Keycloak)",
-  "Event-driven architectures with Kafka and RabbitMQ",
-  "APIs that are pleasant to integrate against",
-  "Dockerised local environments that just work",
-  "Android when the product calls for it",
+  "Microservices and event-driven systems on the JVM",
+  "Backend-for-frontend and aggregation layers",
+  "Identity & access (OAuth2, OIDC, Keycloak, CIAM)",
+  "Kotlin coroutines and reactive Spring",
+  "Angular products that replace manual processes",
+  "Cloud-native delivery on GCP, AWS and Kubernetes",
+  "CI/CD pipelines that stay fast under load",
+  "LLM and agentic tooling for routine engineering work",
   "Market research for things I might build next",
 ];
 

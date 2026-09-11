@@ -12,14 +12,14 @@ export const siteConfig = {
   /** Full name, used in the header, hero, footer and structured data. */
   name: "Ivan Sapronov",
   /** Short professional title shown next to the name. */
-  title: "Fullstack Software Engineer",
+  title: "Fullstack / Backend Software Engineer",
   /** One-sentence description used for <meta name="description"> and the hero. */
   description:
-    "Fullstack software engineer with 4+ years building backend and web systems — distributed services, identity, and the occasional Android app. Pilot in training, motorcyclist, and collector of countries.",
-  /** Where you are based. Replace the placeholder. */
-  location: "[YOUR LOCATION]",
-  /** Public contact email. */
-  email: "sapronovivancore@gmail.com",
+    "Fullstack / backend engineer with ~5 years shipping Java, Kotlin, Spring and Angular systems — microservices, SSO/CIAM and cloud-native deployments on GCP, AWS and Kubernetes. Pilot in training, motorcyclist, collector of countries.",
+  /** Where you are based. */
+  location: "Prague, Czech Republic",
+  /** Public contact email (the professional address from your CV). */
+  email: "sapronovivanprace@gmail.com",
   /** Current availability shown as a status pill in the hero. */
   availability: {
     /** "open" | "limited" | "closed" */
@@ -44,6 +44,12 @@ export const siteConfig = {
   },
   /** Handle used in <meta name="twitter:creator"> if you have an X/Twitter account. */
   twitterHandle: "",
+  /** Spoken languages, shown on the About page. */
+  languages: [
+    { name: "English", level: "Professional" },
+    { name: "Czech", level: "Professional" },
+    { name: "Russian", level: "Native" },
+  ],
 } as const;
 
 export type SocialKey = keyof typeof siteConfig.social;
@@ -66,19 +72,51 @@ export const navigation = [
  */
 export const techStack = [
   {
-    group: "Backend",
-    items: ["Java", "Kotlin", "Spring Boot", "Spring Security", "Hibernate / JPA", "Node.js"],
+    group: "Languages & backend",
+    items: [
+      "Java",
+      "Kotlin",
+      "TypeScript",
+      "Spring Boot",
+      "Spring WebFlux",
+      "Spring Security",
+      "JPA / Hibernate",
+      "Kotlin Coroutines",
+      "REST & GraphQL",
+      "OpenAPI",
+    ],
   },
   {
-    group: "Web",
-    items: ["TypeScript", "Angular", "Astro", "HTML & CSS", "Tailwind CSS"],
+    group: "Frontend",
+    items: ["Angular", "RxJS", "NgRx", "React", "Astro", "Tailwind CSS"],
   },
   {
-    group: "Data & messaging",
-    items: ["PostgreSQL", "Redis", "Kafka", "RabbitMQ"],
+    group: "Cloud & infrastructure",
+    items: [
+      "GCP",
+      "AWS (S3, SQS, CloudWatch)",
+      "Docker",
+      "Kubernetes",
+      "Argo CD",
+      "Terraform",
+      "Helm",
+      "GitHub Actions",
+      "GitLab CI",
+    ],
   },
   {
-    group: "Identity & infra",
-    items: ["Keycloak", "OAuth 2.0 / OIDC", "Docker", "CI/CD", "SonarQube"],
+    group: "Data, auth & observability",
+    items: [
+      "PostgreSQL",
+      "Redis",
+      "Kafka",
+      "ElasticSearch",
+      "Flyway",
+      "Keycloak",
+      "OAuth2 / OIDC",
+      "Testcontainers",
+      "Grafana & Prometheus",
+      "LLMs & MCP",
+    ],
   },
 ] as const;

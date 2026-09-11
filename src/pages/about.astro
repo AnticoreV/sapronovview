@@ -42,9 +42,10 @@ const gallery = [
       </h1>
       <div class="text-fg-muted mt-6 space-y-4 text-lg leading-relaxed">
         <p>
-          I'm {siteConfig.name}, a fullstack software engineer with more than four years in backend
-          and web development. I spend most of my time on the JVM — Java and Kotlin, Spring, and the
-          ecosystem of brokers, caches and identity providers that real systems are made of.
+          I'm {siteConfig.name}, a fullstack / backend engineer based in Prague with about five
+          years of building and scaling enterprise web applications and services. I spend most of my
+          time on the JVM — Java and Kotlin, Spring — and on the Angular frontends, cloud
+          infrastructure and identity systems that real products are made of.
         </p>
         <p>
           The rest of my time goes to things with engines and horizons: ultralight aircraft,
@@ -93,27 +94,30 @@ const gallery = [
       </div>
       <div class="text-fg-muted space-y-4 text-lg leading-relaxed">
         <p>
-          I started in Java — designing application infrastructure, defining business logic and
-          wiring Hibernate to real databases. Early work included parsers, messenger bots and admin
-          panels: unglamorous, but the fastest way to learn how data actually moves through a
-          company.
+          I started freelancing in Java in 2021, building a CRM with an admin panel and the
+          analytics services behind its React dashboards. At Ableneo the problems got more
+          distributed: Redis caching and reactive services with Spring WebFlux, Keycloak for SSO and
+          CIAM, Kafka with custom connectors, Dockerised services on Kubernetes, and the Grafana,
+          Prometheus and InfluxDB stack to watch it all in production.
         </p>
         <p>
-          From there the problems got more distributed. I integrated Redis caching, built custom
-          Kafka and RabbitMQ connectors so services could talk to each other reliably, and
-          implemented OAuth 2.0 authorisation with Spring Security and Keycloak — the identity layer
-          (CIAM, SSO) that every product eventually needs and nobody wants to get wrong. Along the
-          way I picked up performance testing, Dockerising systems and analysing infrastructure that
-          other people had built.
+          At CCA Group I owned both sides of the stack — a dynamic form engine in Angular that cut
+          the time to create new form types from days to hours, and the Java services behind it,
+          some of which I moved to Kotlin coroutines to roughly halve p95 latency under peak load.
+          At NCR Voyix I designed backend-for-frontend and aggregator services for a system serving
+          around two million users, built a self-service Angular platform for US clients, ran
+          services on GCP with full observability, and started using LLM and agentic tooling to take
+          the routine out of engineering work.
         </p>
         <p>
-          On the client side I've shipped an Angular wallet for multi-currency accounts and
-          contributed a kanban board to Faradey, a Matrix-based Android messenger — a reminder that
-          the backend only matters if the thing on the screen works.
+          Most recently I spent three months at CreativeDock building Kotlin/Spring Boot
+          microservices from scratch and fixing the GitLab CI and Argo CD plumbing around them.
+          Alongside all that I've contributed a kanban board to Faradey, a Matrix-based Android
+          messenger, and shipped a couple of wallet applications.
         </p>
         <p class="border-border-strong bg-surface text-fg-muted rounded-lg border border-dashed px-4 py-3 text-base">
-          [Add the personal part of the story: where you grew up, what got you into computers, the
-          first thing you flew or rode, and where you're based now.]
+          [Add the personal part of the story: where you grew up, what got you into computers, and
+          the first thing you flew or rode.]
         </p>
       </div>
     </div>
@@ -156,6 +160,15 @@ const gallery = [
           </div>
         ))}
       </dl>
+      <p class="eyebrow mt-10 mb-3">Languages</p>
+      <ul class="flex flex-wrap gap-2">
+        {siteConfig.languages.map((l) => (
+          <li class="border-border bg-surface rounded-pill border px-3.5 py-1.5 text-sm">
+            <span class="text-fg font-medium">{l.name}</span>
+            <span class="text-fg-subtle"> · {l.level}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   </section>
 
