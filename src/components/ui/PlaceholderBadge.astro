@@ -1,21 +1,16 @@
 ---
 /**
- * Tiny dashed pill that marks content still containing placeholder text.
- * Remove `placeholder: true` from the entry's frontmatter to hide it.
+ * Dev-only marker for content that still contains placeholders. Production
+ * builds never render placeholder entries, so this never ships.
  */
 interface Props {
   label?: string;
-  class?: string;
 }
-const { label = "Placeholder", class: className } = Astro.props;
+const { label = "Placeholder" } = Astro.props;
 ---
 
-<span
-  class:list={[
-    "border-border-strong text-fg-subtle inline-flex items-center gap-1 rounded-pill border border-dashed px-2 py-0.5 font-mono text-[0.65rem] tracking-wider uppercase",
-    className,
-  ]}
-  title="This entry still contains placeholder text"
->
-  {label}
-</span>
+{import.meta.env.DEV && (
+  <span class="mono inline-flex items-center rounded-sm border border-dashed border-ink-muted px-1.5 py-0.5 text-[11px] font-semibold tracking-[0.04em] text-ink-muted uppercase">
+    [{label}]
+  </span>
+)}

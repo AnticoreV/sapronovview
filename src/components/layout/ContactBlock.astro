@@ -1,0 +1,64 @@
+---
+/**
+ * The night-panel contact block that closes every page: three ContactRoutes
+ * (hiring, investing, partnering → /contact with the topic preselected) and the
+ * email address as the primary button.
+ */
+import ContactRoute from "@components/contact/ContactRoute.astro";
+import { siteConfig } from "@config";
+import { contactRoutes } from "@data/contact";
+
+interface Props {
+  /** Heading level: 2 inside a page, 1 when the block is the page (/contact). */
+  level?: 1 | 2;
+}
+const { level = 2 } = Astro.props;
+const Heading = level === 1 ? "h1" : "h2";
+---
+
+<section
+  id="contact"
+  class="night band section-y bg-panel text-ink"
+  aria-labelledby="contact-heading"
+>
+  <div class="shell flex flex-col gap-11">
+    <Heading
+      id="contact-heading"
+      class="display text-[clamp(3rem,7.4vw,7.25rem)] leading-[0.88] tracking-[-0.02em]"
+    >
+      Cleared for
+      <br />
+      <span class="text-select">your project.</span>
+    </Heading>
+    <ul class="grid grid-cols-[repeat(auto-fit,minmax(min(300px,100%),1fr))] gap-4">
+      {contactRoutes.map((route) => (
+        <li class="flex">
+          <ContactRoute route={route} href={`/contact?topic=${route.id}`} />
+        </li>
+      ))}
+    </ul>
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-4">
+      <a href={`mailto:${siteConfig.email}`} class="btn btn-primary min-h-[54px] max-w-full px-7">
+        <span class="truncate">{siteConfig.email}</span>
+      </a>
+      {siteConfig.social.linkedin && (
+        <a
+          href={siteConfig.social.linkedin}
+          class="link-inline inline-flex min-h-11 items-center underline-offset-[6px]"
+          rel="me"
+        >
+          LinkedIn
+        </a>
+      )}
+      {siteConfig.social.github && (
+        <a
+          href={siteConfig.social.github}
+          class="link-inline inline-flex min-h-11 items-center underline-offset-[6px]"
+          rel="me"
+        >
+          GitHub
+        </a>
+      )}
+    </div>
+  </div>
+</section>

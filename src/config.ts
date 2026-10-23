@@ -4,34 +4,46 @@
  * Every page, component and SEO tag reads from this file, so updating your
  * personal details here updates them everywhere.
  *
- * Values wrapped in square brackets, e.g. "[YOUR LOCATION]", are placeholders
- * that still need to be replaced with real information.
+ * Values wrapped in square brackets, e.g. "[YOUR LOCATION]", are placeholders:
+ * they never render in production (see README "Still to fill").
  */
+
+export type Availability = "open" | "limited" | "closed";
 
 export const siteConfig = {
   /** Full name, used in the header, hero, footer and structured data. */
   name: "Ivan Sapronov",
-  /** Short professional title shown next to the name. */
-  title: "Fullstack / Backend Software Engineer",
-  /** One-sentence description used for <meta name="description"> and the hero. */
+  /** Header callsign (aircraft-registration style) and home base (ICAO code of Prague). */
+  callsign: "I.SAPRONOV",
+  base: "LKPR",
+  /** Short professional title, used in <title>, Open Graph and JSON-LD. */
+  title: "Backend & Fullstack Engineer · Founder",
+  /** Meta description (from the approved hero lede). */
   description:
-    "Fullstack / backend engineer with ~5 years shipping Java, Kotlin, Spring and Angular systems — microservices, SSO/CIAM and cloud-native deployments on GCP, AWS and Kubernetes. Pilot in training, motorcyclist, collector of countries.",
+    "Backend & fullstack engineer and founder in Prague. I build backend systems and products, set up AI agents and automation, and ship services to production.",
+  /** Hero copy, approved with the D4 · Pre-flight design (2026-10-22). */
+  hero: {
+    eyebrow: "PRE-FLIGHT ✓ · BACKEND & FULLSTACK ENGINEER · FOUNDER",
+    lede: "I build backend systems and products, set up AI agents and automation, and ship services to production. Instruments, not adjectives — every number on this panel is real.",
+  },
   /** Where you are based. */
   location: "Prague, Czech Republic",
-  /** Public contact email (the professional address from your CV). */
+  city: "Prague",
+  /** Public contact email (the professional address from the CV). */
   email: "sapronovivanprace@gmail.com",
-  /** Current availability shown as a status pill in the hero. */
+  /** Availability: drives the annunciator in the header, hero panel and crew card. */
   availability: {
-    /** "open" | "limited" | "closed" */
-    status: "open" as "open" | "limited" | "closed",
-    label: "Open to interesting projects",
+    status: "open" as Availability,
+    label: "Open to projects",
   },
-  /** What you are working on right now (one line, shown on the homepage). */
-  currentFocus: "Building Ownira and researching the Apex line market opportunity",
+  /** What you are working on right now (one line). */
+  currentFocus: "Building Ownira (in pilot) and validating Apexline",
+  /** Experience on the JVM, as stated in the CV (~5 years). */
+  experienceSummary: "~5 yrs on the JVM",
   /** Language for <html lang> and Open Graph locale. */
   locale: "en",
   ogLocale: "en_US",
-  /** Default Open Graph image (1200×630). Replace the placeholder file in /public/images. */
+  /** Default Open Graph image (1200×630), generated at build time — see src/lib/brand-images.ts. */
   ogImage: "/images/og-default.png",
   /** Public profile links. Leave a value empty ("") to hide it. */
   social: {
@@ -44,17 +56,39 @@ export const siteConfig = {
   },
   /** Handle used in <meta name="twitter:creator"> if you have an X/Twitter account. */
   twitterHandle: "",
-  /** Spoken languages, shown on the About page. */
+  /** Spoken languages, shown on the About page and the crew card. */
   languages: [
-    { name: "English", level: "Professional" },
-    { name: "Czech", level: "Professional" },
-    { name: "Russian", level: "Native" },
+    { name: "English", code: "EN", level: "Professional" },
+    { name: "Czech", code: "CS", level: "Professional" },
+    { name: "Russian", code: "RU", level: "Native" },
   ],
+  /**
+   * Contact form endpoint (Formspree: "https://formspree.io/f/<id>").
+   * Set PUBLIC_FORM_ACTION at build time. While it is empty the form says so
+   * and email stays the primary channel.
+   */
+  formAction: (import.meta.env.PUBLIC_FORM_ACTION as string | undefined) ?? "",
 } as const;
 
 export type SocialKey = keyof typeof siteConfig.social;
 
-/** Top-level navigation. Order here is the order in the header and footer. */
+/** Annunciator wording for each availability state (long + short for mobile). */
+export const availabilityText: Record<Availability, { long: string; short: string }> = {
+  open: { long: "OPEN TO PROJECTS", short: "OPEN" },
+  limited: { long: "LIMITED AVAILABILITY", short: "LIMITED" },
+  closed: { long: "NOT AVAILABLE", short: "CLOSED" },
+};
+
+/** Header strip navigation (mono, uppercase). `match` marks the active page. */
+export const primaryNav = [
+  { label: "Products", href: "/#build" },
+  { label: "Systems", href: "/#capabilities" },
+  { label: "Cases", href: "/projects", match: "/projects" },
+  { label: "Log", href: "/experience", match: "/experience" },
+  { label: "Writing", href: "/writing", match: "/writing" },
+] as const;
+
+/** Every page — used by the mobile sheet and the footer. */
 export const navigation = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
@@ -68,8 +102,8 @@ export const navigation = [
 ] as const;
 
 /**
- * Technologies you use most often. Shown on the homepage.
- * Grouped so the list reads as a system rather than a keyword dump.
+ * Technologies you use most often, grouped so the list reads as a system
+ * rather than a keyword dump. Shown on the About page.
  */
 export const techStack = [
   {

@@ -1,0 +1,84 @@
+---
+/**
+ * One <picture> with a day and a night image. Night sources match
+ * `(prefers-color-scheme: dark)`, which is also the default theme, so the browser
+ * downloads only the image it shows. When the stored theme overrides the OS (or the
+ * knob is turned), a tiny script re-targets the sources to the `.dark` class.
+ */
+import { getImage } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  day: ImageMetadata;
+  night: ImageMetadata;
+  alt: string;
+  widths: number[];
+  sizes: string;
+  loading?: "eager" | "lazy";
+  fetchpriority?: "high" | "auto";
+  class?: string;
+}
+const {
+  day,
+  night,
+  alt,
+  widths,
+  sizes,
+  loading = "lazy",
+  fetchpriority,
+  class: className,
+} = Astro.props;
+
+const variant = async (src: ImageMetadata, format: "avif" | "webp") =>
+  getImage({ src, widths: widths.filter((w) => w <= src.width), format });
+const [dayAvif, dayWebp, nightAvif, nightWebp] = await Promise.all([
+  variant(day, "avif"),
+  variant(day, "webp"),
+  variant(night, "avif"),
+  variant(night, "webp"),
+]);
+const DARK = "(prefers-color-scheme: dark)";
+---
+
+<picture data-theme-picture>
+  <source
+    data-theme-source="night"
+    media={DARK}
+    type="image/avif"
+    srcset={nightAvif.srcSet.attribute}
+    sizes={sizes}
+  />
+  <source
+    data-theme-source="night"
+    media={DARK}
+    type="image/webp"
+    srcset={nightWebp.srcSet.attribute}
+    sizes={sizes}
+  />
+  <source type="image/avif" srcset={dayAvif.srcSet.attribute} sizes={sizes} />
+  <source type="image/webp" srcset={dayWebp.srcSet.attribute} sizes={sizes} />
+  <img
+    src={dayWebp.src}
+    alt={alt}
+    width={day.width}
+    height={day.height}
+    loading={loading}
+    decoding={loading === "eager" ? "sync" : "async"}
+    fetchpriority={fetchpriority}
+    class={className}
+  />
+</picture>
+
+<script>
+  /** Point night sources at the `.dark` class instead of the OS preference. */
+  function syncThemePictures() {
+    const night = document.documentElement.classList.contains("dark");
+    const osNight = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const media = night === osNight ? "(prefers-color-scheme: dark)" : night ? "all" : "not all";
+    document.querySelectorAll<HTMLSourceElement>("[data-theme-source='night']").forEach((s) => {
+      if (s.media !== media) s.media = media;
+    });
+  }
+  document.addEventListener("astro:page-load", syncThemePictures);
+  document.addEventListener("themechange", syncThemePictures);
+</script>

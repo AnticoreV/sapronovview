@@ -1,70 +1,80 @@
 ---
 /**
- * Root layout: <head> (fonts, SEO, theme bootstrap), header, footer,
- * skip link and view transitions.
+ * Root layout: <head> (fonts, SEO, theme bootstrap), header strip, the night-panel
+ * contact block that closes every page, footer, skip link and view transitions.
  */
 import { ClientRouter } from "astro:transitions";
 import { Font } from "astro:assets";
 import SEO, { type Props as SEOProps } from "@components/seo/SEO.astro";
 import Header from "@components/layout/Header.astro";
 import Footer from "@components/layout/Footer.astro";
+import ContactBlock from "@components/layout/ContactBlock.astro";
 import { siteConfig } from "@config";
 import "@styles/global.css";
 
 interface Props extends SEOProps {
   /** Extra classes for <main>. */
   class?: string;
+  /** Every page ends with the night-panel contact block; /contact is that block itself. */
+  contactBlock?: boolean;
 }
-const { class: className, ...seo } = Astro.props;
+const { class: className, contactBlock = true, ...seo } = Astro.props;
 ---
 
 <!doctype html>
-<html lang={siteConfig.locale} class="scroll-pt-24">
+<html lang={siteConfig.locale}>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#fbfaf8" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#151311" media="(prefers-color-scheme: dark)" />
+    {/* The header strip is an instrument face in both themes. */}
+    <meta name="theme-color" content="#101211" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    {/* Theme bootstrap — runs before paint to avoid a flash of the wrong theme. */}
+    {/* Theme bootstrap — runs before paint so there is no flash of the wrong panel.
+        Stored choice wins; otherwise the OS preference decides. */}
     <script is:inline>
       (() => {
-        const applyTheme = () => {
+        const apply = () => {
+          let stored = null;
           try {
-            const stored = localStorage.getItem("theme");
-            const dark = stored
-              ? stored === "dark"
-              : window.matchMedia("(prefers-color-scheme: dark)").matches;
-            document.documentElement.classList.toggle("dark", dark);
+            stored = localStorage.getItem("theme");
           } catch {
             /* storage unavailable */
           }
+          const dark = stored
+            ? stored === "dark"
+            : window.matchMedia("(prefers-color-scheme: dark)").matches;
+          document.documentElement.classList.toggle("dark", dark);
         };
-        applyTheme();
-        document.addEventListener("astro:after-swap", applyTheme);
+        apply();
+        document.addEventListener("astro:after-swap", apply);
       })();
     </script>
-    <Font cssVariable="--font-family-display" preload />
-    <Font cssVariable="--font-family-sans" preload />
+    {/* Latin subsets are preloaded; latin-ext (Czech diacritics) loads on demand. */}
+    <Font cssVariable="--font-saira" preload />
+    <Font cssVariable="--font-saira-ext" />
+    <Font cssVariable="--font-jetbrains-mono" preload />
+    <Font cssVariable="--font-jetbrains-mono-ext" />
 
     <SEO {...seo} />
     <ClientRouter fallback="swap" />
+    <slot name="head" />
   </head>
   <body class="flex min-h-dvh flex-col">
     <a
       href="#main"
-      class="bg-accent text-on-accent sr-only rounded-pill px-4 py-2 font-medium focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50"
+      class="btn btn-primary btn-sm sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50"
     >
       Skip to content
     </a>
     <Header />
-    <main id="main" class:list={["flex-1", className]} tabindex="-1">
+    <main id="main" class:list={["flex-1 outline-none", className]} tabindex="-1">
       <slot />
     </main>
+    {contactBlock && <ContactBlock />}
     <Footer />
   </body>
 </html>

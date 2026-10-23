@@ -3,8 +3,10 @@
  * All <head> metadata: title, description, canonical, Open Graph, Twitter
  * cards, RSS discovery, and Person / WebSite structured data.
  */
+import { getImage } from "astro:assets";
 import JsonLd from "@components/seo/JsonLd.astro";
 import { siteConfig } from "@config";
+import { defaultPortrait } from "@lib/portraits";
 import { cleanPath } from "@lib/utils";
 
 export interface Props {
@@ -47,20 +49,27 @@ const fullTitle = titleTemplate ? `${title} · ${siteConfig.name}` : title;
 
 const isHome = pathname === "/";
 
+const portrait = isHome
+  ? await getImage({ src: defaultPortrait.studio, width: 640, format: "jpg" })
+  : undefined;
+
 const personLd = {
   "@context": "https://schema.org",
   "@type": "Person",
   "@id": `${site.origin}/#person`,
   name: siteConfig.name,
-  jobTitle: siteConfig.title,
+  jobTitle: "Backend & Fullstack Engineer",
   description: siteConfig.description,
   url: site.origin,
   email: `mailto:${siteConfig.email}`,
-  image: new URL("/images/about/portrait.jpg", site).toString(),
+  ...(portrait ? { image: new URL(portrait.src, site).toString() } : {}),
   sameAs: Object.values(siteConfig.social).filter(Boolean),
-  ...(siteConfig.location && !siteConfig.location.startsWith("[")
-    ? { address: { "@type": "PostalAddress", addressLocality: siteConfig.location } }
-    : {}),
+  knowsLanguage: siteConfig.languages.map((l) => l.name),
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: siteConfig.city,
+    addressCountry: "CZ",
+  },
 };
 
 const websiteLd = {
