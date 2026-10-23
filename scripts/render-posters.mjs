@@ -1,9 +1,10 @@
 /**
  * Render the 3D posters (the LCP images and reduced-motion / no-WebGL fallbacks)
- * from the live scenes, at the real stage size and 2× density:
+ * from the live scenes, at the real stage size (1440 viewport) and 2× density:
  *
- *   src/assets/hero/panel-{day,night}.png   ← src/scripts/panel3d.ts on /
- *   src/assets/globe/globe-{day,night}.png  ← src/scripts/globe3d.ts on /adventures
+ *   src/assets/hero/blueprint-{light,dark}.png  ← src/scripts/hero3d.ts on / (t = 12.85 s,
+ *                                                the finished drawing)
+ *   src/assets/globe/globe-{light,dark}.png  ← src/scripts/globe3d.ts on /adventures
  *
  * Usage (needs a running preview of the current build):
  *   npm run build && npm run preview -- --host 127.0.0.1 --port 4321 &
@@ -23,11 +24,11 @@ const DPR = 2;
 
 const jobs = [
   {
-    name: "panel",
-    path: `/?panel-capture=${DPR}`,
-    flag: "__panelReady",
-    canvas: ".panel-canvas",
-    out: "src/assets/hero/panel",
+    name: "hero",
+    path: `/?hero-capture=${DPR}`,
+    flag: "__heroReady",
+    canvas: ".hero-canvas",
+    out: "src/assets/hero/blueprint",
   },
   {
     name: "globe",
@@ -44,16 +45,16 @@ const browser = await chromium.launch({
 });
 
 try {
-  for (const theme of ["day", "night"]) {
+  for (const theme of ["light", "dark"]) {
     const context = await browser.newContext({
       viewport: { width: 1440, height: 900 },
       deviceScaleFactor: 1,
-      colorScheme: theme === "night" ? "dark" : "light",
+      colorScheme: theme,
       reducedMotion: "no-preference",
     });
     await context.addInitScript((t) => {
       try {
-        localStorage.setItem("theme", t === "night" ? "dark" : "light");
+        localStorage.setItem("theme", t);
       } catch {
         /* ignore */
       }
@@ -62,7 +63,7 @@ try {
     page.on("pageerror", (e) => console.error(`[${theme}] page error:`, e.message));
     for (const job of jobs) {
       await page.goto(BASE + job.path, { waitUntil: "networkidle" });
-      await page.waitForFunction((flag) => Boolean(window[flag]), job.flag, { timeout: 60_000 });
+      await page.waitForFunction((flag) => Boolean(window[flag]), job.flag, { timeout: 120_000 });
       const { dataUrl, width, height } = await page.evaluate((sel) => {
         const c = document.querySelector(sel);
         return { dataUrl: c.toDataURL("image/png"), width: c.width, height: c.height };
