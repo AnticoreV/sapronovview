@@ -209,6 +209,17 @@
     display: none !important;
   }
 
+  /* Safe-area padding for notched phones (classes instead of inline styles). */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  .pt-safe-10 {
+    padding-top: max(10px, env(safe-area-inset-top));
+  }
+  .pb-safe-18 {
+    padding-bottom: max(18px, env(safe-area-inset-bottom));
+  }
+
   /* Numbers line up like on a readout. */
   .tabular {
     font-variant-numeric: tabular-nums;
