@@ -3,9 +3,10 @@
  * "Proof in production" (03) — the homepage case rows: title, summary, metric chips
  * from src/data/readouts.ts and mono meta. "All projects →".
  */
+import Glyphs from "@components/ui/Glyphs.astro";
 import SectionHeader from "@components/ui/SectionHeader.astro";
 import { homeCases } from "@data/home";
-import { readouts } from "@data/readouts";
+import { readouts, type Readout, type ReadoutId } from "@data/readouts";
 import type { Project } from "@lib/content";
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
 }
 const { projects } = Astro.props;
 const cases = homeCases.filter((c) => projects.some((p) => p.id === c.slug));
+const readout = (id: ReadoutId): Readout => readouts[id];
 ---
 
 {cases.length > 0 && (
@@ -37,7 +39,13 @@ const cases = homeCases.filter((c) => projects.some((p) => p.id === c.slug));
               <span class="flex flex-col gap-2.5">
                 <span class="flex flex-wrap gap-1.5">
                   {c.chips.map((id) => (
-                    <span class="chip bg-bg uppercase">{readouts[id].chip}</span>
+                    <span class="chip bg-bg uppercase">
+                      <Glyphs
+                        text={readout(id).chip ?? readout(id).value}
+                        spoken={readout(id).chipSpoken}
+                        weight="bold"
+                      />
+                    </span>
                   ))}
                 </span>
                 <span class="mono text-[12px] text-ink-muted uppercase">{c.meta.join(" · ")}</span>

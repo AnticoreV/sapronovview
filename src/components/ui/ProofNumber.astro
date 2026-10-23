@@ -5,6 +5,7 @@
  * src/data/readouts.ts. Values with `count` count up once when first seen (static
  * under reduced motion).
  */
+import Glyphs from "@components/ui/Glyphs.astro";
 import type { Readout } from "@data/readouts";
 
 interface Props {
@@ -26,9 +27,11 @@ const count = readout.count;
     data-count-to={count?.to}
     data-count-prefix={count?.prefix}
     data-count-suffix={count?.suffix}
+    aria-hidden={readout.spoken ? "true" : undefined}
   >
-    {readout.value}
+    <Glyphs text={readout.value} weight="heavy" />
   </span>
+  {readout.spoken && <span class="sr-only">{readout.spoken}</span>}
   <span class="mono text-[12px] font-medium tracking-[0.04em] text-ink-muted uppercase">
     {readout.label} · {readout.source}
   </span>

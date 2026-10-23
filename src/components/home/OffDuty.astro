@@ -4,6 +4,7 @@
  * While a post is published, the Writing rows render above it (same style as the cases).
  */
 import type { Post } from "@lib/content";
+import Arrow from "@components/ui/Arrow.astro";
 import SectionHeader from "@components/ui/SectionHeader.astro";
 
 interface Props {
@@ -56,7 +57,8 @@ const offDuty = [
       <p class="text-[18px]">{offDuty}</p>
     </div>
     <a href="/hobbies" class="link-more">
-      Hobbies &amp; map&nbsp;<span aria-hidden="true">→</span>
+      Hobbies &amp; map
+      <Arrow class="ml-[0.4em]" />
     </a>
   </div>
 </section>

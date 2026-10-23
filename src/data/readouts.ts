@@ -16,8 +16,10 @@ export type Readout = {
   label: string;
   /** Where it comes from — employer or client, as in the track record. */
   source: string;
-  /** Display value, exactly as shown. */
+  /** Display value, exactly as shown (→ and ≈ are drawn as inline SVG, see Glyphs). */
   value: string;
+  /** The value in words for screen readers when the symbols don't read well ("hours to minutes"). */
+  spoken?: string;
   /** Optional count-up for the HTML number. */
   count?: { prefix?: string; to: number; suffix?: string };
   /** One-line context in words, used for screen readers and case studies. */
@@ -26,6 +28,8 @@ export type Readout = {
   project?: string;
   /** Metric chip on the homepage case rows (mono, uppercase), e.g. "~2M users". */
   chip?: string;
+  /** The chip in words for screen readers, when it differs from the plain reading. */
+  chipSpoken?: string;
 };
 
 export const readouts = {
@@ -34,11 +38,13 @@ export const readouts = {
     label: "Users served",
     source: "NCR Voyix",
     value: "~2M",
+    spoken: "about 2 million",
     count: { prefix: "~", to: 2, suffix: "M" },
     detail:
       "Enterprise system serving around two million users, run on GCP with full observability.",
     project: "self-service-menu-platform",
     chip: "~2M users",
+    chipSpoken: "about 2 million users",
   },
   downstream: {
     id: "downstream",
@@ -55,6 +61,7 @@ export const readouts = {
     label: "p95 latency, roughly halved",
     source: "CCA Group",
     value: "≈ ½",
+    spoken: "approximately half",
     detail:
       "Kotlin coroutines ran independent downstream calls concurrently — p95 latency roughly halved under peak load.",
     project: "dynamic-form-engine",
@@ -65,15 +72,18 @@ export const readouts = {
     label: "CI queue time",
     source: "CreativeDock",
     value: "h → min",
+    spoken: "hours to minutes",
     detail: "GitLab CI build queue times cut from hours to minutes.",
     project: "creativedock-greenfield-services",
     chip: "CI h → min",
+    chipSpoken: "CI queue: hours to minutes",
   },
   formTypes: {
     id: "form-types",
     label: "New form type",
     source: "CCA Group",
     value: "days → h",
+    spoken: "days to hours",
     detail: "Effort to create a new form type went from days to hours.",
     project: "dynamic-form-engine",
     chip: "days → hours",

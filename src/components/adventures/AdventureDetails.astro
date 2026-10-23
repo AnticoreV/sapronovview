@@ -9,6 +9,7 @@
  *   in  `adventure:pick`   { id } | { country } | {}  (from the map or globe)
  *   out `adventure:select` { id, country, lat, lng }   (map + globe follow)
  */
+import Arrow from "@components/ui/Arrow.astro";
 import { groupByCountry, home, priorityLabels, type AdventureLocation } from "@data/adventures";
 import { shown } from "@lib/content";
 
@@ -119,7 +120,7 @@ const groups = [
       {a.href && (
         <a href={a.href} class="link-more mt-4">
           {a.hrefLabel ?? "Read more"}
-          <span aria-hidden="true">&nbsp;→</span>
+          <Arrow class="ml-[0.4em]" />
         </a>
       )}
     </article>

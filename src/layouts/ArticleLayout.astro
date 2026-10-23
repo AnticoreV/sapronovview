@@ -3,6 +3,7 @@
 import { Image } from "astro:assets";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
+import Arrow from "@components/ui/Arrow.astro";
 import FormattedDate from "@components/ui/FormattedDate.astro";
 import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
 import TechBadge from "@components/ui/TechBadge.astro";
@@ -112,7 +113,10 @@ const jsonLd = {
     <nav aria-label="Adjacent articles" class="shell mt-10 grid gap-4 sm:grid-cols-2">
       {prev ? (
         <a href={`/writing/${prev.id}`} class="card lift flex flex-col gap-1 p-5 no-underline">
-          <span class="label text-ink-muted">← Previous</span>
+          <span class="label text-ink-muted">
+            <Arrow dir="left" class="mr-[0.4em]" />
+            Previous
+          </span>
           <span class="font-semibold">{prev.data.title}</span>
         </a>
       ) : (
@@ -123,7 +127,10 @@ const jsonLd = {
           href={`/writing/${next.id}`}
           class="card lift flex flex-col gap-1 p-5 text-right no-underline"
         >
-          <span class="label text-ink-muted">Next →</span>
+          <span class="label text-ink-muted">
+            Next
+            <Arrow class="ml-[0.4em]" />
+          </span>
           <span class="font-semibold">{next.data.title}</span>
         </a>
       )}

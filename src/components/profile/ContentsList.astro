@@ -3,6 +3,7 @@
  * ContentsList — "Before you hire, invest or partner": the homepage contents as
  * numbered rows (01 Products I build … 05 Get in touch), each → its section.
  */
+import Arrow from "@components/ui/Arrow.astro";
 import { contents } from "@data/home";
 
 interface Props {
@@ -32,7 +33,7 @@ const { class: className } = Astro.props;
               </span>
               {item.label}
             </span>
-            <span aria-hidden="true">→</span>
+            <Arrow weight="bold" />
           </a>
         </li>
       );

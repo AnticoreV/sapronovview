@@ -511,6 +511,32 @@
     color: var(--ink-muted);
   }
 
+  /* Inline-SVG glyphs for → ← ↗ ≈ (not in the fonts' Latin subsets): em-sized, currentColor. */
+  .glyph {
+    display: inline-block;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    overflow: visible;
+  }
+  .glyph-arrow {
+    width: 0.92em;
+    height: 0.55em;
+    vertical-align: 0.02em;
+  }
+  .glyph-arrow--up-right {
+    width: 0.6em;
+    height: 0.6em;
+    vertical-align: 0;
+  }
+  .glyph-approx {
+    width: 0.66em;
+    height: 0.5em;
+    vertical-align: 0.04em;
+  }
+
   /* Dot for legends and status lines. */
   .dot {
     display: inline-block;

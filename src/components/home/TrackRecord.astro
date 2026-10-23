@@ -5,6 +5,7 @@
  * "Full experience →".
  */
 import RecordRow from "@components/experience/RecordRow.astro";
+import Arrow from "@components/ui/Arrow.astro";
 import SectionHeader from "@components/ui/SectionHeader.astro";
 import type { Position } from "@lib/content";
 import { cvPath } from "@lib/cv";
@@ -47,7 +48,8 @@ const { positions } = Astro.props;
       </ol>
       <p class="mt-7">
         <a href="/experience" class="link-more">
-          Full experience&nbsp;<span aria-hidden="true">→</span>
+          Full experience
+          <Arrow class="ml-[0.4em]" />
         </a>
       </p>
     </div>

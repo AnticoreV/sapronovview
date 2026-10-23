@@ -7,6 +7,7 @@
  * on idle once the stage is visible (desktop with a mouse), or on the first scroll /
  * touch / key on phones — renders the poster's frame and fades in over it.
  */
+import Glyphs from "@components/ui/Glyphs.astro";
 import ThemePicture from "@components/ui/ThemePicture.astro";
 import posterLight from "@/assets/hero/blueprint-light.png";
 import posterDark from "@/assets/hero/blueprint-dark.png";
@@ -57,7 +58,9 @@ const legend = [
         {l.label}
       </span>
     ))}
-    <span>SKETCH → BUILD → SHIP → LEARN</span>
+    <span>
+      <Glyphs text="SKETCH → BUILD → SHIP → LEARN" />
+    </span>
   </figcaption>
 </figure>
 

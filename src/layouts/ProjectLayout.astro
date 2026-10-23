@@ -6,6 +6,7 @@
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
 import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
+import Arrow from "@components/ui/Arrow.astro";
 import ProofNumber from "@components/ui/ProofNumber.astro";
 import StatusBadge from "@components/ui/StatusBadge.astro";
 import TechBadge from "@components/ui/TechBadge.astro";
@@ -122,7 +123,7 @@ const jsonLd = {
           {links.map((l) => (
             <a href={l.href} class="link-more" rel="noopener noreferrer">
               {l.label}
-              <span aria-hidden="true">&nbsp;↗</span>
+              <Arrow dir="up-right" class="ml-[0.35em]" />
             </a>
           ))}
         </div>

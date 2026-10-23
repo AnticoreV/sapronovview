@@ -4,6 +4,7 @@
  * (bold) · ROLE · SHIPPED (one real outcome — the position's `shipped` line, a
  * shortened form of a real achievement). Four cells on desktop, stacked on phones.
  */
+import Glyphs from "@components/ui/Glyphs.astro";
 import { employmentLabels, shortCompany, shown, yearsLabel, type Position } from "@lib/content";
 
 interface Props {
@@ -40,7 +41,7 @@ const Tag = href ? "a" : "div";
   {shipped && (
     <span class="text-ink-muted">
       <span class="sr-only">Shipped: </span>
-      {shipped}
+      <Glyphs text={shipped} />
     </span>
   )}
 </Tag>
