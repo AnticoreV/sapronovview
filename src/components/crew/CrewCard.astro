@@ -1,0 +1,220 @@
+---
+/**
+ * CrewCard — "who I am" in one raised module: a studio portrait beside mono
+ * fields. Day panel: studio portrait (grey matches the aluminium); night panel:
+ * the cut-out. With `switcher`, a four-position rotary switch flips between the
+ * four portraits (pure CSS: radio inputs + :has()).
+ */
+import ThemePicture from "@components/ui/ThemePicture.astro";
+import { siteConfig } from "@config";
+import { portraits } from "@lib/portraits";
+
+interface Props {
+  switcher?: boolean;
+  /** Load the default portrait eagerly (when the card is above the fold). */
+  eager?: boolean;
+  class?: string;
+}
+const { switcher = false, eager = false, class: className } = Astro.props;
+const list = switcher ? portraits : portraits.slice(0, 1);
+const fields = [
+  { k: "Crew", v: siteConfig.name },
+  { k: "Base", v: `${siteConfig.city} · ${siteConfig.base}` },
+  { k: "Role", v: "Engineer · founder" },
+  { k: "Lang", v: siteConfig.languages.map((l) => l.code).join(" · ") },
+  { k: "Hours", v: siteConfig.experienceSummary },
+];
+const portraitSizes = "(min-width: 640px) 200px, 160px";
+---
+
+<div
+  class:list={[
+    "crew module flex flex-wrap gap-6 p-5 sm:p-6",
+    switcher && "crew--switch",
+    className,
+  ]}
+>
+  <div class="crew__portrait relative shrink-0">
+    {list.map((p, i) => (
+      <div class="crew__shot" data-portrait={p.id} data-default={i === 0 ? "" : undefined}>
+        <ThemePicture
+          day={p.studio}
+          night={p.cutout}
+          alt={p.alt}
+          widths={[200, 400]}
+          sizes={portraitSizes}
+          loading={eager && i === 0 ? "eager" : "lazy"}
+        />
+      </div>
+    ))}
+  </div>
+  <div class="flex min-w-0 flex-[1_1_260px] flex-col gap-6">
+    <dl class="mono grid grid-cols-[repeat(auto-fit,minmax(min(150px,100%),1fr))] content-start gap-x-6 gap-y-3.5 text-label">
+      {fields.map((f) => (
+        <div>
+          <dt class="text-ink-muted uppercase">{f.k}</dt>
+          <dd class="mt-0.5 font-semibold">{f.v}</dd>
+        </div>
+      ))}
+      <div>
+        <dt class="text-ink-muted uppercase">Status</dt>
+        <dd class="mt-0.5 font-bold text-ok-ink">
+          <span aria-hidden="true">● </span>
+          {siteConfig.availability.label}
+        </dd>
+      </div>
+    </dl>
+    {switcher && (
+      <fieldset class="rotary">
+        <legend class="label text-xs text-ink-muted">Portrait selector</legend>
+        <div class="rotary__body">
+          <span class="rotary__knob" aria-hidden="true">
+            <i class="rotary__pointer" />
+          </span>
+          <div class="rotary__positions">
+            {portraits.map((p, i) => (
+              <label class="rotary__pos">
+                <input
+                  type="radio"
+                  name="crew-portrait"
+                  value={p.id}
+                  checked={i === 0}
+                  class="sr-only"
+                />
+                <span class="rotary__mark" aria-hidden="true">
+                  {p.short}
+                </span>
+                <span class="sr-only">{p.alt}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      </fieldset>
+    )}
+  </div>
+</div>
+
+<style>
+  .crew__portrait {
+    width: 160px;
+    height: 200px;
+  }
+  @media (min-width: 640px) {
+    .crew__portrait {
+      width: 200px;
+      height: 250px;
+    }
+  }
+  .crew__shot {
+    position: absolute;
+    inset: 0;
+    display: none;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    box-shadow: inset 0 0 0 1px var(--panel-edge-strong);
+  }
+  .crew__shot[data-default] {
+    display: block;
+  }
+  .crew__shot :global(picture) {
+    display: contents;
+  }
+  .crew__shot :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 10%;
+  }
+  :global(.dark) .crew__shot :global(img) {
+    background: radial-gradient(120% 90% at 50% 20%, #232828, #121515);
+  }
+
+  /* Rotary switch: four detented positions, cut-out of the panel. */
+  .crew--switch:has(input:checked) .crew__shot {
+    display: none;
+  }
+  .crew--switch:has(input[value="turtleneck"]:checked) [data-portrait="turtleneck"],
+  .crew--switch:has(input[value="green"]:checked) [data-portrait="green"],
+  .crew--switch:has(input[value="black"]:checked) [data-portrait="black"],
+  .crew--switch:has(input[value="white"]:checked) [data-portrait="white"] {
+    display: block;
+  }
+  .rotary {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .rotary__body {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 10px;
+  }
+  .rotary__knob {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 999px;
+    background: #1c201f;
+    border: 2px solid #464c49;
+    box-shadow:
+      inset 0 -3px 0 rgb(0 0 0 / 0.45),
+      0 1px 0 var(--panel-sheet);
+  }
+  .rotary__pointer {
+    width: 4px;
+    height: 20px;
+    border-radius: 2px;
+    background: var(--select);
+    transform: translateY(-8px) rotate(-45deg);
+    transform-origin: 50% 100%;
+    transition: transform 0.18s steps(2, end);
+  }
+  .crew--switch:has(input[value="green"]:checked) .rotary__pointer {
+    transform: translateY(-8px) rotate(-15deg);
+  }
+  .crew--switch:has(input[value="black"]:checked) .rotary__pointer {
+    transform: translateY(-8px) rotate(15deg);
+  }
+  .crew--switch:has(input[value="white"]:checked) .rotary__pointer {
+    transform: translateY(-8px) rotate(45deg);
+  }
+  .rotary__positions {
+    display: flex;
+    gap: 6px;
+  }
+  .rotary__pos {
+    position: relative;
+    cursor: pointer;
+  }
+  .rotary__mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--panel-edge-strong);
+    background: var(--panel-raised);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .rotary__pos:hover .rotary__mark {
+    border-color: var(--ink);
+  }
+  .rotary__pos input:checked + .rotary__mark {
+    background: var(--face);
+    color: var(--select);
+    border-color: var(--face);
+  }
+  .rotary__pos input:focus-visible + .rotary__mark {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+</style>

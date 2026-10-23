@@ -1,63 +1,57 @@
 ---
 /**
- * Sticky site header with desktop nav, active-page indicator, theme toggle
- * and an accessible mobile drawer (native <dialog>, so focus trapping,
- * Escape handling and inert-ing the page come for free).
+ * HeaderStrip — the site header as a dark instrument strip: callsign, mono nav
+ * (current page in cyan, underlined), the availability annunciator and the day /
+ * night knob. Below 960px the nav moves into a full-height face sheet (native
+ * <dialog>: focus trapping, Escape and inert page for free).
  */
-import { Menu, X } from "lucide-astro";
-import ThemeToggle from "@components/ui/ThemeToggle.astro";
-import SocialLinks from "@components/ui/SocialLinks.astro";
-import { navigation, siteConfig } from "@config";
+import Annunciator from "@components/ui/Annunciator.astro";
+import ThemeKnob from "@components/ui/ThemeKnob.astro";
+import { navigation, primaryNav, siteConfig, withWriting, writingFallbackNav } from "@config";
+import { contactRoutes } from "@data/contact";
+import { hasWriting } from "@lib/content";
 import { cleanPath } from "@lib/utils";
 
+// Until a post is published, CONTACT takes WRITING's slot and Writing leaves the sheet.
+const hasPosts = await hasWriting();
+const stripNav = hasPosts
+  ? primaryNav
+  : primaryNav.map((item) => (item.href === "/writing" ? writingFallbackNav : item));
+const sheetNav = withWriting(navigation, hasPosts);
+
 const pathname = cleanPath(Astro.url.pathname);
-const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
-const initials = siteConfig.name
-  .split(" ")
-  .map((n) => n[0])
-  .join("")
-  .slice(0, 2);
+const isActive = (match?: string) =>
+  match ? pathname === match || pathname.startsWith(`${match}/`) : false;
+const isCurrent = (href: string) =>
+  href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 ---
 
-<header
-  class="border-border/80 bg-bg/80 sticky top-0 z-40 border-b backdrop-blur-md supports-[backdrop-filter]:bg-bg/70"
-  transition:name="site-header"
-  transition:persist
->
-  <div class="container-site flex h-16 items-center justify-between gap-4">
-    <a href="/" class="group flex items-center gap-2.5 rounded-pill">
-      <span
-        class="bg-fg text-bg group-hover:bg-accent group-hover:text-on-accent flex size-8 items-center justify-center rounded-lg font-display text-sm font-bold tracking-tight transition-colors"
-        aria-hidden="true"
-      >
-        {initials}
-      </span>
-      <span class="font-display text-[0.95rem] font-semibold tracking-tight">
-        {siteConfig.name}
-      </span>
+<header class="face-band pt-safe sticky top-0 z-40">
+  <div class="band flex min-h-[64px] items-center justify-between gap-6 py-2.5">
+    <a
+      href="/"
+      class="mono shrink-0 text-[13px] font-semibold tracking-[0.1em] text-marking no-underline sm:text-sm"
+    >
+      {siteConfig.callsign}
+      <span class="max-sm:hidden"> / {siteConfig.base}</span>
+      <span class="sr-only">— {siteConfig.name}, home</span>
     </a>
 
-    <nav aria-label="Primary" class="hidden lg:block">
-      <ul class="flex items-center gap-1">
-        {navigation.map((item) => {
-          const active = isActive(item.href);
+    <nav aria-label="Primary" class="max-nav:hidden">
+      <ul class="mono flex items-center gap-[26px] text-[13px]">
+        {stripNav.map((item) => {
+          const active = isActive(item.match);
           return (
             <li>
               <a
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 class:list={[
-                  "relative rounded-pill px-3 py-2 text-sm font-medium transition-colors",
-                  active ? "text-fg" : "text-fg-muted hover:text-fg",
+                  "nav-link uppercase",
+                  active ? "text-select underline" : "text-marking no-underline",
                 ]}
               >
                 {item.label}
-                {active && (
-                  <span
-                    class="bg-accent absolute inset-x-3 -bottom-[1px] h-0.5 rounded-full"
-                    aria-hidden="true"
-                  />
-                )}
               </a>
             </li>
           );
@@ -65,65 +59,114 @@ const initials = siteConfig.name
       </ul>
     </nav>
 
-    <div class="flex items-center gap-1">
-      <ThemeToggle />
+    <div class="flex items-center gap-2 sm:gap-3">
+      <a
+        href="/contact"
+        class="annunciator-link rounded-sm no-underline"
+        aria-label={`${siteConfig.availability.label} — contact`}
+        transition:persist="annunciator"
+      >
+        <Annunciator blink />
+      </a>
+      <ThemeKnob />
       <button
         type="button"
-        class="text-fg-muted hover:bg-surface-muted hover:text-fg inline-flex size-10 items-center justify-center rounded-pill transition-colors lg:hidden"
+        class="nav:hidden inline-flex size-11 items-center justify-center rounded-sm border border-[#464c49] bg-transparent text-marking"
         aria-label="Open menu"
         aria-haspopup="dialog"
         aria-controls="mobile-nav"
         data-open-menu
       >
-        <Menu size={20} aria-hidden="true" />
+        <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true">
+          <path d="M0 1h18M0 6h18M0 11h18" stroke="currentColor" stroke-width="1.5"></path>
+        </svg>
       </button>
     </div>
   </div>
 
   <dialog
     id="mobile-nav"
-    class="bg-bg text-fg m-0 h-dvh max-h-none w-full max-w-none p-0 backdrop:bg-black/40 open:flex open:flex-col lg:hidden"
+    class="face-band m-0 h-dvh max-h-none w-full max-w-none p-0 backdrop:bg-black/50 open:flex open:flex-col nav:hidden"
     aria-label="Site navigation"
   >
-    <div class="container-site flex h-16 shrink-0 items-center justify-between">
-      <span class="font-display font-semibold tracking-tight">{siteConfig.name}</span>
+    <div class="band pt-safe-10 flex min-h-[64px] shrink-0 items-center justify-between gap-4 border-b border-[#2a2f2e] pb-2.5">
+      <span class="mono text-[13px] font-semibold tracking-[0.1em]">{siteConfig.callsign}</span>
       <button
         type="button"
-        class="text-fg-muted hover:bg-surface-muted hover:text-fg inline-flex size-10 items-center justify-center rounded-pill transition-colors"
+        class="inline-flex size-11 items-center justify-center rounded-sm border border-[#464c49] bg-transparent text-marking"
         aria-label="Close menu"
         data-close-menu
       >
-        <X size={20} aria-hidden="true" />
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+          <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.6"></path>
+        </svg>
       </button>
     </div>
-    <nav aria-label="Mobile" class="container-site flex-1 overflow-y-auto py-6">
-      <ul class="flex flex-col">
-        {navigation.map((item, i) => {
-          const active = isActive(item.href);
+    <nav aria-label="Mobile" class="band flex-1 overflow-y-auto py-6">
+      <ol class="flex flex-col">
+        {sheetNav.map((item, i) => {
+          const current = isCurrent(item.href);
           return (
             <li>
               <a
                 href={item.href}
-                aria-current={active ? "page" : undefined}
+                aria-current={current ? "page" : undefined}
                 class:list={[
-                  "border-border flex items-center justify-between border-b py-4 font-display text-2xl font-semibold tracking-tight transition-colors",
-                  active ? "text-accent-strong" : "text-fg hover:text-accent-strong",
+                  "flex min-h-[52px] items-center justify-between border-b border-[#2a2f2e] py-3 text-[22px] font-bold no-underline",
+                  current ? "text-select" : "text-marking",
                 ]}
               >
                 <span>{item.label}</span>
-                <span class="text-fg-subtle font-mono text-xs">0{i + 1}</span>
+                <span class="mono text-xs font-semibold text-marking-muted" aria-hidden="true">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
               </a>
             </li>
           );
         })}
+      </ol>
+      <p class="label mt-8 text-marking-muted">Routes</p>
+      <ul class="mt-3 flex flex-wrap gap-2">
+        {contactRoutes.map((r) => (
+          <li>
+            <a
+              href={`/contact?topic=${r.id}`}
+              class="mono inline-flex min-h-11 items-center rounded-sm border border-[#464c49] px-3 text-xs font-semibold tracking-[0.04em] text-marking uppercase no-underline"
+            >
+              {r.label}
+            </a>
+          </li>
+        ))}
       </ul>
-      <div class="mt-8">
-        <p class="eyebrow mb-3">Elsewhere</p>
-        <SocialLinks labels />
-      </div>
+      <p class="mt-8">
+        <a href={`mailto:${siteConfig.email}`} class="link-inline break-all text-marking">
+          {siteConfig.email}
+        </a>
+      </p>
     </nav>
   </dialog>
 </header>
+
+<style>
+  .annunciator-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .annunciator-link:hover :global(.annunciator) {
+    filter: brightness(1.25);
+  }
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 1px;
+  }
+  .nav-link:hover {
+    text-decoration-line: underline;
+  }
+</style>
 
 <script>
   function setupMobileNav() {
@@ -131,28 +174,23 @@ const initials = siteConfig.name
     if (!dialog || dialog.dataset.bound) return;
     dialog.dataset.bound = "true";
 
-    const open = () => {
-      dialog.showModal();
-      document.documentElement.style.overflow = "hidden";
-    };
-    const close = () => {
-      dialog.close();
-    };
-    document.querySelectorAll("[data-open-menu]").forEach((b) => b.addEventListener("click", open));
+    const close = () => dialog.open && dialog.close();
+    document.querySelectorAll("[data-open-menu]").forEach((b) =>
+      b.addEventListener("click", () => {
+        dialog.showModal();
+        document.documentElement.style.overflow = "hidden";
+      }),
+    );
     dialog.querySelectorAll("[data-close-menu]").forEach((b) => b.addEventListener("click", close));
     dialog.addEventListener("close", () => {
       document.documentElement.style.overflow = "";
     });
-    // Close when navigating via a link inside the drawer.
     dialog.querySelectorAll("a").forEach((a) => a.addEventListener("click", close));
-    // Close if the viewport grows past the mobile breakpoint.
-    const mq = window.matchMedia("(min-width: 64rem)");
-    mq.addEventListener("change", (e) => {
-      if (e.matches && dialog.open) close();
+    window.matchMedia("(min-width: 60rem)").addEventListener("change", (e) => {
+      if (e.matches) close();
     });
   }
-  setupMobileNav();
-  document.addEventListener("astro:after-swap", setupMobileNav);
+  document.addEventListener("astro:page-load", setupMobileNav);
   document.addEventListener("astro:before-preparation", () => {
     const dialog = document.getElementById("mobile-nav") as HTMLDialogElement | null;
     if (dialog?.open) dialog.close();

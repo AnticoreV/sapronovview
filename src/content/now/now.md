@@ -1,10 +1,10 @@
 ---
-updated: 2026-09-10
+updated: 2026-10-22
 location: "Prague, Czech Republic"
 working:
-  - "Building Ownira — [one line on the current milestone]"
-  - "Researching the market possibilities of the Apex line"
-  - "Keeping this site honest: replacing placeholders with real photos and numbers"
+  - "Building Ownira — now in pilot"
+  - "Validating Apexline, a peer-to-peer motorcycle rental marketplace for Europe"
+  - "[One line on the current Ownira milestone]"
 learning:
   - "[Something you are learning — e.g. a new language, framework or flying skill]"
   - "[Another thing]"
@@ -14,7 +14,7 @@ reading:
     note: "[Why you picked it up]"
   - title: "[BOOK TITLE]"
     author: "[AUTHOR]"
-sideProjects: ["ownira", "apex-line-market-research"]
+sideProjects: ["ownira", "apexline"]
 interests:
   - "Ultralight aviation"
   - "Motorcycle touring"

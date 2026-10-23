@@ -1,0 +1,34 @@
+---
+/** "What I'm building" — own products as instrument modules (for partners and investors). */
+import InstrumentModule from "@components/projects/InstrumentModule.astro";
+import SectionHeader from "@components/ui/SectionHeader.astro";
+import type { Project } from "@lib/content";
+
+interface Props {
+  products: Project[];
+}
+const { products } = Astro.props;
+---
+
+{products.length > 0 && (
+  <section
+    id="build"
+    class="band section-y bg-panel-raised shadow-[inset_0_1px_0_var(--panel-edge),inset_0_-1px_0_var(--panel-edge)]"
+    aria-labelledby="build-heading"
+  >
+    <div class="shell flex flex-col gap-10">
+      <SectionHeader
+        id="build-heading"
+        title="What I'm building"
+        tag="OWN PRODUCTS · FOR PARTNERS AND INVESTORS"
+      />
+      <ul class="grid grid-cols-[repeat(auto-fit,minmax(min(460px,100%),1fr))] gap-4">
+        {products.map((p) => (
+          <li class="flex">
+            <InstrumentModule project={p} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}

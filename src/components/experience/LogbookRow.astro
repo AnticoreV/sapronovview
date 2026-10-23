@@ -1,0 +1,52 @@
+---
+/**
+ * LogbookRow — one position: YEARS (cyan) · OPERATOR (bold) · POSITION ·
+ * LOGGED (one real outcome — the position's `logged` line, a shortened form of a
+ * real achievement). Four cells on desktop, stacked in two lines on mobile.
+ */
+import { employmentLabels, shortCompany, shown, yearsLabel, type Position } from "@lib/content";
+
+interface Props {
+  position: Position;
+  href?: string;
+}
+const { position, href } = Astro.props;
+const { data } = position;
+const contract = data.employmentType === "freelance" || data.employmentType === "contract";
+const positionText = contract
+  ? `${data.role} · ${employmentLabels.contract.toLowerCase()}`
+  : data.role;
+const logged = shown(data.logged) ?? shown(data.achievements[0]);
+const Tag = href ? "a" : "div";
+---
+
+<Tag
+  href={href}
+  class="logrow grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-x-6 gap-y-1 border-b border-[#2a2f2e] py-[18px] text-marking no-underline"
+>
+  <span class="text-select">
+    <span class="sr-only">Years: </span>
+    {yearsLabel(data.startDate, data.endDate)}
+  </span>
+  <span class="font-bold">
+    <span class="sr-only">Operator: </span>
+    {shortCompany(data.company)}
+  </span>
+  <span>
+    <span class="sr-only">Position: </span>
+    {positionText}
+  </span>
+  {logged && (
+    <span class="text-marking-muted">
+      <span class="sr-only">Logged: </span>
+      {logged}
+    </span>
+  )}
+</Tag>
+
+<style>
+  a.logrow:hover span:nth-child(2) {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+</style>

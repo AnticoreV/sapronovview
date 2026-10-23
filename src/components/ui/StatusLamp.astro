@@ -1,0 +1,57 @@
+---
+/**
+ * Status light + word (PILOT, VALIDATING, COMPLETED…). The word always carries the
+ * state; the lamp colour follows the avionics code. `on="face"` for dark instrument
+ * faces, `on="panel"` for the light/dark panel (text uses the accessible ink tokens).
+ */
+import type { LampTone } from "@lib/content";
+
+interface Props {
+  label: string;
+  tone: LampTone;
+  on?: "face" | "panel";
+  class?: string;
+}
+const { label, tone, on = "face", class: className } = Astro.props;
+const toneClass = `lamp-${tone} on-${on}`;
+---
+
+<span
+  class:list={[
+    "status placard inline-flex items-center gap-1.5 whitespace-nowrap",
+    toneClass,
+    className,
+  ]}
+>
+  <i class="lamp" aria-hidden="true"></i>
+  {label}
+</span>
+
+<style>
+  /* Lamp colour follows the avionics code; the word uses accessible ink on the panel. */
+  .lamp-ok .lamp {
+    color: var(--ok);
+  }
+  .lamp-caution .lamp {
+    color: var(--caution);
+  }
+  .lamp-off .lamp {
+    color: var(--marking-muted);
+  }
+  .on-face.lamp-ok {
+    color: var(--ok);
+  }
+  .on-face.lamp-caution {
+    color: var(--caution);
+  }
+  .on-face.lamp-off {
+    color: var(--marking-muted);
+  }
+  .on-panel.lamp-ok {
+    color: var(--ok-ink);
+  }
+  .on-panel.lamp-caution,
+  .on-panel.lamp-off {
+    color: var(--ink-muted);
+  }
+</style>

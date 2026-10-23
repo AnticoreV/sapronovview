@@ -12,6 +12,7 @@ achievements:
   - "Established automated testing with JUnit and Mockito, raising coverage and reducing production regressions"
   - "Dockerised microservices and deployed them to Kubernetes, enabling independent scaling and modular infrastructure"
   - "Integrated Kafka for inter-service communication (including custom connectors) and built observability with Grafana, Prometheus and InfluxDB to monitor production health"
+logged: "Keycloak · Kafka · K8s"
 technologies:
   - Java
   - Spring WebFlux

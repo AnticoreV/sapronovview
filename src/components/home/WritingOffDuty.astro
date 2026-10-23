@@ -1,0 +1,83 @@
+---
+/**
+ * Writing (latest posts) + the "Off duty" module (hobbies as an addition).
+ * While no post is published, only the Off-duty module renders, full width.
+ */
+import type { Post } from "@lib/content";
+
+interface Props {
+  posts: Post[];
+  countries: number;
+}
+const { posts, countries } = Astro.props;
+const offDuty = [
+  "ULL pilot in training",
+  "motorcycle touring",
+  `${countries} countries on the map`,
+  "sport",
+].join(" · ");
+const hasPosts = posts.length > 0;
+---
+
+{hasPosts ? (
+  <section id="journal" class="band section-y" aria-labelledby="journal-heading">
+    <div class="shell flex flex-wrap gap-8">
+      <div class="flex flex-[999_1_600px] flex-col gap-6">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <h2 id="journal-heading" class="display text-display-l">
+            Writing
+          </h2>
+          <a href="/writing" class="link-ghost inline-flex min-h-11 items-center">
+            All posts<span aria-hidden="true">&nbsp;→</span>
+          </a>
+        </div>
+        <ul class="border-b-2 border-ink">
+          {posts.map((post) => (
+            <li>
+              <a
+                href={`/writing/${post.id}`}
+                class="post-row flex justify-between gap-5 border-t-2 border-ink py-5 no-underline"
+              >
+                <span class="text-title font-bold">{post.data.title}</span>
+                {post.data.tags[0] && (
+                  <span class="mono shrink-0 text-xs text-ink-muted uppercase">
+                    {post.data.tags[0]}
+                  </span>
+                )}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div class="module flex flex-[1_1_300px] flex-col gap-3 self-start p-[26px]">
+        <h2 class="label text-xs text-ink-muted">Off duty</h2>
+        <p>{offDuty}</p>
+        <a href="/hobbies" class="link-ghost inline-flex min-h-11 items-center">
+          Hobbies &amp; map<span aria-hidden="true">&nbsp;→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+) : (
+  <section id="off-duty" class="band section-y" aria-labelledby="off-duty-heading">
+    <div class="shell module flex flex-wrap items-center justify-between gap-x-8 gap-y-4 p-[26px] sm:px-8">
+      <div class="flex flex-col gap-2">
+        <h2 id="off-duty-heading" class="label text-xs text-ink-muted">
+          Off duty
+        </h2>
+        <p class="text-body-l">{offDuty}</p>
+      </div>
+      <a href="/hobbies" class="link-ghost inline-flex min-h-11 items-center">
+        Hobbies &amp; map<span aria-hidden="true">&nbsp;→</span>
+      </a>
+    </div>
+  </section>
+)}
+
+<style>
+  .post-row:hover span:first-child {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+  }
+</style>

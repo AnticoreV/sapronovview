@@ -1,22 +1,89 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
-import Button from "@components/ui/Button.astro";
 ---
 
-<BaseLayout title="Page not found" description="That page doesn't exist." noindex>
-  <div class="container-site flex min-h-[60vh] flex-col items-center justify-center py-20 text-center">
-    <p class="eyebrow">404</p>
-    <h1 class="mt-3 text-4xl sm:text-5xl">Off the map.</h1>
-    <p class="text-fg-muted mt-4 max-w-md text-lg">
-      This page doesn't exist — or it moved without filing a flight plan.
-    </p>
-    <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-      <Button href="/" arrow>
-        Back home
-      </Button>
-      <Button href="/projects" variant="secondary">
-        Browse projects
-      </Button>
+<BaseLayout title="Off course" description="That page doesn't exist." noindex>
+  <section class="band section-y">
+    <div class="shell flex flex-wrap items-center gap-10">
+      <div class="flex flex-[1_1_420px] flex-col gap-6">
+        <p class="label text-ink-muted">404 · Heading lost</p>
+        <h1 class="display text-display-xl">Off course.</h1>
+        <p class="max-w-[520px] text-body-l">
+          This page doesn't exist — or it moved without filing a flight plan.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a href="/" class="btn btn-primary">
+            Return to base
+          </a>
+          <a href="/projects" class="btn btn-secondary">
+            Projects
+          </a>
+        </div>
+      </div>
+      <div class="flex flex-[1_1_320px] justify-center">
+        {/* Heading indicator (static): compass card with the heading bug off course. */}
+        <svg
+          viewBox="0 0 320 320"
+          class="w-full max-w-[340px]"
+          role="img"
+          aria-label="Heading indicator showing heading 404, off course"
+        >
+          <circle cx="160" cy="160" r="156" fill="var(--face-edge)"></circle>
+          <circle cx="160" cy="160" r="144" fill="var(--face)"></circle>
+          <g transform="rotate(-38 160 160)" stroke="#a2a8a4" stroke-width="2">
+            {Array.from({ length: 72 }, (_, i) => {
+              const long = i % 6 === 0;
+              return (
+                <line
+                  x1="160"
+                  y1={long ? 26 : 30}
+                  x2="160"
+                  y2="40"
+                  transform={`rotate(${i * 5} 160 160)`}
+                  stroke-width={long ? 3 : 1.5}
+                />
+              );
+            })}
+            {["N", "3", "6", "E", "12", "15", "S", "21", "24", "W", "30", "33"].map((l, i) => (
+              <text
+                x="160"
+                y="62"
+                transform={`rotate(${i * 30} 160 160)`}
+                fill="#f1f1eb"
+                stroke="none"
+                font-family="var(--font-mono)"
+                font-size="17"
+                font-weight="700"
+                text-anchor="middle"
+              >
+                {l}
+              </text>
+            ))}
+          </g>
+          {/* heading bug (magenta = the route you should be on) */}
+          <path d="M150 16h20l-4 12h-12z" fill="#e0569f"></path>
+          {/* lubber line + aircraft */}
+          <path d="M160 8v30" stroke="#3fcfdf" stroke-width="3"></path>
+          <path
+            d="M160 112v80M128 150h64M146 192h28"
+            stroke="#3fcfdf"
+            stroke-width="6"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
+          <text
+            x="160"
+            y="244"
+            fill="#3fcfdf"
+            font-family="var(--font-mono)"
+            font-size="22"
+            font-weight="700"
+            text-anchor="middle"
+          >
+            HDG 404
+          </text>
+        </svg>
+      </div>
     </div>
-  </div>
+  </section>
 </BaseLayout>

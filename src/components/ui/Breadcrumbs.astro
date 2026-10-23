@@ -1,11 +1,8 @@
 ---
-/**
- * Breadcrumb trail. Also emits BreadcrumbList JSON-LD.
- */
-import { ChevronRight } from "lucide-astro";
+/** Mono breadcrumb trail with BreadcrumbList structured data. */
 import JsonLd from "@components/seo/JsonLd.astro";
 
-export interface Crumb {
+interface Crumb {
   label: string;
   href?: string;
 }
@@ -14,33 +11,32 @@ interface Props {
   class?: string;
 }
 const { items, class: className } = Astro.props;
-const site = Astro.site ?? new URL("http://localhost");
-const all = [{ label: "Home", href: "/" }, ...items];
-
+const site = Astro.site ?? new URL("http://localhost:4321");
+const all: Crumb[] = [{ label: "Home", href: "/" }, ...items];
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
-  itemListElement: all.map((item, i) => ({
+  itemListElement: all.map((c, i) => ({
     "@type": "ListItem",
     position: i + 1,
-    name: item.label,
-    ...(item.href ? { item: new URL(item.href, site).toString() } : {}),
+    name: c.label,
+    ...(c.href ? { item: new URL(c.href, site).toString() } : {}),
   })),
 };
 ---
 
-<nav aria-label="Breadcrumb" class:list={["text-fg-subtle text-sm", className]}>
-  <ol class="flex flex-wrap items-center gap-1.5">
-    {all.map((item, i) => (
-      <li class="flex items-center gap-1.5">
-        {i > 0 && <ChevronRight size={14} aria-hidden="true" class="opacity-60" />}
-        {item.href && i < all.length - 1 ? (
-          <a href={item.href} class="hover:text-fg transition-colors">
-            {item.label}
+<nav aria-label="Breadcrumb" class:list={["label text-xs text-ink-muted", className]}>
+  <ol class="flex flex-wrap items-center gap-x-2 gap-y-1">
+    {all.map((c, i) => (
+      <li class="flex items-center gap-2">
+        {i > 0 && <span aria-hidden="true">/</span>}
+        {c.href && i < all.length - 1 ? (
+          <a href={c.href} class="inline-flex min-h-8 items-center hover:text-ink hover:underline">
+            {c.label}
           </a>
         ) : (
-          <span class="text-fg-muted" aria-current="page">
-            {item.label}
+          <span aria-current="page" class="text-ink">
+            {c.label}
           </span>
         )}
       </li>

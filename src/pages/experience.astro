@@ -1,63 +1,85 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
-import Button from "@components/ui/Button.astro";
-import CTASection from "@components/ui/CTASection.astro";
-import SectionHeading from "@components/ui/SectionHeading.astro";
 import ExperienceItem from "@components/experience/ExperienceItem.astro";
+import LogbookRow from "@components/experience/LogbookRow.astro";
 import MilestoneList from "@components/experience/MilestoneList.astro";
 import { getMilestones, getPositions, milestoneLabels } from "@lib/content";
 import { siteConfig } from "@config";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 
 const [positions, milestones] = await Promise.all([getPositions(), getMilestones()]);
 const types = Object.keys(milestoneLabels) as Array<keyof typeof milestoneLabels>;
 const byType = (t: (typeof types)[number]) => milestones.filter((m) => m.data.type === t);
+// "Download CV" appears only once the file exists (see README); until then: CV on request.
+const CV_FILE = "/cv/ivan-sapronov-cv.pdf";
+const cvPath = existsSync(join(process.cwd(), "public", CV_FILE)) ? CV_FILE : undefined;
 ---
 
 <BaseLayout
   title="Experience"
-  description={`Career timeline of ${siteConfig.name}: positions, achievements, education, certifications, talks and community work.`}
+  description={`Logbook of ${siteConfig.name}: every position since 2021 with what I built and what changed because of it — JVM services, Angular products, identity, Kafka, Kubernetes and cloud.`}
 >
-  <div class="container-site pt-10 sm:pt-14">
-    <Breadcrumbs items={[{ label: "Experience" }]} />
-    <SectionHeading
-      level={1}
-      eyebrow="Experience"
-      title="Career timeline"
-      description="Where I've worked, what I owned and what changed because of it — from a freelance CRM in 2021 to Kotlin microservices and cloud platforms serving millions of users."
-      class="mt-8"
-    >
-      <Button slot="action" href="/contact" variant="secondary" size="sm" arrow>
-        Request a CV
-      </Button>
-    </SectionHeading>
+  <div class="band pt-8 md:pt-10">
+    <div class="shell">
+      <Breadcrumbs items={[{ label: "Experience" }]} />
+      <div class="mt-8 flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="label text-ink-muted">Experience · since 2021</p>
+          <h1 class="display mt-3 text-display-l">Logbook</h1>
+        </div>
+        {cvPath ? (
+          <a href={cvPath} class="btn btn-primary" download>
+            Download CV
+          </a>
+        ) : (
+          <a href="/contact?topic=hiring" class="btn btn-primary">
+            CV on request
+          </a>
+        )}
+      </div>
+      <p class="mt-5 max-w-[640px] text-body-l">
+        Where I've worked, what I owned and what changed because of it — from a freelance CRM in
+        2021 to Kotlin microservices and a platform serving around two million users.
+      </p>
+    </div>
   </div>
 
-  <section class="container-site pb-16" aria-labelledby="positions-heading">
-    <h2 id="positions-heading" class="sr-only">
-      Positions
-    </h2>
-    <ol class="space-y-12 sm:space-y-16">
-      {positions.map((position) => (
-        <li class="reveal">
-          <ExperienceItem position={position} />
-        </li>
-      ))}
-    </ol>
+  <section class="band mt-10" aria-label="Logbook summary">
+    <div class="shell face face-bezel mono px-5 py-4 text-sm sm:px-8">
+      <ol>
+        {positions.map((p) => (
+          <li class="last:[&>*]:border-b-0">
+            <LogbookRow position={p} href={`#${p.id}`} />
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="band py-12 md:py-16" aria-labelledby="positions-heading">
+    <div class="shell sheet px-[clamp(16px,5vw,64px)] py-10 md:py-14">
+      <h2 id="positions-heading" class="display text-[clamp(1.75rem,3vw,2.5rem)]">
+        Positions
+      </h2>
+      <ol class="mt-8 flex flex-col divide-y divide-panel-edge">
+        {positions.map((position) => (
+          <li class="py-10 first:pt-0 last:pb-0">
+            <ExperienceItem position={position} />
+          </li>
+        ))}
+      </ol>
+    </div>
   </section>
 
   {milestones.length > 0 && (
-    <section
-      class="border-border bg-surface-muted/60 border-t"
-      aria-labelledby="milestones-heading"
-    >
-      <div class="container-site section">
-        <SectionHeading
-          id="milestones-heading"
-          eyebrow="Beyond the job titles"
-          title="Education, credentials & community"
-        />
-        <div class="grid gap-5 md:grid-cols-2">
+    <section class="band pb-16" aria-labelledby="milestones-heading">
+      <div class="shell">
+        <h2 id="milestones-heading" class="display text-[clamp(1.75rem,3vw,2.5rem)]">
+          Education, credentials & community
+        </h2>
+        <div class="mt-6 grid gap-4 md:grid-cols-2">
           {types.map((t) => (
             <MilestoneList type={t} items={byType(t)} />
           ))}
@@ -65,9 +87,4 @@ const byType = (t: (typeof types)[number]) => milestones.filter((m) => m.data.ty
       </div>
     </section>
   )}
-  <CTASection
-    title="Want the full story?"
-    description="I'm happy to share a CV, references or walk through any of these roles in detail."
-    primaryLabel="Get in touch"
-  />
 </BaseLayout>

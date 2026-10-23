@@ -1,0 +1,14 @@
+---
+/** Crew card + pre-flight checklist, directly under the hero. */
+import CrewCard from "@components/crew/CrewCard.astro";
+import Checklist from "@components/crew/Checklist.astro";
+---
+
+<section class="band pb-16 md:pb-24" aria-label="Crew card and checklist">
+  <div class="shell flex flex-wrap gap-4">
+    <CrewCard class="flex-[999_1_560px]" />
+    <div class="flex flex-[1_1_320px]">
+      <Checklist />
+    </div>
+  </div>
+</section>

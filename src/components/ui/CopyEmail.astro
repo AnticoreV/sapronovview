@@ -1,0 +1,40 @@
+---
+/** "Copy" button next to a mailto link: copies the address, says "Copied". */
+import { siteConfig } from "@config";
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<button
+  type="button"
+  class:list={["btn btn-secondary btn-sm", className]}
+  data-copy-email={siteConfig.email}
+  aria-label="Copy email address"
+>
+  <span data-copy-label aria-live="polite">
+    Copy
+  </span>
+</button>
+
+<script>
+  function setupCopyEmail() {
+    document.querySelectorAll<HTMLButtonElement>("[data-copy-email]").forEach((button) => {
+      if (button.dataset.bound) return;
+      button.dataset.bound = "true";
+      const label = button.querySelector<HTMLElement>("[data-copy-label]");
+      button.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(button.dataset.copyEmail ?? "");
+          if (label) label.textContent = "Copied";
+          setTimeout(() => label && (label.textContent = "Copy"), 1800);
+        } catch {
+          if (label) label.textContent = "Select & copy";
+        }
+      });
+    });
+  }
+  document.addEventListener("astro:page-load", setupCopyEmail);
+</script>

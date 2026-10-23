@@ -1,0 +1,46 @@
+---
+/** Logbook (experience) as a full-width instrument face. */
+import LogbookRow from "@components/experience/LogbookRow.astro";
+import type { Position } from "@lib/content";
+
+interface Props {
+  positions: Position[];
+}
+const { positions } = Astro.props;
+---
+
+<section id="experience" class="face-band band section-y" aria-labelledby="experience-heading">
+  <div class="shell flex flex-col gap-9">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <h2 id="experience-heading" class="display text-display-l">
+        Logbook
+      </h2>
+      <a href="/contact?topic=hiring" class="btn btn-primary min-h-12 px-[22px]">
+        CV on request
+      </a>
+    </div>
+    <div class="mono text-sm">
+      <div
+        class="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-x-6 gap-y-1 border-b border-[#2a2f2e] py-3.5 text-xs text-marking-muted max-md:hidden"
+        aria-hidden="true"
+      >
+        <span>YEARS</span>
+        <span>OPERATOR</span>
+        <span>POSITION</span>
+        <span>LOGGED</span>
+      </div>
+      <ol>
+        {positions.map((p) => (
+          <li>
+            <LogbookRow position={p} href={`/experience#${p.id}`} />
+          </li>
+        ))}
+      </ol>
+      <p class="mt-6">
+        <a href="/experience" class="link-ghost inline-flex min-h-11 items-center text-marking">
+          Full logbook<span aria-hidden="true">&nbsp;→</span>
+        </a>
+      </p>
+    </div>
+  </div>
+</section>

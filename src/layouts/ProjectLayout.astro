@@ -1,38 +1,50 @@
 ---
 /**
- * Case-study layout for /projects/[slug].
+ * Case study on a kneeboard sheet: eyebrow (type · organisation · years), title,
+ * readouts for any real numbers, body, technologies as mono chips, links.
  */
-import { Image } from "astro:assets";
-import { ArrowUpRight, Calendar, Github, Globe, User } from "lucide-astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
-import Button from "@components/ui/Button.astro";
-import CTASection from "@components/ui/CTASection.astro";
 import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
-import PlaceholderImage from "@components/ui/PlaceholderImage.astro";
-import StatusPill from "@components/ui/StatusPill.astro";
+import Readout from "@components/ui/Readout.astro";
+import StatusLamp from "@components/ui/StatusLamp.astro";
 import TechBadge from "@components/ui/TechBadge.astro";
-import ProjectCard from "@components/projects/ProjectCard.astro";
+import ProjectRow from "@components/projects/ProjectRow.astro";
 import JsonLd from "@components/seo/JsonLd.astro";
-import { categoryLabels, statusLabels, type Project } from "@lib/content";
+import { categoryLabels, shortCompany, shown, statusLabels, type Project } from "@lib/content";
+import { readoutsFor } from "@data/readouts";
 import { siteConfig } from "@config";
 import { cleanPath } from "@lib/utils";
 
-interface Heading {
-  depth: number;
-  slug: string;
-  text: string;
-}
 interface Props {
   project: Project;
-  headings: Heading[];
   related: Project[];
 }
-const { project, headings, related } = Astro.props;
+const { project, related } = Astro.props;
 const { data } = project;
 const status = statusLabels[data.status];
-const toc = headings.filter((h) => h.depth === 2);
 const site = Astro.site ?? new URL("http://localhost:4321");
+const isProduct = Boolean(data.tagline);
+const org = shown(data.organization);
+const eyebrow = [
+  isProduct
+    ? "Product"
+    : data.category === "professional"
+      ? "Case study"
+      : categoryLabels[data.category],
+  org && org !== data.title ? shortCompany(org) : undefined,
+  shown(data.timeframe)?.replace(/\s+—\s+/g, "–"),
+]
+  .filter(Boolean)
+  .join(" · ");
+const readouts = readoutsFor(project.id);
+const role = shown(data.role);
+const links = [
+  data.website && { label: "Live site", href: data.website },
+  data.github && { label: "GitHub", href: data.github },
+  ...data.links,
+].filter(Boolean) as Array<{ label: string; href: string }>;
+const topic = isProduct ? "investing" : "hiring";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -40,7 +52,6 @@ const jsonLd = {
   name: data.title,
   description: data.description,
   url: new URL(cleanPath(Astro.url.pathname), site).toString(),
-  dateCreated: data.date.toISOString(),
   author: { "@type": "Person", name: siteConfig.name, url: site.origin },
   keywords: data.technologies.join(", "),
   ...(data.github ? { codeRepository: data.github } : {}),
@@ -54,206 +65,89 @@ const jsonLd = {
   image={data.cover ? data.cover.src : undefined}
   imageAlt={data.coverAlt}
 >
-  <article>
-    <header class="relative isolate overflow-hidden">
-      <div
-        class="accent-glow pointer-events-none absolute inset-x-0 top-0 -z-10 h-80"
-        aria-hidden="true"
-      ></div>
-      <div class="container-site pt-10 pb-10 sm:pt-14">
-        <Breadcrumbs items={[{ label: "Projects", href: "/projects" }, { label: data.title }]} />
-
-        <div class="mt-8 flex flex-wrap items-center gap-2">
-          <StatusPill
-            label={status.label}
-            tone={status.tone}
-            pulse={data.status === "in-progress" || data.status === "active"}
-          />
-          <span class="text-fg-subtle font-mono text-xs tracking-wider uppercase">
-            {categoryLabels[data.category]}
-          </span>
-          {data.placeholder && <PlaceholderBadge label="Contains placeholders" />}
-        </div>
-        <h1 class="mt-4 max-w-4xl text-4xl leading-[1.05] sm:text-5xl lg:text-6xl">{data.title}</h1>
-        <p class="text-fg-muted mt-5 max-w-2xl text-lg leading-relaxed sm:text-xl">
-          {data.description}
+  <article class="band pt-8 pb-16 md:pb-24">
+    <div class="shell">
+      <Breadcrumbs items={[{ label: "Projects", href: "/projects" }, { label: data.title }]} />
+    </div>
+    <div class="sheet mx-auto mt-6 max-w-[848px] px-[clamp(16px,6vw,64px)] py-10 md:py-16">
+      <p class="label flex flex-wrap items-center gap-x-4 gap-y-2 text-ink-muted">
+        <span>{eyebrow}</span>
+        <StatusLamp label={status.label} tone={status.tone} on="panel" />
+        {data.placeholder && <PlaceholderBadge />}
+      </p>
+      <h1 class="display mt-4 text-[clamp(2.25rem,5vw,3.5rem)] leading-[0.98]">{data.title}</h1>
+      {data.tagline && <p class="mt-4 text-title font-semibold">{data.tagline}</p>}
+      <p class="mt-4 text-body-l">{data.description}</p>
+      {role && (
+        <p class="mono mt-5 text-label text-ink-muted uppercase">
+          Role · <span class="font-semibold text-ink">{role}</span>
         </p>
-
-        <dl class="border-border mt-8 grid gap-x-8 gap-y-4 border-t pt-6 text-sm sm:grid-cols-2 lg:grid-cols-4">
-          {data.role && (
-            <div>
-              <dt class="text-fg-subtle flex items-center gap-1.5 font-mono text-[0.7rem] tracking-wider uppercase">
-                <User size={12} aria-hidden="true" /> Role
-              </dt>
-              <dd class="text-fg mt-1 font-medium">{data.role}</dd>
-            </div>
-          )}
-          {data.organization && (
-            <div>
-              <dt class="text-fg-subtle font-mono text-[0.7rem] tracking-wider uppercase">
-                Organisation
-              </dt>
-              <dd class="text-fg mt-1 font-medium">{data.organization}</dd>
-            </div>
-          )}
-          <div>
-            <dt class="text-fg-subtle flex items-center gap-1.5 font-mono text-[0.7rem] tracking-wider uppercase">
-              <Calendar size={12} aria-hidden="true" /> Timeframe
-            </dt>
-            <dd class="text-fg mt-1 font-medium">{data.timeframe ?? data.date.getUTCFullYear()}</dd>
-          </div>
-          <div>
-            <dt class="text-fg-subtle font-mono text-[0.7rem] tracking-wider uppercase">Links</dt>
-            <dd class="mt-1 flex flex-wrap gap-x-4 gap-y-1">
-              {data.github && (
-                <a
-                  href={data.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="link-underline text-fg inline-flex items-center gap-1 font-medium"
-                >
-                  <Github size={14} aria-hidden="true" /> GitHub
-                </a>
-              )}
-              {data.website && (
-                <a
-                  href={data.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="link-underline text-fg inline-flex items-center gap-1 font-medium"
-                >
-                  <Globe size={14} aria-hidden="true" /> Live site
-                </a>
-              )}
-              {data.links.map((l) => (
-                <a
-                  href={l.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="link-underline text-fg inline-flex items-center gap-1 font-medium"
-                >
-                  {l.label} <ArrowUpRight size={14} aria-hidden="true" />
-                </a>
-              ))}
-              {!data.github && !data.website && data.links.length === 0 && (
-                <span class="text-fg-subtle">—</span>
-              )}
-            </dd>
-          </div>
-        </dl>
-
-        <div class="mt-8">
-          {data.cover ? (
-            <Image
-              src={data.cover}
-              alt={data.coverAlt ?? `${data.title} cover`}
-              width={1400}
-              height={800}
-              widths={[700, 1000, 1400]}
-              sizes="(min-width: 1152px) 1088px, 100vw"
-              loading="eager"
-              class="border-border aspect-[16/9] w-full rounded-card border object-cover"
-              transition:name={`project-cover-${project.id}`}
-            />
-          ) : (
-            <PlaceholderImage
-              label="Project hero image"
-              ratio="16/7"
-              hint="Add cover: to the frontmatter"
-              class="rounded-card"
-            />
-          )}
-        </div>
-      </div>
-    </header>
-
-    <div class="container-site grid gap-12 pb-16 lg:grid-cols-[1fr_280px] lg:gap-16">
-      <div class="prose-site min-w-0" data-project-body>
+      )}
+      {readouts.length > 0 && (
+        <ul
+          class="mt-8 grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-3"
+          aria-label="Readouts"
+        >
+          {readouts.map((r) => (
+            <li class="flex">
+              <Readout readout={r} class="w-full" />
+            </li>
+          ))}
+        </ul>
+      )}
+      <div class="prose-kneeboard mt-10" data-project-body>
         <slot />
       </div>
-
-      <aside class="order-first lg:order-none">
-        <div class="lg:sticky lg:top-24 space-y-8">
-          {toc.length > 0 && (
-            <nav aria-labelledby="toc-heading" class="hidden lg:block">
-              <p id="toc-heading" class="eyebrow mb-3">
-                On this page
-              </p>
-              <ol class="border-border space-y-1 border-l text-sm">
-                {toc.map((h) => (
-                  <li>
-                    <a
-                      href={`#${h.slug}`}
-                      class="text-fg-muted hover:border-accent hover:text-fg -ml-px block border-l border-transparent py-1 pl-4 transition-colors"
-                    >
-                      {h.text}
-                    </a>
-                  </li>
-                ))}
-              </ol>
-            </nav>
-          )}
-          <div>
-            <p class="eyebrow mb-3">Technologies</p>
-            <ul class="flex flex-wrap gap-1.5">
-              {data.technologies.map((t) => (
-                <li>
-                  <TechBadge label={t} />
-                </li>
-              ))}
-            </ul>
-          </div>
-          {data.screenshots.length > 0 && (
-            <div>
-              <p class="eyebrow mb-3">Screenshots</p>
-              <ul class="grid gap-3">
-                {data.screenshots.map((s) => (
-                  <li>
-                    {s.src ? (
-                      <figure>
-                        <Image
-                          src={s.src}
-                          alt={s.alt}
-                          width={560}
-                          height={350}
-                          class="border-border rounded-xl border"
-                        />
-                        {s.caption && (
-                          <figcaption class="text-fg-subtle mt-1 text-xs">{s.caption}</figcaption>
-                        )}
-                      </figure>
-                    ) : (
-                      <PlaceholderImage label={s.alt} ratio="16/10" hint={s.caption} />
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          <div class="hidden lg:block">
-            <Button href="/contact" variant="secondary" size="sm" arrow>
-              Discuss a similar project
-            </Button>
-          </div>
+      {data.technologies.length > 0 && (
+        <div class="mt-10 border-t border-panel-edge pt-6">
+          <h2 class="label text-ink-muted">Stack</h2>
+          <ul class="mt-3 flex flex-wrap gap-1.5">
+            {data.technologies.map((t) => (
+              <li>
+                <TechBadge label={t} />
+              </li>
+            ))}
+          </ul>
         </div>
-      </aside>
+      )}
+      {links.length > 0 && (
+        <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+          {links.map((l) => (
+            <a
+              href={l.href}
+              class="link-ghost inline-flex min-h-11 items-center"
+              rel="noopener noreferrer"
+            >
+              {l.label}
+              <span aria-hidden="true">&nbsp;↗</span>
+            </a>
+          ))}
+        </div>
+      )}
+      <div class="mt-10 flex flex-wrap items-center gap-4">
+        <a href={`/contact?topic=${topic}`} class="btn btn-primary">
+          {isProduct ? "Let's talk" : "Discuss a similar project"}
+        </a>
+        <a href="/projects" class="btn btn-secondary">
+          All projects
+        </a>
+      </div>
     </div>
 
     {related.length > 0 && (
-      <section class="border-border bg-surface-muted/60 border-t" aria-labelledby="related-heading">
-        <div class="container-site section">
-          <h2 id="related-heading" class="mb-8 text-2xl sm:text-3xl">
-            More projects
-          </h2>
-          <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {related.map((p) => (
-              <ProjectCard project={p} />
-            ))}
-          </div>
-        </div>
+      <section class="shell mt-16" aria-labelledby="related-heading">
+        <h2 id="related-heading" class="display text-[clamp(1.75rem,3vw,2.5rem)]">
+          More projects
+        </h2>
+        <ul class="mt-6 border-t-2 border-ink">
+          {related.map((p) => (
+            <li>
+              <ProjectRow project={p} />
+            </li>
+          ))}
+        </ul>
       </section>
     )}
   </article>
-  <CTASection />
   <JsonLd data={jsonLd} />
 </BaseLayout>
