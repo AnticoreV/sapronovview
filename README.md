@@ -283,7 +283,7 @@ invented):
 | `content/projects/land-routing-service.md`   | Case-study page (year, problem / approach sections). Listed under "Code on GitHub".                                                                                                                                                                                                                                                                    |
 | `content/projects/paymont-wallet.md`         | Case-study page (year, most body sections). Listed under "Code on GitHub" with both repositories.                                                                                                                                                                                                                                                      |
 | `content/projects/ownira.md`                 | `timeframe` (start year not confirmed). `website` not set — ownira.cz currently shows a parking page; add `website: https://ownira.cz` when it is live (WEB stays text until then).                                                                                                                                                                    |
-| `content/hobbies/*` (all 4)                  | Photos, stats (hours, licence, home field, bike, longest trip, riding since, countries / continents, next country, discipline, sessions), favourites, the flying-club link, and the "[Write about …]" paragraphs. Titles, taglines and the written paragraphs do show.                                                                                 |
+| `content/hobbies/*` (all 4)                  | Photos, stats (hours, licence, home field, bike, longest trip, riding since, countries / continents, next country, discipline, sessions), favourites, the flying-club link, and the write-ups. While `placeholder: true`, only titles and taglines show.                                                                                               |
 | `content/now/now.md`                         | Current Ownira milestone line, "Learning" (2), "Reading" (2 books)                                                                                                                                                                                                                                                                                     |
 | `data/about.ts` → `facts`                    | All 6 facts (flying hours / licence, bike, country count + next, sport, first program, surprising fact) — the Facts section is hidden                                                                                                                                                                                                                  |
 | `data/adventures.ts`                         | Trip notes for 14 visited places, and the Cyprus town (`[Which town?]` — Cyprus shows by country only)                                                                                                                                                                                                                                                 |
@@ -296,31 +296,27 @@ invented):
 - `src/pages/about.astro`: the personal part of the career story (where you grew up, first
   computer, first flight / ride) — there is no placeholder, add real text when ready.
 
-### Copy waiting for Ivan's answer (changed or kept in v2, not yet approved)
+### Copy decisions (Ivan, 2026-10-23)
 
-1. **Philosophy 03** (`src/data/about.ts`), "Checklists over heroics": the flying sentence was
-   removed. v1: "Flying taught me that good people make bad mistakes when routine is skipped.
-   Runbooks, reviews and tests are the software version of a walk-around." v2: "Good people
-   make bad mistakes when routine is skipped. Runbooks, reviews and tests are how I keep the
-   routine." Approve, reword, keep the title?
-2. **/about personal paragraph** (unchanged from v1): "…Flying rewards preparation and
-   checklists, riding rewards attention, travel rewards curiosity — the same traits I try to
-   bring to a codebase." The last sentence uses flying as a metaphor for software work — keep,
-   cut to the facts, or drop? (The same sentence opens `/hobbies`, where it is in scope.)
-3. **/about labels:** "About · crew" → "About"; "Installed systems" + "Stack I ship with" →
-   one heading "Stack I ship with"; "SOP 01…04" → "01…04"; the "Operating procedures" tag was
-   removed.
-4. **/writing:** meta description lost "— plus the occasional lesson from the cockpit"; the
-   empty state "No entries logged yet" → "No posts published yet".
-5. **Smaller de-aviation swaps:** `/projects` "Featured projects" → "Products and featured
-   work"; `/experience` meta "Logbook of …" → "Track record of …"; the case-study group label
-   "Readouts" → "Proof numbers".
-6. **/hobbies prose** (pre-existing): the four hobby entries are `placeholder: true`, yet their
-   titles, taglines and paragraphs render (only `[…]` fields are hidden). Are the paragraphs
-   Ivan's own words and true? If yes set `placeholder: false`; if not, show only title and
-   tagline.
-7. **Operator line:** if Ivan offers services as an OSVČ, the footer needs one line with name,
-   IČO and registered seat (§435 OZ).
+Answered:
+
+1. **Philosophy 03** (`src/data/about.ts`), "Checklists over heroics": the v2 wording without
+   the flying sentence is approved — "Good people make bad mistakes when routine is skipped.
+   Runbooks, reviews and tests are how I keep the routine."
+2. **/about personal paragraph** ("…Flying rewards preparation and checklists, riding rewards
+   attention, travel rewards curiosity — the same traits I try to bring to a codebase."):
+   keep as it is.
+3. **/hobbies write-ups:** hidden in production until Ivan writes or confirms them — while an
+   entry is `placeholder: true`, `/hobbies` shows only its title and tagline
+   (`src/components/hobbies/HobbyModule.astro`). Set `placeholder: false` to publish one.
+4. **Operator line:** Ivan invoices as an OSVČ, so the footer needs name, IČO and registered
+   seat (§435 OZ) — **waiting for the IČO and the address he wants shown.**
+
+Not asked separately (informational, de-aviation of labels): /about "About · crew" → "About",
+"Installed systems" → "Stack I ship with", "SOP 01…04" → "01…04"; /writing meta lost "— plus
+the occasional lesson from the cockpit", empty state "No posts published yet"; `/projects`
+"Products and featured work"; `/experience` meta "Track record of …"; case-study label
+"Proof numbers".
 
 ## Contact form
 

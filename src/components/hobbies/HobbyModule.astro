@@ -2,11 +2,13 @@
 /**
  * A hobby card — "off duty". Only real fields render: anything still holding a
  * [placeholder] (stats, favourites, photos, links, paragraphs) is hidden in production.
+ * While an entry is `placeholder: true`, production shows only its title and tagline —
+ * the write-up stays hidden until Ivan confirms it (2026-10-23).
  */
 import { render } from "astro:content";
 import Arrow from "@components/ui/Arrow.astro";
 import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
-import { hobbyCategoryLabels, shownAll, type Hobby } from "@lib/content";
+import { hidePlaceholders, hobbyCategoryLabels, shownAll, type Hobby } from "@lib/content";
 
 interface Props {
   hobby: Hobby;
@@ -15,6 +17,7 @@ interface Props {
 const { hobby, index } = Astro.props;
 const { data } = hobby;
 const { Content } = await render(hobby);
+const showProse = !(hidePlaceholders && data.placeholder);
 const stats = shownAll(data.stats, (s) => `${s.label} ${s.value}`);
 const favorites = shownAll(data.favorites);
 const links = shownAll(data.links, (l) => `${l.label} ${l.href}`).filter(
@@ -40,9 +43,11 @@ const links = shownAll(data.links, (l) => `${l.label} ${l.href}`).filter(
     {data.title}
   </h2>
   <p class="text-body-l font-semibold">{data.tagline}</p>
-  <div class="prose-sheet text-ink-muted">
-    <Content />
-  </div>
+  {showProse && (
+    <div class="prose-sheet text-ink-muted">
+      <Content />
+    </div>
+  )}
   {stats.length > 0 && (
     <dl class="grid grid-cols-2 gap-3 sm:grid-cols-3">
       {stats.map((s) => (

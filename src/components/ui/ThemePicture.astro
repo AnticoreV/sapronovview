@@ -130,13 +130,13 @@ const smallDark = `${smallMedia} and ${DARK}`;
 {/* Before first paint: follow the stored theme when it differs from the OS. */}
 <script is:inline>
   (function () {
-    var p = document.currentScript && document.currentScript.previousElementSibling;
+    const p = document.currentScript && document.currentScript.previousElementSibling;
     if (!p) return;
-    var dark = document.documentElement.classList.contains("dark");
-    var os = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const dark = document.documentElement.classList.contains("dark");
+    const os = window.matchMedia("(prefers-color-scheme: dark)").matches;
     if (dark === os) return;
     p.querySelectorAll('source[data-theme-source="dark"]').forEach(function (s) {
-      var base = s.getAttribute("data-base-media");
+      const base = s.getAttribute("data-base-media");
       s.media = dark ? base || "all" : "not all";
     });
   })();
