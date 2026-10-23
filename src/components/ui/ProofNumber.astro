@@ -29,7 +29,7 @@ const count = readout.count;
     data-count-suffix={count?.suffix}
     aria-hidden={readout.spoken ? "true" : undefined}
   >
-    <Glyphs text={readout.value} weight="heavy" />
+    <Glyphs text={readout.value} weight="heavy" silent={Boolean(readout.spoken)} />
   </span>
   {readout.spoken && <span class="sr-only">{readout.spoken}</span>}
   <span class="mono text-[12px] font-medium tracking-[0.04em] text-ink-muted uppercase">

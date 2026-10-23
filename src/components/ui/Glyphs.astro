@@ -14,10 +14,14 @@ interface Props {
   /** Accessible wording for the whole string; the visual string is then aria-hidden. */
   spoken?: string;
   weight?: "text" | "bold" | "heavy";
+  /** No screen-reader words at all (the caller hides the visual and speaks it itself). */
+  silent?: boolean;
 }
-const { text, spoken, weight = "text" } = Astro.props;
+const { text, spoken, weight = "text", silent = false } = Astro.props;
 const parts = text.split(/(→|←|↗|≈)/).filter((p) => p !== "");
-const words: Record<string, string> = { "→": "to", "←": "from", "↗": "", "≈": "approximately" };
+const words: Record<string, string> = silent
+  ? { "→": "", "←": "", "↗": "", "≈": "" }
+  : { "→": "to", "←": "from", "↗": "", "≈": "approximately" };
 const isGlyph = (p: string) => p in words;
 ---
 
