@@ -26,3 +26,7 @@ pnpm-debug.log*
 
 # misc
 *.tsbuildinfo
+
+# Playwright
+test-results/
+playwright-report/
