@@ -146,6 +146,12 @@ config, annunciator, checklist ticking and every aviation label are gone.
   in once (600ms, IntersectionObserver), proof numbers count up once, cards lift on hover.
   Reveals only run when the head script sets `html.motion` (JS on, no reduced motion), so
   without JS or under `prefers-reduced-motion` everything is simply there.
+- **Glyphs:** neither font ships → ← ↗ ≈ in its Latin subsets, so `Arrow` / `Approx`
+  (`src/components/ui/`) draw them as em-sized `currentColor` SVGs with a stroke per text
+  weight, and `Glyphs` renders data strings ("h → min", "≈ ½", chips, the hero legend) with
+  them. Screen readers get words: a readout's `spoken` / `chipSpoken` ("hours to minutes",
+  "approximately half") or "to" / "approximately" per glyph; link arrows are `aria-hidden`.
+  Use `<Arrow />` instead of typing "→" in markup.
 - **Scoped styles and utilities:** Astro's scoped `<style>` is unlayered and beats Tailwind's
   layered utilities, so components never set `display` in scoped CSS for elements that take
   a `class` from outside (e.g. `StatusPill` gets `inline-flex` as a utility so
@@ -162,6 +168,8 @@ client from the track record) and a `detail` sentence. Rules:
 - Only numbers that are in `src/content/experience/` — never a new one.
 - `count` (optional) makes the number count up (`prefix` + 0→`to` + `suffix`).
 - `project` links the number to a case study (`/projects/<slug>`).
+- `spoken` / `chipSpoken` say the value in words for screen readers when the symbols don't
+  read well (`h → min` → "hours to minutes").
 
 ## 3D: hero blueprint and globe
 
@@ -175,7 +183,9 @@ client from the track record) and a `detail` sentence. Rules:
   rebuilt when the theme changes; callout labels are drawn after the self-hosted IBM Plex
   Mono is ready (no Google Fonts request); `LineMaterial` resolution and width follow the
   stage size. The live scene starts on the poster's frame (t = 12.85 s, the finished
-  drawing), holds it 1.6 s, then loops.
+  drawing), holds it 1.6 s, then loops. On stages narrower than 600px (phones) the callout
+  labels are drawn 1.8× larger (≈ 9px text at 375 instead of 5) and only IDEA, ARCHITECTURE,
+  TESTS, DEPLOY and the AGENT LOOP tag are shown, so nothing collides.
 - **Globe** (`src/scripts/globe3d.ts`, port of `3d/d2.html`) — paper globe re-skinned to v2:
   clay-white plate, visited countries in ink, home (Czechia) in accent blue, wishlist
   countries with a dashed accent outline, accent arcs from Prague. Drag to rotate with
@@ -190,8 +200,9 @@ client from the track record) and a `detail` sentence. Rules:
 - **No WebGL or reduced motion:** the hero stays on its poster; `/adventures` shows the flat
   d3-geo map instead of the globe. three.js is never downloaded in either case.
 - **Posters** (`src/assets/hero/blueprint-{light,dark}.png`,
-  `src/assets/globe/globe-{light,dark}.png`) are rendered from the same scene code at the
-  real stage size (1440 viewport) and 2× density:
+  `src/assets/hero/blueprint-small-{light,dark}.png`, `src/assets/globe/globe-{light,dark}.png`)
+  are rendered from the same scene code at the real stage size — 1440 viewport at 2×, and the
+  phone hero at a 375px stage at 3× (with the phone labels):
 
   ```bash
   npm run build && npm run preview -- --host 127.0.0.1 --port 4321   # in another terminal
@@ -199,8 +210,11 @@ client from the track record) and a `detail` sentence. Rules:
   npm run build
   ```
 
-  `ThemePicture` serves the matching light / dark poster as AVIF / WebP and downloads only
-  the one on screen.
+  `ThemePicture` serves the matching light / dark poster (and the phone render below 600px)
+  as AVIF / WebP. Its inline script right after `</picture>` points the dark sources at the
+  stored theme before first paint, so a returning visitor whose stored theme differs from
+  the OS never sees the other poster (the browser's speculative fetch of the OS-theme file
+  may still happen in that case).
 
 ## Content
 
@@ -232,6 +246,11 @@ client from the track record) and a `detail` sentence. Rules:
   `src/pages/about.astro` + `src/data/about.ts`. Aviation appears only as hobby content
   (`/hobbies`, `/adventures`, the off-duty line and the personal paragraph on `/about`).
 - **Adventures:** `src/data/adventures.ts` (+ ISO numeric ids in `src/data/country-ids.ts`).
+- **Public images:** put files in `public/images/` only when they need a stable public URL
+  (e.g. `ivan-sapronov.jpg` for structured data, or an image referenced from Markdown body
+  text). The share image and the static map are generated (`src/lib/brand-images.ts`,
+  `src/pages/images/`); a static file with the same path would override them. Everything
+  else belongs in `src/assets/` so `<Picture>` can resize it and serve AVIF / WebP.
 - **Portraits:** `src/assets/portraits/` — `studio-*` (grey studio background, light theme)
   and `cutout-*` (background removed, dark theme, on a sunken well); alt text in
   `src/lib/portraits.ts`. The homepage card uses the green sweater, `/about` starts on the
@@ -256,23 +275,52 @@ to find: `grep -rn "placeholder: true\|\[[A-Z]" src/content src/data`.
 Hidden in production until real content replaces the placeholder (nothing here may be
 invented):
 
-| Where                                        | Hidden                                                                                                                                                                                                                                                                                                              |
-| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `content/writing/*` (all 3 posts)            | Whole posts — they are template samples (`placeholder: true`): "Building this site with Astro", "What ultralight flying taught me about checklists", "Notes on integrating Keycloak with Spring Security". Rewrite or approve, then set `placeholder: false`. Until then `/writing` shows "No posts published yet". |
-| `content/projects/correct-context-wallet.md` | Case-study page (organization, year, most body sections are placeholders). Listed under "Code on GitHub" with its real description, stack and repository link.                                                                                                                                                      |
-| `content/projects/faradey-android.md`        | Case-study page (organization, year, approach / results sections). Listed under "Code on GitHub".                                                                                                                                                                                                                   |
-| `content/projects/land-routing-service.md`   | Case-study page (year, problem / approach sections). Listed under "Code on GitHub".                                                                                                                                                                                                                                 |
-| `content/projects/paymont-wallet.md`         | Case-study page (year, most body sections). Listed under "Code on GitHub" with both repositories.                                                                                                                                                                                                                   |
-| `content/projects/ownira.md`                 | `timeframe` (start year not confirmed). `website` not set — ownira.cz currently shows a parking page; add `website: https://ownira.cz` when it is live (WEB stays text until then).                                                                                                                                 |
-| `content/hobbies/*` (all 4)                  | Photos, stats (hours, licence, home field, bike, longest trip, riding since, countries / continents, next country, discipline, sessions), favourites, the flying-club link, and the "[Write about …]" paragraphs. Titles, taglines and the written paragraphs do show.                                              |
-| `content/now/now.md`                         | Current Ownira milestone line, "Learning" (2), "Reading" (2 books)                                                                                                                                                                                                                                                  |
-| `data/about.ts` → `facts`                    | All 6 facts (flying hours / licence, bike, country count + next, sport, first program, surprising fact) — the Facts section is hidden                                                                                                                                                                               |
-| `data/about.ts` → philosophy 03              | Copy to approve: "Checklists over heroics" lost its flying sentence in v2 (no aviation metaphors) and now reads "Good people make bad mistakes when routine is skipped. Runbooks, reviews and tests are how I keep the routine."                                                                                    |
-| `src/pages/about.astro`                      | The personal part of the career story (where you grew up, first computer, first flight / ride) — add real text there                                                                                                                                                                                                |
-| `data/adventures.ts`                         | Trip notes for 14 visited places, and the Cyprus town (`[Which town?]` — Cyprus shows by country only)                                                                                                                                                                                                              |
-| `content/milestones/`                        | No milestones yet (template only) — the section is hidden                                                                                                                                                                                                                                                           |
-| CV                                           | `public/cv/ivan-sapronov-cv.pdf` missing → "CV on request" links to `/contact?topic=hiring`                                                                                                                                                                                                                         |
-| Contact form                                 | `PUBLIC_FORM_ACTION` (Formspree endpoint) not set → honest "not connected yet" state                                                                                                                                                                                                                                |
+| Where                                        | Hidden                                                                                                                                                                                                                                                                                                                                                 |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `content/writing/*` (all 3 posts)            | Whole posts — they are template samples (`placeholder: true`): "Building this site with Astro", "What ultralight flying taught me about checklists", "Notes on integrating Keycloak with Spring Security". Rewrite or approve, then set `placeholder: false`. Until then `/writing` shows "No posts published yet".                                    |
+| `content/projects/correct-context-wallet.md` | Case-study page (organization, year, most body sections are placeholders). Listed under "Code on GitHub" with its real description, stack and repository link.                                                                                                                                                                                         |
+| `content/projects/faradey-android.md`        | Case-study page (organization, year, approach / results sections). Listed under "Code on GitHub".                                                                                                                                                                                                                                                      |
+| `content/projects/land-routing-service.md`   | Case-study page (year, problem / approach sections). Listed under "Code on GitHub".                                                                                                                                                                                                                                                                    |
+| `content/projects/paymont-wallet.md`         | Case-study page (year, most body sections). Listed under "Code on GitHub" with both repositories.                                                                                                                                                                                                                                                      |
+| `content/projects/ownira.md`                 | `timeframe` (start year not confirmed). `website` not set — ownira.cz currently shows a parking page; add `website: https://ownira.cz` when it is live (WEB stays text until then).                                                                                                                                                                    |
+| `content/hobbies/*` (all 4)                  | Photos, stats (hours, licence, home field, bike, longest trip, riding since, countries / continents, next country, discipline, sessions), favourites, the flying-club link, and the "[Write about …]" paragraphs. Titles, taglines and the written paragraphs do show.                                                                                 |
+| `content/now/now.md`                         | Current Ownira milestone line, "Learning" (2), "Reading" (2 books)                                                                                                                                                                                                                                                                                     |
+| `data/about.ts` → `facts`                    | All 6 facts (flying hours / licence, bike, country count + next, sport, first program, surprising fact) — the Facts section is hidden                                                                                                                                                                                                                  |
+| `data/adventures.ts`                         | Trip notes for 14 visited places, and the Cyprus town (`[Which town?]` — Cyprus shows by country only)                                                                                                                                                                                                                                                 |
+| `content/milestones/`                        | No milestones yet (template only) — the section is hidden                                                                                                                                                                                                                                                                                              |
+| CV                                           | `public/cv/ivan-sapronov-cv.pdf` missing → "CV on request" links to `/contact?topic=hiring`                                                                                                                                                                                                                                                            |
+| Contact form                                 | `PUBLIC_FORM_ACTION` (Formspree endpoint) not set → honest "not connected yet" state. **Connect it only after** the `/contact` privacy note is a full GDPR Art. 13 text: controller and contact, purpose, legal basis, retention period, Formspree as processor in the US (EU–US DPF / SCCs), the visitor's rights, and the right to complain to ÚOOÚ. |
+
+### Content to add (not hidden — nothing renders until written)
+
+- `src/pages/about.astro`: the personal part of the career story (where you grew up, first
+  computer, first flight / ride) — there is no placeholder, add real text when ready.
+
+### Copy waiting for Ivan's answer (changed or kept in v2, not yet approved)
+
+1. **Philosophy 03** (`src/data/about.ts`), "Checklists over heroics": the flying sentence was
+   removed. v1: "Flying taught me that good people make bad mistakes when routine is skipped.
+   Runbooks, reviews and tests are the software version of a walk-around." v2: "Good people
+   make bad mistakes when routine is skipped. Runbooks, reviews and tests are how I keep the
+   routine." Approve, reword, keep the title?
+2. **/about personal paragraph** (unchanged from v1): "…Flying rewards preparation and
+   checklists, riding rewards attention, travel rewards curiosity — the same traits I try to
+   bring to a codebase." The last sentence uses flying as a metaphor for software work — keep,
+   cut to the facts, or drop? (The same sentence opens `/hobbies`, where it is in scope.)
+3. **/about labels:** "About · crew" → "About"; "Installed systems" + "Stack I ship with" →
+   one heading "Stack I ship with"; "SOP 01…04" → "01…04"; the "Operating procedures" tag was
+   removed.
+4. **/writing:** meta description lost "— plus the occasional lesson from the cockpit"; the
+   empty state "No entries logged yet" → "No posts published yet".
+5. **Smaller de-aviation swaps:** `/projects` "Featured projects" → "Products and featured
+   work"; `/experience` meta "Logbook of …" → "Track record of …"; the case-study group label
+   "Readouts" → "Proof numbers".
+6. **/hobbies prose** (pre-existing): the four hobby entries are `placeholder: true`, yet their
+   titles, taglines and paragraphs render (only `[…]` fields are hidden). Are the paragraphs
+   Ivan's own words and true? If yes set `placeholder: false`; if not, show only title and
+   tagline.
+7. **Operator line:** if Ivan offers services as an OSVČ, the footer needs one line with name,
+   IČO and registered seat (§435 OZ).
 
 ## Contact form
 
@@ -285,9 +333,11 @@ disabled), success (`role="status"`, only after the endpoint answers OK), failur
 - **Not connected (now):** the form says "Form not connected yet — email me at …", email
   stays the primary action, and "Write it as an email" opens the same message (subject from
   the topic) in the visitor's email app. Nothing is sent from the page.
-- **Connect Formspree:** create a form at formspree.io and build with
+- **Connect Formspree:** first extend the privacy note on `/contact` to a full GDPR Art. 13
+  text (see "Still to fill"), then create a form at formspree.io and build with
   `PUBLIC_FORM_ACTION=https://formspree.io/f/<id>` (e.g. a Cloudflare Pages environment
-  variable). The privacy note on `/contact` then names Formspree as the processor.
+  variable). The CSP already allows `https://formspree.io` for `connect-src` and
+  `form-action`.
 - The site sets no cookies and runs no analytics, so there is no consent banner; the theme
   choice lives in `localStorage` only.
 
@@ -316,11 +366,12 @@ any build machine). The favicon and touch icon are the isometric cube mark.
   `focus`, 2px offset; `on-accent` on the contact panel), 44px targets in the header,
   breadcrumbs, footer, forms and chips, skip link, labelled fields, status always in words
   (never colour alone), the globe's list as its keyboard equivalent, reduced motion respected
-  everywhere. axe-core 4.10 (WCAG 2.2 AA + best practice): **0 violations** on every route,
-  light and dark, 1440 and 375 (also with motion on, and with the menu sheet open).
-- Lighthouse 12.8 (local preview, mobile preset, 2026-10-23): `/` Performance 99, LCP 2.1 s
-  (the poster image), TBT 0 ms, CLS 0; `/adventures` 99, LCP 2.1 s (the globe poster), TBT
-  0 ms, CLS 0; Accessibility, Best practices and SEO 100 on both.
+  everywhere. axe-core 4.10 (WCAG 2.2 AA + best practice): **0 violations** in 78 runs —
+  16 routes (incl. the four case studies and `/404`), light and dark, 1440 and 375, plus runs
+  with motion on and with the menu sheet open.
+- Lighthouse 12.8 (local preview, mobile preset, 2026-10-23, light and dark): `/` Performance
+  99, LCP 2.0 s (the phone poster), TBT 0 ms, CLS 0; `/adventures` 99, LCP 2.1 s (the globe
+  poster), TBT 0 ms, CLS 0; Accessibility, Best practices and SEO 100 on both.
 - three.js (~133 KB gzip, plus 14 KB for the hero scene) loads only on `/` and `/adventures`,
   lazily (see above).
 
@@ -340,18 +391,38 @@ Domain: **https://ivansapronov.com** (set as `site` in `astro.config.mjs` and in
 
 ### Security headers
 
-`public/_headers` (Cloudflare Pages) sets, for every path: `X-Content-Type-Options:
-nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Frame-Options: DENY` and
-`Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()`, plus
-long-lived caching for `/_astro/*`. `public/_redirects` holds permanent redirects.
+`public/_headers` (Cloudflare Pages) sets, for every path:
 
-**No Content-Security-Policy yet.** Astro's `security.csp` was tried (2026-10-23): the theme
-bootstrap and the 3D scenes work on a direct page load, but the per-page hash policy breaks
-client-side navigation — after a `ClientRouter` transition the next page's inline styles are
-refused, the router injects a `data:` module script, and Shiki's inline styles are not
-covered. Options for later: drop `ClientRouter` (full page loads) and keep `security.csp`, or
-switch to external stylesheets and scripts with a `'self'` policy set in `_headers`. The
-markup does not use inline `style` attributes, so either path is open.
+- `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`,
+  `X-Frame-Options: DENY`, `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+  (no `interest-cohort`, which Chrome reports as unknown);
+- `Strict-Transport-Security: max-age=31536000` (no `includeSubDomains`, no `preload`);
+- a header-level **Content-Security-Policy**:
+
+  ```text
+  default-src 'self'; script-src 'self' 'unsafe-inline' data:; style-src 'self' 'unsafe-inline';
+  img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://formspree.io;
+  form-action 'self' https://formspree.io mailto:; frame-ancestors 'none'; base-uri 'self';
+  object-src 'none'
+  ```
+
+  The site loads nothing from other origins. Inline scripts and styles are allowed because
+  Astro inlines small module scripts and component styles, and the theme bootstrap runs
+  inline before paint. `data:` in `script-src` is for `ClientRouter`: after a swap it inserts
+  an empty `data:` module whose load event makes `astro:page-load` wait until the new page's
+  inline modules have run; blocking it makes initialisation after navigation racy (with
+  inline scripts already allowed it adds no real exposure). `mailto:` in `form-action` is the
+  not-connected form's no-JS fallback. Astro's per-page hash CSP (`security.csp`) was tried
+  earlier and breaks `ClientRouter` navigation, so it stays off.
+
+plus long-lived caching for `/_astro/*`. `public/_redirects` holds the permanent redirects
+(with trailing-slash variants).
+
+`astro preview` ignores `_headers`; `scripts/serve-dist.mjs` applies it the way Cloudflare
+Pages does, so the whole Playwright suite runs under these headers, and one test navigates
+with `ClientRouter` through five pages, starts both 3D scenes and submits the form with zero
+CSP violations. After changing the policy, run `npm run test:e2e` and check the Pages
+preview deploy (console) before merging.
 
 ## Tech stack
 
