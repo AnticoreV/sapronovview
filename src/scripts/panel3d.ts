@@ -40,7 +40,7 @@ import {
 } from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
-import { careerSpan, readouts } from "@data/readouts";
+import { careerSpan, readouts, type Readout } from "@data/readouts";
 
 export type PanelHandle = {
   /** Re-read the theme from <html class="dark"> and redraw. */
@@ -145,6 +145,9 @@ async function fontsReady(mono: string, sans: string) {
 }
 
 const isNight = () => document.documentElement.classList.contains("dark");
+
+/** LCD value: the short panel form when there is one (e.g. "≈ ½"). */
+const lcdValue = (r: Readout) => r.panelValue ?? r.value;
 
 /** Give the main thread back between heavy init phases (no single long task). */
 const yieldToMain = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
@@ -597,9 +600,9 @@ export async function mountPanel(
     });
     const label = (r: { panel?: string; label: string; source: string }) =>
       r.panel ?? `${r.label} · ${r.source}`.toUpperCase();
-    module(-0.9, -2.35, 2.6, 0.78, lcd(label(readouts.p95), readouts.p95.value));
-    module(1.95, -2.35, 2.6, 0.78, lcd(label(readouts.ciQueue), readouts.ciQueue.value));
-    module(4.85, -2.35, 2.6, 0.78, lcd(label(readouts.downstream), readouts.downstream.value));
+    module(-0.9, -2.35, 2.6, 0.78, lcd(label(readouts.p95), lcdValue(readouts.p95)));
+    module(1.95, -2.35, 2.6, 0.78, lcd(label(readouts.ciQueue), lcdValue(readouts.ciQueue)));
+    module(4.85, -2.35, 2.6, 0.78, lcd(label(readouts.downstream), lcdValue(readouts.downstream)));
 
     // toggle switches
     for (let i = 0; i < 3; i++) {

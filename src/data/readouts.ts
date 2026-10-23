@@ -26,6 +26,8 @@ export type Readout = {
   project?: string;
   /** Shorter label for the 3D panel's LCD, where space is tight. */
   panel?: string;
+  /** Shorter value for the 3D panel's LCD (e.g. "≈ ½" for "≈ halved"). */
+  panelValue?: string;
 };
 
 export const readouts = {
@@ -52,9 +54,10 @@ export const readouts = {
   },
   p95: {
     id: "p95",
-    label: "p95",
+    label: "p95 latency",
     source: "CCA Group",
-    value: "≈ ½",
+    value: "≈ halved",
+    panelValue: "≈ ½",
     detail:
       "Kotlin coroutines ran independent downstream calls concurrently — p95 latency roughly halved under peak load.",
     project: "dynamic-form-engine",

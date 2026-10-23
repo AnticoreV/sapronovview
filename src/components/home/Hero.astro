@@ -1,8 +1,8 @@
 ---
 /**
  * Hero from the approved D4 artboard: eyebrow, name, lede, Email me + What I
- * build, and the live 3D instrument panel. On narrow screens the panel's proof
- * numbers are repeated as legible LCD readouts underneath.
+ * build, and the live 3D instrument panel, with the panel's proof numbers repeated
+ * underneath as legible LCD readouts (src/data/readouts.ts).
  */
 import PanelStage from "@components/home/PanelStage.astro";
 import Readout from "@components/ui/Readout.astro";
@@ -33,13 +33,14 @@ const [first, ...rest] = siteConfig.name.split(" ");
     </div>
     <div class="min-w-0 flex-[999_1_640px]">
       <PanelStage />
-      <ul class="mt-4 grid grid-cols-2 gap-3 md:hidden" aria-label="Proof readouts">
-        {heroReadouts.map((r) => (
-          <li class="flex">
-            <Readout readout={r} class="w-full" />
-          </li>
-        ))}
-      </ul>
     </div>
   </div>
+  {/* The panel's proof numbers as legible LCD readouts (2×2 on phones, one row from md). */}
+  <ul class="shell mt-6 grid grid-cols-2 gap-3 md:grid-cols-4" aria-label="Proof readouts">
+    {heroReadouts.map((r) => (
+      <li class="flex">
+        <Readout readout={r} class="w-full" />
+      </li>
+    ))}
+  </ul>
 </section>
