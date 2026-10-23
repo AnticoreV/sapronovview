@@ -1,8 +1,7 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
-import SectionHeading from "@components/ui/SectionHeading.astro";
-import ArticleCard from "@components/writing/ArticleCard.astro";
+import ArticleRow from "@components/writing/ArticleRow.astro";
 import TagList from "@components/writing/TagList.astro";
 import { getAllTags, getPosts } from "@lib/content";
 
@@ -22,21 +21,21 @@ const { tag, posts, tags } = Astro.props;
   title={`Posts tagged “${tag}”`}
   description={`${posts.length} article${posts.length === 1 ? "" : "s"} tagged ${tag}.`}
 >
-  <div class="container-site pt-10 pb-16 sm:pt-14">
-    <Breadcrumbs items={[{ label: "Writing", href: "/writing" }, { label: `#${tag}` }]} />
-    <SectionHeading
-      level={1}
-      eyebrow="Tag"
-      title={`#${tag}`}
-      description={`${posts.length} article${posts.length === 1 ? "" : "s"}`}
-      class="mt-8"
-    />
-    <TagList tags={tags} active={tag} />
-    <h2 class="sr-only">Articles</h2>
-    <div class="mt-10 max-w-3xl">
-      {posts.map((post) => (
-        <ArticleCard post={post} variant="row" />
-      ))}
+  <div class="band pt-8 pb-16 md:pt-10 md:pb-24">
+    <div class="shell">
+      <Breadcrumbs items={[{ label: "Writing", href: "/writing" }, { label: `#${tag}` }]} />
+      <p class="label mt-8 text-ink-muted">
+        Tag · {posts.length} article{posts.length === 1 ? "" : "s"}
+      </p>
+      <h1 class="display mt-3 text-display-l">#{tag}</h1>
+      <TagList tags={tags} active={tag} class="mt-8" />
+      <ul class="mt-10 border-b-2 border-ink">
+        {posts.map((post) => (
+          <li>
+            <ArticleRow post={post} />
+          </li>
+        ))}
+      </ul>
     </div>
   </div>
 </BaseLayout>

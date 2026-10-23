@@ -1,0 +1,64 @@
+---
+/** "Systems online" — capabilities as switched-on aircraft systems (SystemToggle). */
+import SectionHeader from "@components/ui/SectionHeader.astro";
+import { capabilities } from "@data/home";
+---
+
+<section id="capabilities" class="band section-y" aria-labelledby="capabilities-heading">
+  <div class="shell flex flex-col gap-10">
+    <SectionHeader id="capabilities-heading" title="Systems online" tag="WHAT I CAN DO FOR YOU" />
+    <ul class="grid grid-cols-[repeat(auto-fit,minmax(min(290px,100%),1fr))] gap-4">
+      {capabilities.map((c) => (
+        <li
+          class:list={[
+            "flex flex-col gap-3.5 rounded-lg p-[26px]",
+            c.spotlight ? "face" : "module",
+          ]}
+        >
+          <div class="flex items-center justify-between gap-3">
+            <span
+              class:list={["mono text-label font-bold", c.spotlight ? "text-select" : "text-ink"]}
+            >
+              {c.code}
+            </span>
+            <span role="img" aria-label="On" class:list={["toggle", c.spotlight && "toggle--spot"]}>
+              <i />
+            </span>
+          </div>
+          <h3 class="text-[24px] leading-[1.1] font-bold">{c.title}</h3>
+          <p class:list={["text-base", c.spotlight ? "text-marking-muted" : "text-ink-muted"]}>
+            {c.text}
+          </p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .toggle {
+    display: inline-flex;
+    justify-content: flex-end;
+    flex: none;
+    width: 40px;
+    height: 22px;
+    padding: 3px;
+    border-radius: 11px;
+    background: var(--ok-ink);
+  }
+  :global(.dark) .toggle:not(.toggle--spot) {
+    background: #1a5e36;
+  }
+  .toggle i {
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    background: #f1f1eb;
+  }
+  .toggle--spot {
+    background: var(--select);
+  }
+  .toggle--spot i {
+    background: var(--face);
+  }
+</style>

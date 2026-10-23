@@ -1,24 +1,26 @@
 ---
+/**
+ * Homepage — the approved D4 · Pre-flight artboard (PreflightDesktop.dc.html):
+ * hero with the live 3D panel → crew card + checklist → products → systems →
+ * case studies → logbook → writing + off duty → contact (from BaseLayout).
+ */
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Hero from "@components/home/Hero.astro";
-import SelectedProjects from "@components/home/SelectedProjects.astro";
-import Intro from "@components/home/Intro.astro";
-import CareerHighlights from "@components/home/CareerHighlights.astro";
-import TechStack from "@components/home/TechStack.astro";
-import LatestWriting from "@components/home/LatestWriting.astro";
-import HobbiesStrip from "@components/home/HobbiesStrip.astro";
-import AdventuresTeaser from "@components/adventures/AdventuresTeaser.astro";
-import CTASection from "@components/ui/CTASection.astro";
-import { getFeaturedProjects, getHobbies, getPositions, getPosts } from "@lib/content";
+import CrewRow from "@components/home/CrewRow.astro";
+import Products from "@components/home/Products.astro";
+import Systems from "@components/home/Systems.astro";
+import Cases from "@components/home/Cases.astro";
+import Logbook from "@components/home/Logbook.astro";
+import WritingOffDuty from "@components/home/WritingOffDuty.astro";
+import { getPositions, getPosts, getProjects } from "@lib/content";
+import { adventures } from "@data/adventures";
 import { siteConfig } from "@config";
 
-const [projects, positions, posts, hobbies] = await Promise.all([
-  getFeaturedProjects(4),
-  getPositions(),
-  getPosts(),
-  getHobbies(),
-]);
-const highlights = positions.filter((p) => p.data.highlight).slice(0, 3);
+const [projects, positions, posts] = await Promise.all([getProjects(), getPositions(), getPosts()]);
+const products = projects.filter((p) => p.data.tagline);
+const countries = new Set(
+  adventures.filter((a) => a.status === "visited").map((a) => a.countryCode),
+).size;
 ---
 
 <BaseLayout
@@ -28,12 +30,10 @@ const highlights = positions.filter((p) => p.data.highlight).slice(0, 3);
   type="profile"
 >
   <Hero />
-  <SelectedProjects projects={projects} />
-  <Intro />
-  <CareerHighlights positions={highlights.length ? highlights : positions.slice(0, 3)} />
-  <TechStack />
-  <LatestWriting posts={posts.slice(0, 3)} />
-  <HobbiesStrip hobbies={hobbies.filter((h) => h.data.featured).slice(0, 4)} />
-  <AdventuresTeaser />
-  <CTASection />
+  <CrewRow />
+  <Products products={products} />
+  <Systems />
+  <Cases projects={projects} />
+  <Logbook positions={positions} />
+  <WritingOffDuty posts={posts.slice(0, 3)} countries={countries} />
 </BaseLayout>

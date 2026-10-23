@@ -1,0 +1,96 @@
+---
+/**
+ * Pre-flight checklist on an instrument face = the homepage table of contents.
+ * Each item switches from "· · ·" to a green CHECK once its section has been
+ * reached; the last item is always Contact → YOUR MOVE. Without JS or under
+ * reduced motion every item simply reads CHECK.
+ */
+import { checklist } from "@data/home";
+---
+
+<nav class="face flex w-full flex-col gap-2.5 p-6" aria-labelledby="checklist-title" data-checklist>
+  <p id="checklist-title" class="mono text-xs text-marking-muted">
+    CHECKLIST · BEFORE YOU HIRE, INVEST OR PARTNER
+  </p>
+  <ol class="mono flex flex-col text-sm">
+    {checklist.map((item) => (
+      <li>
+        <a
+          href={item.href}
+          class="flex min-h-11 items-center justify-between gap-4 border-b border-dotted border-[#464c49] py-1.5 text-marking no-underline hover:underline"
+        >
+          <span>{item.label}</span>
+          <span class="check" aria-hidden="true" data-check-for={item.href.slice(1)}>
+            CHECK
+          </span>
+        </a>
+      </li>
+    ))}
+    <li>
+      <a
+        href="#contact"
+        class="flex min-h-11 items-center justify-between gap-4 py-1.5 text-marking no-underline hover:underline"
+      >
+        <span>Contact</span>
+        <span class="text-caution" aria-hidden="true">
+          YOUR MOVE
+        </span>
+      </a>
+    </li>
+  </ol>
+</nav>
+
+<style>
+  .check {
+    min-width: 5ch;
+    text-align: right;
+    color: var(--ok);
+  }
+  .check[data-pending] {
+    color: var(--marking-muted);
+  }
+  .check[data-ticked] {
+    animation: check-in 0.25s var(--ease-mech) both;
+  }
+</style>
+
+<script>
+  function setupChecklist() {
+    const root = document.querySelector<HTMLElement>("[data-checklist]");
+    if (!root || root.dataset.bound) return;
+    root.dataset.bound = "true";
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!("IntersectionObserver" in window)) return;
+
+    const marks = [...root.querySelectorAll<HTMLElement>("[data-check-for]")];
+    const reached = (el: Element) => el.getBoundingClientRect().top < window.innerHeight * 0.7;
+    const tick = (mark: HTMLElement) => {
+      if (!("pending" in mark.dataset)) return;
+      delete mark.dataset.pending;
+      mark.dataset.ticked = "";
+      mark.textContent = "CHECK";
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const mark = marks.find((m) => m.dataset.checkFor === entry.target.id);
+          if (mark) tick(mark);
+          io.unobserve(entry.target);
+        }
+      },
+      { rootMargin: "0px 0px -30% 0px" },
+    );
+
+    for (const mark of marks) {
+      const section = document.getElementById(mark.dataset.checkFor ?? "");
+      if (!section || reached(section)) continue;
+      mark.dataset.pending = "";
+      mark.textContent = "· · ·";
+      io.observe(section);
+    }
+    document.addEventListener("astro:before-swap", () => io.disconnect(), { once: true });
+  }
+  document.addEventListener("astro:page-load", setupChecklist);
+</script>
