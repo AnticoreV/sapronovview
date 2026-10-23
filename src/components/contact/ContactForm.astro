@@ -139,7 +139,7 @@ const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]))
     >
       <p class="label font-semibold text-error-ink">MESSAGE NOT SENT</p>
       <p>
-        Something went wrong on the way. Email me directly at
+        Something went wrong on the way. Email me directly at{" "}
         <a href={`mailto:${siteConfig.email}`} class="link-inline font-semibold">
           {siteConfig.email}
         </a>{" "}
@@ -153,7 +153,7 @@ const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]))
     >
       <p class="label font-semibold">FORM NOT CONNECTED YET</p>
       <p>
-        Nothing was sent. Email me at
+        Nothing was sent. Email me at{" "}
         <a href={`mailto:${siteConfig.email}`} class="link-inline font-semibold">
           {siteConfig.email}
         </a>{" "}
