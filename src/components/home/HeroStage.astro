@@ -11,12 +11,15 @@ import Glyphs from "@components/ui/Glyphs.astro";
 import ThemePicture from "@components/ui/ThemePicture.astro";
 import posterLight from "@/assets/hero/blueprint-light.png";
 import posterDark from "@/assets/hero/blueprint-dark.png";
+import posterSmallLight from "@/assets/hero/blueprint-small-light.png";
+import posterSmallDark from "@/assets/hero/blueprint-small-dark.png";
 
 // The artboard's description of the drawing (screens/HeroV6.dc.html).
 const description =
   "An isometric technical drawing builds itself: three idea sketches, two struck out at a validation gate; the architecture (frontend, backend, services) is drawn stroke by stroke and filled with colour; tests stamp checks; a rose review mark erases one link and redraws it through a queue; dashed CI/CD arrows carry a package to a deploy target where service blocks extrude; a sparkline draws on an observe card; a rose pen-orb flies back along the agent loop and sketches the next idea while the sheet clears.";
 // Measured: beside the name (≥ 1270px viewport) the stage is ≤ 800px wide (797 at 1440);
-// below that it takes the full width.
+// below that it takes the full width. Below 600px phones get their own render (larger,
+// fewer callout labels — see hero3d.ts), 375 / 750 / 1125 wide.
 const sizes = "(min-width: 1270px) 800px, 100vw";
 const widths = [480, 640, 800, 1200, 1594];
 // HeroLegend, exactly as the V6 artboard: an ink line for DRAWN, clay dots for the rest.
@@ -39,6 +42,10 @@ const legend = [
       <ThemePicture
         light={posterLight}
         dark={posterDark}
+        lightSmall={posterSmallLight}
+        darkSmall={posterSmallDark}
+        smallMedia="(max-width: 599px)"
+        smallWidths={[375, 750, 1125]}
         alt=""
         widths={widths}
         sizes={sizes}

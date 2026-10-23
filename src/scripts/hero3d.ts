@@ -170,6 +170,16 @@ const ease = {
 const wrap = (x: number, p: number) => ((x % p) + p) % p;
 const smoothstep01 = (x: number) => x * x * (3 - 2 * x);
 
+/**
+ * Narrow stages (phones, < 600 px): callout labels drawn 1.8× larger (≈ 9 px text at 375 px
+ * instead of ≈ 5) and only the main ones shown, so they stay legible and don't collide.
+ * A constant factor keeps the phone poster and the live scene identical at any phone width.
+ */
+const COMPACT_BELOW = 600;
+const COMPACT_LABEL_SCALE = 1.8;
+const COMPACT_LABELS = new Set(["idea", "arch", "tests", "deploy"]);
+const isCompact = (w: number) => w < COMPACT_BELOW;
+
 /** Stroke width in CSS px per unit, scaled with the frame (r4v6 `frame()`); never hairline. */
 const lineWidthFor = (w: number, h: number) =>
   Math.max(0.75, 2.1 * Math.min(w / 1280, h / 800) * Math.max(0.75, Math.min(1.25, 12.6 / ZOOM)));
@@ -197,7 +207,7 @@ type Stroke = {
   pattern: LineMaterial | null;
   set(p: number, op?: number, o?: { from?: number; march?: number }): void;
 };
-type Callout = { set(k: number, op?: number): void };
+type Callout = { set(k: number, op?: number): void; scale(k: number): void };
 
 /**
  * Build the whole drawing for one palette. Geometry and materials belong to this build
@@ -217,6 +227,7 @@ async function buildScene(
   const textures: Texture[] = [];
   const lineMats: LineMaterial[] = [];
   let LW = lineWidthFor(size.w, size.h);
+  let compact = isCompact(size.w);
   const maxAniso = renderer.capabilities.getMaxAnisotropy();
   const col = (h: string) => new Color(h);
   const canvasTex = (c: HTMLCanvasElement) => {
@@ -442,7 +453,8 @@ async function buildScene(
       new SpriteMaterial({ map: t, transparent: true, depthTest: false, toneMapped: false }),
     );
     const h = sz * 1.4;
-    sp.scale.set((h * c.width) / c.height, h, 1);
+    const baseW = (h * c.width) / c.height;
+    sp.scale.set(baseW, h, 1);
     sp.center.set(align === "left" ? 0 : align === "right" ? 1 : 0.5, 0.5);
     sp.position.copy(elbow);
     sp.renderOrder = 9;
@@ -462,14 +474,19 @@ async function buildScene(
     dot.position.copy(anchor);
     dot.renderOrder = 9;
     world.add(dot);
+    let dotK = 1;
     return {
+      scale(k: number) {
+        sp.scale.set(baseW * k, h * k, 1);
+        dotK = Math.sqrt(k);
+      },
       set(k: number, op = 1) {
         const lk = seg(k, 0, 0.55);
         const tk = seg(k, 0.45, 1);
         if (leader) leader.set(lk, op);
         dot.visible = k > 0 && op > 0.002 && !!leader;
         dot.material.opacity = op;
-        dot.scale.setScalar(Math.max(0.001, ease.back(seg(k, 0, 0.3))));
+        dot.scale.setScalar(Math.max(0.001, ease.back(seg(k, 0, 0.3)) * dotK));
         sp.visible = tk > 0 && op > 0.002;
         sp.material.opacity = tk * op;
       },
@@ -963,6 +980,7 @@ async function buildScene(
     );
     const h = 0.5;
     s.scale.set((h * c.width) / c.height, h, 1);
+    s.userData.base = { w: (h * c.width) / c.height, h };
     s.renderOrder = 9;
     s.position.copy(arcCurve.getPoint(0.5)).add(V(0, 0.5, 0));
     world.add(s);
@@ -1007,6 +1025,16 @@ async function buildScene(
     deploy: callout("DEPLOY", depCorner, depCorner.clone().add(V(0.55, 0, 0.55))),
     observe: callout("OBSERVE", obsCorner, up(obsCorner, 0.55)),
   };
+
+  /** Callouts kept on narrow stages; everything is shown otherwise. */
+  const shown = (key: keyof typeof Lb) => (!compact || COMPACT_LABELS.has(key) ? 1 : 0);
+  const applyLabelScale = () => {
+    const k = compact ? COMPACT_LABEL_SCALE : 1;
+    Object.values(Lb).forEach((c) => c.scale(k));
+    const base = agentTag.userData.base as { w: number; h: number };
+    agentTag.scale.set(base.w * k, base.h * k, 1);
+  };
+  applyLabelScale();
 
   const tokSegA = tokA.distanceTo(tokB);
   const tokSegB = tokB.distanceTo(tokC);
@@ -1116,21 +1144,22 @@ async function buildScene(
     revMark.set(S("rev", t), (1 - S("revOut", t)) * clr);
     Lb.review.set(
       seg(t, T.rev[0] + 0.15, T.rev[1] + 0.2),
-      (1 - seg(t, T.revOut[1] + 0.6, T.revOut[1] + 1.1)) * clr,
+      (1 - seg(t, T.revOut[1] + 0.6, T.revOut[1] + 1.1)) * clr * shown("review"),
     );
     // dimension + callouts
     dim.forEach((s, i) => s.set(seg(t, T.dim[0] + i * 0.1, T.dim[1]), clr));
-    const lab = (c: Callout, a: number, b: number, op = 1) => c.set(seg(t, a, b), op * clr);
-    lab(Lb.idea, 0.35, 0.95, t >= T.clear[1] ? 0 : 1);
-    lab(Lb.validate, 1.1, 1.6);
-    lab(Lb.frontend, 3.2, 3.7);
-    lab(Lb.backend, 3.65, 4.15);
-    lab(Lb.services, 4.2, 4.7);
-    lab(Lb.arch, 4.7, 5.1);
-    lab(Lb.tests, 6.75, 7.25);
-    lab(Lb.cicd, 9.45, 9.95);
-    lab(Lb.deploy, 5.0, 5.5);
-    lab(Lb.observe, 5.3, 5.8);
+    const lab = (key: keyof typeof Lb, a: number, b: number, op = 1) =>
+      Lb[key].set(seg(t, a, b), op * clr * shown(key));
+    lab("idea", 0.35, 0.95, t >= T.clear[1] ? 0 : 1);
+    lab("validate", 1.1, 1.6);
+    lab("frontend", 3.2, 3.7);
+    lab("backend", 3.65, 4.15);
+    lab("services", 4.2, 4.7);
+    lab("arch", 4.7, 5.1);
+    lab("tests", 6.75, 7.25);
+    lab("cicd", 9.45, 9.95);
+    lab("deploy", 5.0, 5.5);
+    lab("observe", 5.3, 5.8);
     // tests: stamps
     stampsSp.forEach((s, i) => {
       const k = seg(t, T.tests[0] + i * 0.13, T.tests[0] + 0.32 + i * 0.13);
@@ -1266,6 +1295,11 @@ async function buildScene(
       m.resolution.set(w, h);
       m.linewidth = LW * (m.userData.w as number);
     });
+    const nextCompact = isCompact(w);
+    if (nextCompact !== compact) {
+      compact = nextCompact;
+      applyLabelScale();
+    }
   };
 
   const dispose = () => {
