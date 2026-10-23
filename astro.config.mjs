@@ -69,10 +69,11 @@ export default defineConfig({
   site: SITE_URL,
   output: "static",
   trailingSlash: "never",
-  // Renamed pages keep working (static meta-refresh page; public/_redirects adds a real
-  // 301 on Cloudflare Pages).
+  // Removed pages forward to the project list (static meta-refresh page; public/_redirects
+  // adds a real 301 on Cloudflare Pages). Apexline was taken off the site on 2026-10-23.
   redirects: {
-    "/projects/apex-line-market-research": "/projects/apexline",
+    "/projects/apex-line-market-research": "/projects",
+    "/projects/apexline": "/projects",
   },
   build: {
     format: "file",

@@ -17,7 +17,7 @@ export const contactRoutes = [
   {
     id: "investing",
     label: "Investing",
-    title: "Ownira and Apexline",
+    title: "Ownira",
     text: "Stage, progress and plans — let's talk.",
     subject: "Investing",
   },

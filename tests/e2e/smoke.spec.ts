@@ -5,7 +5,6 @@ const routes = [
   "/about",
   "/projects",
   "/projects/ownira",
-  "/projects/apexline",
   "/experience",
   "/writing",
   "/hobbies",
@@ -195,10 +194,12 @@ test("about: heading, ProfilePage structured data", async ({ page }) => {
   expect(profile?.mainEntity?.image).toMatch(/\/images\/ivan-sapronov\.jpg$/);
 });
 
-test("renamed Apexline page: old URL forwards to /projects/apexline", async ({ page }) => {
-  await page.goto("/projects/apex-line-market-research");
-  await page.waitForURL(/\/projects\/apexline$/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Apexline");
+test("removed Apexline pages forward to /projects", async ({ page }) => {
+  for (const old of ["/projects/apexline", "/projects/apex-line-market-research"]) {
+    await page.goto(old);
+    await page.waitForURL(/\/projects$/);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  }
 });
 
 test("404 has no canonical", async ({ page }) => {

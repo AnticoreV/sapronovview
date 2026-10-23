@@ -1,2 +1,3 @@
 # Cloudflare Pages redirects (https://developers.cloudflare.com/pages/configuration/redirects/)
-/projects/apex-line-market-research /projects/apexline 301
+/projects/apex-line-market-research /projects 301
+/projects/apexline /projects 301

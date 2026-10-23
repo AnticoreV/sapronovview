@@ -1,7 +1,7 @@
 # sapronovview — ivansapronov.com
 
 The personal site of **Ivan Sapronov**, backend & fullstack engineer and founder in Prague:
-what he builds (Ownira, Apexline, client systems), what he can do, the logbook, writing and —
+what he builds (Ownira, client systems), what he can do, the logbook, writing and —
 as an addition — the hobbies.
 
 Built with [Astro 7](https://astro.build) (static), TypeScript, Tailwind CSS v4 and content
@@ -183,8 +183,8 @@ image matches the live scene.
   and `validating`. `featured: true` projects are instrument modules on `/projects`.
   Entries still marked `placeholder: true` that have a `github` URL are listed under "Code on
   GitHub" as compact rows (title, description, stack, repository links — no case-study page).
-- **Renamed pages:** Apexline lives at `/projects/apexline`; the old
-  `/projects/apex-line-market-research` forwards there (Astro `redirects` in
+- **Removed pages:** Apexline was taken off the site (2026-10-23). `/projects/apexline` and the
+  older `/projects/apex-line-market-research` forward to `/projects` (Astro `redirects` in
   `astro.config.mjs` + a 301 in `public/_redirects` for Cloudflare Pages).
 - **Homepage case studies:** `homeCases` in `src/data/home.ts` (slugs must exist).
 - **Experience:** `src/content/experience/*.md`. `logged` is the logbook's LOGGED cell — a
@@ -232,7 +232,6 @@ invented):
 | `content/projects/land-routing-service.md`   | Case-study page (year, problem / approach sections). Listed under "Code on GitHub".                                                                                                                                                                                                                                |
 | `content/projects/paymont-wallet.md`         | Case-study page (year, most body sections). Listed under "Code on GitHub" with both repositories.                                                                                                                                                                                                                  |
 | `content/projects/ownira.md`                 | `timeframe` (start year not confirmed). `website` not set — ownira.cz currently shows a parking page; add `website: https://ownira.cz` when it is live.                                                                                                                                                            |
-| `content/projects/apexline.md`               | `timeframe` (start year not confirmed)                                                                                                                                                                                                                                                                             |
 | `content/hobbies/*` (all 4)                  | Photos, stats (hours, licence, home field, bike, longest trip, riding since, countries / continents, next country, discipline, sessions), favourites, the flying-club link, and the "[Write about …]" paragraphs. Titles, taglines and the written paragraphs do show.                                             |
 | `content/now/now.md`                         | Current Ownira milestone line, "Learning" (2), "Reading" (2 books)                                                                                                                                                                                                                                                 |
 | `data/about.ts` → `facts`                    | All 6 facts (flying hours / licence, bike, country count + next, sport, first program, surprising fact) — the Facts section is hidden                                                                                                                                                                              |

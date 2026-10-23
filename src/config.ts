@@ -37,7 +37,7 @@ export const siteConfig = {
     label: "Open to projects",
   },
   /** What you are working on right now (one line). */
-  currentFocus: "Building Ownira (in pilot) and validating Apexline",
+  currentFocus: "Building Ownira (in pilot)",
   /** Experience on the JVM, as stated in the CV (~5 years). */
   experienceSummary: "~5 yrs on the JVM",
   /** Language for <html lang> and Open Graph locale. */
