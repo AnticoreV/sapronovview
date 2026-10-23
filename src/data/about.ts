@@ -52,7 +52,7 @@ export const facts = [
 
 export const currentInterests = [
   "Ownira",
-  "Apex line market research",
+  "Apexline validation",
   "Ultralight aviation",
   "Motorcycle touring",
   "Country visiting",
