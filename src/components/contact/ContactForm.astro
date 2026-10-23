@@ -14,9 +14,9 @@ const connected = /^https:\/\/formspree\.io\/f\/[A-Za-z0-9]+$/.test(action);
 const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]));
 ---
 
-<div class="module flex flex-col gap-6 p-6 sm:p-8" data-contact>
+<div class="card flex flex-col gap-6 p-6 sm:p-8" data-contact>
   <div class="flex flex-col gap-2">
-    <h2 class="text-heading font-bold">Send a message</h2>
+    <h2 class="text-heading">Send a message</h2>
     {!connected && (
       <p class="text-small text-ink-muted" role="note">
         <strong class="text-ink">Form not connected yet</strong> — email me at{" "}
@@ -121,17 +121,23 @@ const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]))
   </form>
 
   <div aria-live="polite" data-contact-status>
-    <div class="face flex flex-col gap-1.5 p-5" data-state="success" hidden tabindex="-1">
-      <p class="mono text-label font-bold text-ok">● MESSAGE RECEIVED</p>
+    <div
+      class="flex flex-col gap-1.5 rounded-md bg-ok-soft p-5"
+      data-state="success"
+      role="status"
+      hidden
+      tabindex="-1"
+    >
+      <p class="label font-semibold text-ok-ink">● MESSAGE RECEIVED</p>
       <p>Thanks — your message is in my inbox. I'll reply by email.</p>
     </div>
     <div
-      class="flex flex-col gap-1.5 rounded-lg bg-panel-raised p-5 shadow-[inset_0_0_0_2px_var(--error-ink)]"
+      class="flex flex-col gap-1.5 rounded-md border-2 border-error-ink bg-surface p-5"
       data-state="failure"
       role="alert"
       hidden
     >
-      <p class="mono text-label font-bold text-error-ink">MESSAGE NOT SENT</p>
+      <p class="label font-semibold text-error-ink">MESSAGE NOT SENT</p>
       <p>
         Something went wrong on the way. Email me directly at
         <a href={`mailto:${siteConfig.email}`} class="link-inline font-semibold">
@@ -141,11 +147,11 @@ const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]))
       </p>
     </div>
     <div
-      class="flex flex-col gap-2 rounded-lg bg-panel-raised p-5 shadow-[inset_0_0_0_2px_var(--panel-edge-strong)]"
+      class="flex flex-col gap-2 rounded-md border-2 border-line-strong bg-surface-sunken p-5"
       data-state="offline"
       hidden
     >
-      <p class="mono text-label font-bold">FORM NOT CONNECTED YET</p>
+      <p class="label font-semibold">FORM NOT CONNECTED YET</p>
       <p>
         Nothing was sent. Email me at
         <a href={`mailto:${siteConfig.email}`} class="link-inline font-semibold">
@@ -170,9 +176,9 @@ const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]))
   }
   .field label {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
   }
   .field input,
@@ -182,10 +188,10 @@ const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]))
     min-height: 48px;
     padding: 0 14px;
     border-radius: var(--radius-md);
-    border: 1px solid var(--panel-edge-strong);
-    background: var(--panel-raised);
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
     color: var(--ink);
-    font: 400 1.0625rem/1.4 var(--font-sans);
+    font: 400 17px/1.4 var(--font-sans);
   }
   .field select {
     padding-right: 36px;
@@ -208,10 +214,14 @@ const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]))
   .field textarea:hover {
     border-color: var(--ink-muted);
   }
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: var(--ink-muted);
+  }
   .field input:focus-visible,
   .field select:focus-visible,
   .field textarea:focus-visible {
-    border-color: var(--ink);
+    border-color: var(--accent);
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }

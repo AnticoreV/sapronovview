@@ -11,10 +11,10 @@ const tags = await getAllTags(posts);
 
 <BaseLayout
   title="Writing"
-  description="Engineering notes on the JVM, identity, delivery and automation — plus the occasional lesson from the cockpit."
+  description="Engineering notes on the JVM, identity, delivery and automation."
   noindex={posts.length === 0}
 >
-  <div class="band pt-8 pb-16 md:pt-10 md:pb-24">
+  <div class="band section-gap pt-8 md:pt-10">
     <div class="shell">
       <Breadcrumbs items={[{ label: "Writing" }]} />
       <div class="mt-8 flex flex-wrap items-end justify-between gap-6">
@@ -23,7 +23,7 @@ const tags = await getAllTags(posts);
           <h1 class="display mt-3 text-display-l">Writing</h1>
         </div>
         {posts.length > 0 && (
-          <a href="/rss.xml" class="link-ghost inline-flex min-h-11 items-center">
+          <a href="/rss.xml" class="link-more">
             RSS feed
           </a>
         )}
@@ -33,7 +33,7 @@ const tags = await getAllTags(posts);
       </p>
       <TagList tags={tags} class="mt-8" />
       {posts.length > 0 ? (
-        <ul class="mt-10 border-b-2 border-ink">
+        <ul class="mt-10 flex flex-col gap-3">
           {posts.map((post) => (
             <li>
               <ArticleRow post={post} />
@@ -41,8 +41,8 @@ const tags = await getAllTags(posts);
           ))}
         </ul>
       ) : (
-        <div class="module mt-10 max-w-[720px] p-6">
-          <p class="label text-ink">No entries logged yet</p>
+        <div class="card mt-10 max-w-[720px] p-6">
+          <p class="label text-ink">No posts published yet</p>
           <p class="mt-2 text-ink-muted">New notes will appear here.</p>
         </div>
       )}

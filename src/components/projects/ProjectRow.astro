@@ -1,5 +1,5 @@
 ---
-/** A project as a kneeboard row: title, one-line description, mono meta. */
+/** A project as a row card (as on the homepage): title, one-line description, mono meta. */
 import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
 import { categoryLabels, shortCompany, shown, statusLabels, type Project } from "@lib/content";
 
@@ -13,6 +13,7 @@ const meta = [
   org ? shortCompany(org) : categoryLabels[data.category],
   shown(data.timeframe),
   statusLabels[data.status].label,
+  ...data.technologies.slice(0, 4),
 ]
   .filter(Boolean)
   .join(" · ");
@@ -20,19 +21,20 @@ const meta = [
 
 <a
   href={`/projects/${project.id}`}
-  class="row grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-x-8 gap-y-2 border-b border-panel-edge py-6 no-underline"
+  class="row card lift grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] items-start gap-x-8 gap-y-3 p-7 no-underline"
 >
-  <span class="text-heading font-bold">{data.title}</span>
+  <span class="text-[26px] leading-[1.15] font-bold tracking-[-0.02em]">{data.title}</span>
   <span class="text-ink-muted">{data.description}</span>
-  <span class="mono text-xs leading-relaxed text-ink-muted uppercase">
+  <span class="mono text-[12px] leading-relaxed text-ink-muted uppercase">
     {meta}
-    <br />
-    {data.technologies.slice(0, 4).join(" · ")}
     {data.placeholder && <PlaceholderBadge />}
   </span>
 </a>
 
 <style>
+  .row:hover {
+    color: var(--ink);
+  }
   .row:hover span:first-child {
     text-decoration: underline;
     text-decoration-thickness: 2px;

@@ -1,17 +1,24 @@
 ---
+/**
+ * /projects — Ownira first (wide ProductModule), featured client work as ProductModules,
+ * the rest as rows; category filters; "Code on GitHub" rows for repositories whose
+ * case study is still being written.
+ */
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
 import CodeRow from "@components/projects/CodeRow.astro";
-import InstrumentModule from "@components/projects/InstrumentModule.astro";
+import ProductModule from "@components/projects/ProductModule.astro";
 import ProjectFilters from "@components/projects/ProjectFilters.astro";
 import ProjectRow from "@components/projects/ProjectRow.astro";
+import SectionHeader from "@components/ui/SectionHeader.astro";
 import { getCodeProjects, getProjects } from "@lib/content";
 
 const [all, code] = await Promise.all([getProjects(), getCodeProjects()]);
 // Entries still marked placeholder only appear as repository rows (also in dev).
 const projects = all.filter((p) => !p.data.placeholder);
-const featured = projects.filter((p) => p.data.featured);
-const rest = projects.filter((p) => !p.data.featured);
+const products = projects.filter((p) => p.data.tagline);
+const featured = projects.filter((p) => p.data.featured && !p.data.tagline);
+const rest = projects.filter((p) => !p.data.featured && !p.data.tagline);
 ---
 
 <BaseLayout
@@ -33,15 +40,20 @@ const rest = projects.filter((p) => !p.data.featured);
     </div>
   </div>
 
-  <section class="band pt-8 pb-16 md:pb-24" aria-labelledby="featured-heading" data-project-group>
+  <section class="band pt-8 pb-4" aria-labelledby="featured-heading" data-project-group>
     <div class="shell">
       <h2 id="featured-heading" class="sr-only">
-        Featured projects
+        Products and featured work
       </h2>
-      <ul class="grid grid-cols-[repeat(auto-fit,minmax(min(420px,100%),1fr))] gap-4">
-        {featured.map((p, i) => (
+      <ul class="grid grid-cols-[repeat(auto-fit,minmax(min(400px,100%),1fr))] gap-4">
+        {products.map((p) => (
+          <li class="flex md:col-span-full" data-category={p.data.category}>
+            <ProductModule project={p} level={2} />
+          </li>
+        ))}
+        {featured.map((p) => (
           <li class="flex" data-category={p.data.category}>
-            <InstrumentModule project={p} level={2} size={i < 2 && p.data.tagline ? "lg" : "md"} />
+            <ProductModule project={p} level={2} size="md" />
           </li>
         ))}
       </ul>
@@ -49,12 +61,10 @@ const rest = projects.filter((p) => !p.data.featured);
   </section>
 
   {rest.length > 0 && (
-    <section class="band pb-16 md:pb-24" aria-labelledby="archive-heading" data-project-group>
-      <div class="shell sheet px-[clamp(20px,4vw,56px)] py-10">
-        <h2 id="archive-heading" class="display text-[clamp(1.75rem,3vw,2.5rem)]">
-          Archive
-        </h2>
-        <ul class="mt-6 border-t-2 border-ink">
+    <section class="band pt-12 pb-4" aria-labelledby="archive-heading" data-project-group>
+      <div class="shell flex flex-col gap-6">
+        <SectionHeader id="archive-heading" title="Archive" />
+        <ul class="flex flex-col gap-3">
           {rest.map((p) => (
             <li data-category={p.data.category}>
               <ProjectRow project={p} />
@@ -66,15 +76,10 @@ const rest = projects.filter((p) => !p.data.featured);
   )}
 
   {code.length > 0 && (
-    <section class="band pb-16 md:pb-24" aria-labelledby="code-heading" data-project-group>
-      <div class="shell sheet px-[clamp(20px,4vw,56px)] py-10">
-        <div class="flex flex-wrap items-end justify-between gap-4">
-          <h2 id="code-heading" class="display text-[clamp(1.75rem,3vw,2.5rem)]">
-            Code on GitHub
-          </h2>
-          <span class="label text-ink-muted">Public repositories</span>
-        </div>
-        <ul class="mt-6 border-t-2 border-ink">
+    <section class="band section-gap pt-12" aria-labelledby="code-heading" data-project-group>
+      <div class="shell flex flex-col gap-6">
+        <SectionHeader id="code-heading" title="Code on GitHub" tag="PUBLIC REPOSITORIES" />
+        <ul class="border-t border-line">
           {code.map((p) => (
             <li data-category={p.data.category}>
               <CodeRow project={p} />

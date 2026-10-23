@@ -3,12 +3,9 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
 import HobbyModule from "@components/hobbies/HobbyModule.astro";
 import { getHobbies } from "@lib/content";
-import { adventures } from "@data/adventures";
+import { visitedCountryCount as countries } from "@data/adventures";
 
 const hobbies = await getHobbies();
-const countries = new Set(
-  adventures.filter((a) => a.status === "visited").map((a) => a.countryCode),
-).size;
 ---
 
 <BaseLayout
@@ -26,7 +23,7 @@ const countries = new Set(
       </p>
       <nav aria-label="Jump to hobby" class="mt-8 flex flex-wrap gap-2">
         {hobbies.map((h) => (
-          <a href={`#${h.id}`} class="chip min-h-11 no-underline">
+          <a href={`#${h.id}`} class="chip">
             {h.data.title}
           </a>
         ))}
@@ -34,7 +31,7 @@ const countries = new Set(
     </div>
   </div>
 
-  <div class="band py-12 md:py-16">
+  <div class="band pt-10 pb-4 md:pt-12">
     <div class="shell grid gap-4 lg:grid-cols-2">
       {hobbies.map((hobby, i) => (
         <HobbyModule hobby={hobby} index={i} />
@@ -42,17 +39,20 @@ const countries = new Set(
     </div>
   </div>
 
-  <section class="band pb-16 md:pb-24" aria-labelledby="map-teaser">
+  <section class="band section-gap pt-8" aria-labelledby="map-teaser">
     <a
       href="/adventures"
-      class="shell face face-bezel flex flex-wrap items-center justify-between gap-6 p-7 no-underline sm:p-8"
+      class="teaser shell card lift flex flex-wrap items-center justify-between gap-6 p-7 no-underline sm:p-8"
     >
       <span class="flex flex-col gap-2">
-        <span class="placard text-marking-muted">Adventures · globe</span>
-        <span id="map-teaser" class="display text-[clamp(1.75rem,3vw,2.5rem)] leading-none">
+        <span class="label text-ink-muted">Adventures · globe</span>
+        <span
+          id="map-teaser"
+          class="display text-[clamp(28px,3vw,40px)] leading-none tracking-[-0.03em]"
+        >
           {countries} countries on the map
         </span>
-        <span class="text-marking-muted">
+        <span class="text-ink-muted">
           Where I've been, home in Prague, and the places still on the list.
         </span>
       </span>
@@ -60,3 +60,9 @@ const countries = new Set(
     </a>
   </section>
 </BaseLayout>
+
+<style>
+  .teaser:hover {
+    color: var(--ink);
+  }
+</style>

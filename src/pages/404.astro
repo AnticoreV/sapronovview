@@ -1,89 +1,206 @@
 ---
+/**
+ * 404 — "this route isn't deployed." with a small static drawing in the hero's V6
+ * blueprint line style: a dashed CI/CD arrow into a dashed deploy target where one of
+ * the four service blocks is missing (inline SVG, isometric, no three.js on this page).
+ */
 import BaseLayout from "@layouts/BaseLayout.astro";
+
+// True isometric projection: screen-right = x − z, screen-down = x + z, up = y.
+const S = 62;
+const CX = 268;
+const CY = 196;
+const COS30 = Math.cos(Math.PI / 6);
+const pt = (x: number, y: number, z: number): [number, number] => [
+  +(CX + (x - z) * COS30 * S).toFixed(1),
+  +(CY + (x + z) * 0.5 * S - y * S).toFixed(1),
+];
+const iso = (x: number, y: number, z: number) => pt(x, y, z).join(",");
+const poly = (pts: Array<[number, number, number]>) => pts.map((p) => iso(...p)).join(" ");
+
+// Deploy target (as in the hero: 2.7 × 2.7 footprint, four 0.88 blocks).
+const HALF = 1.35;
+const W = 0.88;
+const blocks = [
+  { x: -0.62, z: -0.62, h: 1.15, missing: false },
+  { x: 0.62, z: -0.62, h: 0.8, missing: false },
+  { x: -0.62, z: 0.62, h: 0.65, missing: true },
+  { x: 0.62, z: 0.62, h: 0.95, missing: false },
+]
+  // painter's order: farther (smaller x + z) first
+  .sort((a, b) => a.x + a.z - (b.x + b.z))
+  .map((b) => {
+    const x0 = b.x - W / 2;
+    const x1 = b.x + W / 2;
+    const z0 = b.z - W / 2;
+    const z1 = b.z + W / 2;
+    const h = b.h;
+    return {
+      ...b,
+      top: poly([
+        [x0, h, z0],
+        [x1, h, z0],
+        [x1, h, z1],
+        [x0, h, z1],
+      ]),
+      right: poly([
+        [x1, 0, z0],
+        [x1, h, z0],
+        [x1, h, z1],
+        [x1, 0, z1],
+      ]),
+      front: poly([
+        [x0, 0, z1],
+        [x1, 0, z1],
+        [x1, h, z1],
+        [x0, h, z1],
+      ]),
+      dot: pt(b.x + 0.22, h, b.z + 0.22),
+    };
+  });
+const footprint = poly([
+  [-HALF, 0, -HALF],
+  [HALF, 0, -HALF],
+  [HALF, 0, HALF],
+  [-HALF, 0, HALF],
+]);
+const route = `${iso(-3.6, 0, -0.2)} ${iso(-1.5, 0, -0.2)}`;
+const arrowHead = [iso(-1.78, 0, -0.42), iso(-1.5, 0, -0.2), iso(-1.78, 0, 0.02)].join(" ");
+// Callout on the missing block's open front-left edge, leader down-left to the label.
+const [ax, ay] = pt(-0.62 - W / 2, 0.33, 0.62 + W / 2);
+const [lx, ly] = [ax - 64, ay + 46];
 ---
 
-<BaseLayout title="Off course" description="That page doesn't exist." noindex>
-  <section class="band section-y">
+<BaseLayout title="Not found" description="That page doesn't exist." noindex>
+  <section class="band section-gap pt-14">
     <div class="shell flex flex-wrap items-center gap-10">
       <div class="flex flex-[1_1_420px] flex-col gap-6">
-        <p class="label text-ink-muted">404 · Heading lost</p>
-        <h1 class="display text-display-xl">Off course.</h1>
-        <p class="max-w-[520px] text-body-l">
-          This page doesn't exist — or it moved without filing a flight plan.
-        </p>
-        <div class="flex flex-wrap gap-4">
+        <h1 class="display text-[clamp(44px,6vw,88px)] leading-[0.95] tracking-[-0.045em]">
+          404 — this route isn't deployed.
+        </h1>
+        <div class="flex flex-wrap gap-3">
           <a href="/" class="btn btn-primary">
-            Return to base
-          </a>
-          <a href="/projects" class="btn btn-secondary">
-            Projects
+            Back to home
           </a>
         </div>
       </div>
-      <div class="flex flex-[1_1_320px] justify-center">
-        {/* Heading indicator (static): compass card with the heading bug off course. */}
+      <div class="flex flex-[1_1_360px] justify-center">
         <svg
-          viewBox="0 0 320 320"
-          class="w-full max-w-[340px]"
+          viewBox="0 0 520 340"
+          class="blueprint w-full max-w-[560px]"
           role="img"
-          aria-label="Heading indicator showing heading 404, off course"
+          aria-label="A blueprint drawing of a deploy target: a dashed CI/CD arrow leads to a dashed footprint where three service blocks stand and the fourth is missing, drawn only as a dashed outline."
         >
-          <circle cx="160" cy="160" r="156" fill="var(--face-edge)"></circle>
-          <circle cx="160" cy="160" r="144" fill="var(--face)"></circle>
-          <g transform="rotate(-38 160 160)" stroke="#a2a8a4" stroke-width="2">
-            {Array.from({ length: 72 }, (_, i) => {
-              const long = i % 6 === 0;
-              return (
-                <line
-                  x1="160"
-                  y1={long ? 26 : 30}
-                  x2="160"
-                  y2="40"
-                  transform={`rotate(${i * 5} 160 160)`}
-                  stroke-width={long ? 3 : 1.5}
-                />
-              );
-            })}
-            {["N", "3", "6", "E", "12", "15", "S", "21", "24", "W", "30", "33"].map((l, i) => (
-              <text
-                x="160"
-                y="62"
-                transform={`rotate(${i * 30} 160 160)`}
-                fill="#f1f1eb"
-                stroke="none"
-                font-family="var(--font-mono)"
-                font-size="17"
-                font-weight="700"
-                text-anchor="middle"
-              >
-                {l}
-              </text>
-            ))}
-          </g>
-          {/* heading bug (magenta = the route you should be on) */}
-          <path d="M150 16h20l-4 12h-12z" fill="#e0569f"></path>
-          {/* lubber line + aircraft */}
-          <path d="M160 8v30" stroke="#3fcfdf" stroke-width="3"></path>
-          <path
-            d="M160 112v80M128 150h64M146 192h28"
-            stroke="#3fcfdf"
-            stroke-width="6"
-            stroke-linecap="round"
-            fill="none"
-          ></path>
-          <text
-            x="160"
-            y="244"
-            fill="#3fcfdf"
-            font-family="var(--font-mono)"
-            font-size="22"
-            font-weight="700"
-            text-anchor="middle"
-          >
-            HDG 404
+          <polyline points={route} class="ci"></polyline>
+          <polyline points={arrowHead} class="ink"></polyline>
+          <polygon points={footprint} class="footprint"></polygon>
+          {blocks.map((b) =>
+            b.missing ? (
+              <g class="missing">
+                <polygon points={b.right} />
+                <polygon points={b.front} />
+                <polygon points={b.top} />
+              </g>
+            ) : (
+              <g>
+                <polygon points={b.right} class="face-right" />
+                <polygon points={b.front} class="face-front" />
+                <polygon points={b.top} class="face-top" />
+                <circle cx={b.dot[0]} cy={b.dot[1]} r="4" class="live" />
+              </g>
+            ),
+          )}
+          <circle cx={ax} cy={ay} r="3.5" class="lead-dot"></circle>
+          <polyline points={`${ax},${ay} ${lx},${ly}`} class="leader"></polyline>
+          <text x={lx - 6} y={ly + 5} text-anchor="end" class="callout">
+            404
           </text>
         </svg>
       </div>
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  /* V6 blueprint palette (r4v6.html): ink outlines, faint construction lines, flat fills. */
+  .blueprint {
+    --c-ink: #10141a;
+    --c-faint: #7d879a;
+    --c-label: #4d5662;
+    --c-top: #59c990;
+    --c-right: #4fb080;
+    --c-front: #469a71;
+    --c-dot: #ffffff;
+  }
+  :global(.dark) .blueprint {
+    --c-ink: #eef1f4;
+    --c-faint: #8c96a4;
+    --c-label: #a3acb8;
+    --c-top: #59c990;
+    --c-right: #4dae7d;
+    --c-front: #43966d;
+    --c-dot: #eef1f4;
+  }
+  .blueprint polygon,
+  .blueprint polyline {
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+  .face-top,
+  .face-right,
+  .face-front {
+    stroke: var(--c-ink);
+    stroke-width: 2;
+  }
+  .face-top {
+    fill: var(--c-top);
+  }
+  .face-right {
+    fill: var(--c-right);
+  }
+  .face-front {
+    fill: var(--c-front);
+  }
+  .live {
+    fill: var(--c-dot);
+    opacity: 0.85;
+  }
+  .footprint {
+    fill: none;
+    stroke: var(--c-faint);
+    stroke-width: 1.6;
+    stroke-dasharray: 7 6;
+  }
+  .missing polygon {
+    fill: none;
+    stroke: var(--c-faint);
+    stroke-width: 1.6;
+    stroke-dasharray: 5 5;
+  }
+  .ci {
+    fill: none;
+    stroke: var(--c-ink);
+    stroke-width: 2.2;
+    stroke-dasharray: 10 7;
+  }
+  .ink {
+    fill: none;
+    stroke: var(--c-ink);
+    stroke-width: 2.2;
+  }
+  .leader {
+    fill: none;
+    stroke: var(--c-faint);
+    stroke-width: 1.4;
+  }
+  .lead-dot {
+    fill: var(--c-ink);
+  }
+  .callout {
+    fill: var(--c-label);
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+  }
+</style>

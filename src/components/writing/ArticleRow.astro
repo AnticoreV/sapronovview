@@ -1,5 +1,5 @@
 ---
-/** An article as a row on the panel: title, description, date and tags. */
+/** An article as a row card (styled like the case rows): title, description, date and tags. */
 import FormattedDate from "@components/ui/FormattedDate.astro";
 import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
 import type { Post } from "@lib/content";
@@ -15,13 +15,13 @@ const { minutes } = readingTime(post.body ?? "");
 
 <a
   href={`/writing/${post.id}`}
-  class="post grid gap-x-8 gap-y-2 border-t-2 border-ink py-6 no-underline md:grid-cols-[1fr_220px]"
+  class="post card lift grid gap-x-8 gap-y-2 p-7 no-underline md:grid-cols-[1fr_220px]"
 >
   <span class="flex flex-col gap-2">
-    <span class="text-heading font-bold">{data.title}</span>
+    <span class="text-heading">{data.title}</span>
     <span class="text-ink-muted">{data.description}</span>
   </span>
-  <span class="mono text-xs leading-relaxed text-ink-muted uppercase md:text-right">
+  <span class="mono text-[12px] leading-relaxed text-ink-muted uppercase md:text-right">
     <FormattedDate date={data.pubDate} /> · {minutes} min
     <br />
     {data.tags.join(" · ")}
@@ -30,6 +30,9 @@ const { minutes } = readingTime(post.body ?? "");
 </a>
 
 <style>
+  .post:hover {
+    color: var(--ink);
+  }
   .post:hover span span:first-child {
     text-decoration: underline;
     text-decoration-thickness: 2px;

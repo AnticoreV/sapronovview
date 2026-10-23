@@ -1,7 +1,8 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
-import CrewCard from "@components/crew/CrewCard.astro";
+import SectionHeader from "@components/ui/SectionHeader.astro";
+import ProfileCard from "@components/profile/ProfileCard.astro";
 import JsonLd from "@components/seo/JsonLd.astro";
 import { shownAll } from "@lib/content";
 import { personSchema } from "@lib/schema";
@@ -28,14 +29,14 @@ const profileLd = {
   <div class="band pt-8 md:pt-10">
     <div class="shell">
       <Breadcrumbs items={[{ label: "About" }]} />
-      <p class="label mt-8 text-ink-muted">About · crew</p>
+      <p class="label mt-8 text-ink-muted">About</p>
       <h1 class="display mt-3 max-w-[16ch] text-display-l">Engineer and founder.</h1>
     </div>
   </div>
 
-  <section class="band pt-8 pb-16 md:pb-24" aria-labelledby="story-heading">
+  <section class="band section-gap pt-8" aria-labelledby="story-heading">
     <div class="shell grid items-start gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-12">
-      <CrewCard switcher eager />
+      <ProfileCard switcher eager initial="turtleneck" heading={false} />
       <div class="flex flex-col gap-4 text-body">
         <h2 id="story-heading" class="label text-ink-muted">
           Career story
@@ -66,7 +67,7 @@ const profileLd = {
           Most recently I spent three months at CreativeDock building Kotlin/Spring Boot
           microservices from scratch and fixing the GitLab CI and Argo CD plumbing around them.
           Right now I'm building{" "}
-          <a href="/projects/ownira" class="link-inline font-semibold">
+          <a href="/projects/ownira" class="link-inline font-semibold text-accent">
             Ownira
           </a>
           , now in pilot.
@@ -81,37 +82,33 @@ const profileLd = {
     </div>
   </section>
 
-  <section
-    class="band section-y bg-panel-raised shadow-[inset_0_1px_0_var(--panel-edge),inset_0_-1px_0_var(--panel-edge)]"
-    aria-labelledby="philosophy-heading"
-  >
-    <div class="shell">
-      <div class="flex flex-wrap items-end justify-between gap-4">
-        <h2 id="philosophy-heading" class="display text-display-l">
-          How I work
-        </h2>
-        <span class="label text-ink-muted">Operating procedures</span>
-      </div>
-      <ol class="mt-10 grid gap-4 sm:grid-cols-2">
+  <section class="band section-gap" aria-labelledby="philosophy-heading" data-reveal>
+    <div class="shell flex flex-col gap-9">
+      <SectionHeader id="philosophy-heading" title="How I work" />
+      <ol class="grid gap-4 sm:grid-cols-2">
         {philosophy.map((p, i) => (
-          <li class="face face-bezel flex flex-col gap-3 p-7">
-            <span class="placard text-select">SOP {String(i + 1).padStart(2, "0")}</span>
-            <h3 class="text-heading font-bold">{p.title}</h3>
-            <p class="text-marking-muted">{p.text}</p>
+          <li class="card flex flex-col gap-3 p-7">
+            <span class="mono text-[12px] font-semibold tracking-[0.06em] text-ink-muted">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <h3 class="text-heading">{p.title}</h3>
+            <p class="text-ink-muted">{p.text}</p>
           </li>
         ))}
       </ol>
     </div>
   </section>
 
-  <section class="band section-y" aria-label="Values, languages and focus">
+  <section class="band section-gap" aria-label="Values, languages and focus" data-reveal>
     <div class="shell grid gap-12 lg:grid-cols-2">
       <div>
-        <h2 class="display text-[clamp(1.75rem,3vw,2.5rem)]">What I value</h2>
-        <dl class="mt-6 divide-y divide-panel-edge border-y border-panel-edge">
+        <h2 class="display text-[clamp(28px,3vw,40px)] leading-[1.05] tracking-[-0.03em]">
+          What I value
+        </h2>
+        <dl class="mt-6 divide-y divide-line border-y border-line">
           {values.map((v) => (
             <div class="grid gap-1 py-4 sm:grid-cols-[170px_1fr] sm:gap-6">
-              <dt class="mono text-label font-semibold uppercase">{v.label}</dt>
+              <dt class="label pt-0.5 font-semibold">{v.label}</dt>
               <dd class="text-ink-muted">{v.text}</dd>
             </div>
           ))}
@@ -119,8 +116,8 @@ const profileLd = {
         <h2 class="label mt-10 text-ink-muted">Languages</h2>
         <ul class="mt-3 grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3">
           {siteConfig.languages.map((l) => (
-            <li class="face rounded-lg px-4 py-3">
-              <span class="mono block text-[11px] font-semibold tracking-[0.04em] text-marking-muted uppercase">
+            <li class="card px-4 py-3">
+              <span class="mono block text-[12px] font-medium tracking-[0.04em] text-ink-muted uppercase">
                 {l.code} · {l.level}
               </span>
               <span class="mt-1 block font-semibold">{l.name}</span>
@@ -129,10 +126,12 @@ const profileLd = {
         </ul>
       </div>
       <div>
-        <h2 class="display text-[clamp(1.75rem,3vw,2.5rem)]">What I enjoy working on</h2>
+        <h2 class="display text-[clamp(28px,3vw,40px)] leading-[1.05] tracking-[-0.03em]">
+          What I enjoy working on
+        </h2>
         <ul class="mt-6 flex flex-col">
           {enjoys.map((e) => (
-            <li class="flex gap-3 border-b border-panel-edge py-3">
+            <li class="flex gap-3 border-b border-line py-3">
               <span class="mono text-ok-ink" aria-hidden="true">
                 ✓
               </span>
@@ -144,19 +143,21 @@ const profileLd = {
     </div>
   </section>
 
-  <section class="band pb-16 md:pb-24" aria-labelledby="stack-heading">
-    <div class="shell face face-bezel p-7 sm:p-10">
+  <section class="band section-gap" aria-labelledby="stack-heading" data-reveal>
+    <div class="shell card p-7 sm:p-10">
       <div class="flex flex-wrap items-end justify-between gap-4">
-        <h2 id="stack-heading" class="display text-[clamp(1.75rem,3vw,2.5rem)]">
-          Installed systems
+        <h2
+          id="stack-heading"
+          class="display text-[clamp(28px,3vw,40px)] leading-[1.05] tracking-[-0.03em]"
+        >
+          Stack I ship with
         </h2>
-        <span class="placard text-marking-muted">Stack I ship with</span>
       </div>
       <div class="mt-8 grid gap-8 md:grid-cols-2">
         {techStack.map((g) => (
           <div>
-            <h3 class="placard text-select">{g.group}</h3>
-            <p class="mt-2 text-marking-muted">{g.items.join(" · ")}</p>
+            <h3 class="label font-semibold text-accent">{g.group}</h3>
+            <p class="mt-2 text-ink-muted">{g.items.join(" · ")}</p>
           </div>
         ))}
       </div>
@@ -164,14 +165,17 @@ const profileLd = {
   </section>
 
   {realFacts.length > 0 && (
-    <section class="band pb-16 md:pb-24" aria-labelledby="facts-heading">
+    <section class="band section-gap" aria-labelledby="facts-heading">
       <div class="shell">
-        <h2 id="facts-heading" class="display text-[clamp(1.75rem,3vw,2.5rem)]">
+        <h2
+          id="facts-heading"
+          class="display text-[clamp(28px,3vw,40px)] leading-[1.05] tracking-[-0.03em]"
+        >
           Facts
         </h2>
         <ul class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {realFacts.map((f) => (
-            <li class="module p-5">{f.text}</li>
+            <li class="card p-5">{f.text}</li>
           ))}
         </ul>
       </div>

@@ -1,5 +1,5 @@
 ---
-/** Article on a kneeboard sheet; code blocks sit on an instrument face. */
+/** Article on a Sheet (surface, 68ch); code blocks use the github-light / github-dark-dimmed pair. */
 import { Image } from "astro:assets";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
@@ -7,6 +7,7 @@ import FormattedDate from "@components/ui/FormattedDate.astro";
 import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
 import TechBadge from "@components/ui/TechBadge.astro";
 import ArticleRow from "@components/writing/ArticleRow.astro";
+import SectionHeader from "@components/ui/SectionHeader.astro";
 import JsonLd from "@components/seo/JsonLd.astro";
 import type { Post } from "@lib/content";
 import { cleanPath, readingTime } from "@lib/utils";
@@ -53,7 +54,7 @@ const jsonLd = {
   tags={data.tags}
   noindex={data.draft}
 >
-  <article class="band pt-8 pb-16 md:pb-24">
+  <article class="band section-gap pt-8">
     <div class="shell">
       <Breadcrumbs items={[{ label: "Writing", href: "/writing" }, { label: data.title }]} />
     </div>
@@ -78,7 +79,9 @@ const jsonLd = {
         {data.draft && <PlaceholderBadge label="Draft" />}
         {data.placeholder && <PlaceholderBadge label="Sample" />}
       </p>
-      <h1 class="display mt-4 text-[clamp(2.25rem,5vw,3.5rem)] leading-[0.98]">{data.title}</h1>
+      <h1 class="display mt-4 text-[clamp(36px,5vw,56px)] leading-[1] tracking-[-0.04em]">
+        {data.title}
+      </h1>
       <p class="mt-4 text-body-l">{data.description}</p>
       {data.tags.length > 0 && (
         <ul class="mt-6 flex flex-wrap gap-2" aria-label="Tags">
@@ -101,18 +104,15 @@ const jsonLd = {
           class="mt-8 aspect-video w-full rounded-md object-cover"
         />
       )}
-      <div class="prose-kneeboard mt-10">
+      <div class="prose-sheet mt-10">
         <slot />
       </div>
     </div>
 
     <nav aria-label="Adjacent articles" class="shell mt-10 grid gap-4 sm:grid-cols-2">
       {prev ? (
-        <a
-          href={`/writing/${prev.id}`}
-          class="module flex flex-col gap-1 p-5 no-underline hover:underline"
-        >
-          <span class="label text-xs text-ink-muted">← Previous</span>
+        <a href={`/writing/${prev.id}`} class="card lift flex flex-col gap-1 p-5 no-underline">
+          <span class="label text-ink-muted">← Previous</span>
           <span class="font-semibold">{prev.data.title}</span>
         </a>
       ) : (
@@ -121,20 +121,18 @@ const jsonLd = {
       {next && (
         <a
           href={`/writing/${next.id}`}
-          class="module flex flex-col gap-1 p-5 text-right no-underline hover:underline"
+          class="card lift flex flex-col gap-1 p-5 text-right no-underline"
         >
-          <span class="label text-xs text-ink-muted">Next →</span>
+          <span class="label text-ink-muted">Next →</span>
           <span class="font-semibold">{next.data.title}</span>
         </a>
       )}
     </nav>
 
     {related.length > 0 && (
-      <section class="shell mt-16" aria-labelledby="related-posts">
-        <h2 id="related-posts" class="display text-[clamp(1.75rem,3vw,2.5rem)]">
-          Related notes
-        </h2>
-        <ul class="mt-6 border-b-2 border-ink">
+      <section class="shell mt-16 flex flex-col gap-6" aria-labelledby="related-posts">
+        <SectionHeader id="related-posts" title="Related notes" />
+        <ul class="flex flex-col gap-3">
           {related.map((p) => (
             <li>
               <ArticleRow post={p} />

@@ -11,11 +11,11 @@ const { type, items } = Astro.props;
 ---
 
 {items.length > 0 && (
-  <section aria-labelledby={`milestone-${type}`} class="module p-6">
+  <section aria-labelledby={`milestone-${type}`} class="card p-6">
     <h3 id={`milestone-${type}`} class="label text-ink-muted">
       {milestoneLabels[type].plural}
     </h3>
-    <ul class="mt-4 divide-y divide-panel-edge">
+    <ul class="mt-4 divide-y divide-line">
       {items.map(({ data }) => (
         <li class="py-3 first:pt-0 last:pb-0">
           <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
@@ -28,7 +28,7 @@ const { type, items } = Astro.props;
                 data.title
               )}
             </p>
-            <p class="mono text-xs text-ink-muted">
+            <p class="meta text-ink-muted">
               {formatMonthYear(data.date)}
               {data.endDate && ` — ${formatMonthYear(data.endDate)}`}
             </p>

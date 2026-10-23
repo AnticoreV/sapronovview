@@ -21,7 +21,7 @@ const { tag, posts, tags } = Astro.props;
   title={`Posts tagged “${tag}”`}
   description={`${posts.length} article${posts.length === 1 ? "" : "s"} tagged ${tag}.`}
 >
-  <div class="band pt-8 pb-16 md:pt-10 md:pb-24">
+  <div class="band section-gap pt-8 md:pt-10">
     <div class="shell">
       <Breadcrumbs items={[{ label: "Writing", href: "/writing" }, { label: `#${tag}` }]} />
       <p class="label mt-8 text-ink-muted">
@@ -29,7 +29,7 @@ const { tag, posts, tags } = Astro.props;
       </p>
       <h1 class="display mt-3 text-display-l">#{tag}</h1>
       <TagList tags={tags} active={tag} class="mt-8" />
-      <ul class="mt-10 border-b-2 border-ink">
+      <ul class="mt-10 flex flex-col gap-3">
         {posts.map((post) => (
           <li>
             <ArticleRow post={post} />

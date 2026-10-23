@@ -1,8 +1,7 @@
 ---
 /**
- * A hobby as a raised module — "off duty". Only real fields render: anything
- * still holding a [placeholder] (stats, favourites, photos, links, paragraphs)
- * is hidden in production.
+ * A hobby card — "off duty". Only real fields render: anything still holding a
+ * [placeholder] (stats, favourites, photos, links, paragraphs) is hidden in production.
  */
 import { render } from "astro:content";
 import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
@@ -24,28 +23,31 @@ const links = shownAll(data.links, (l) => `${l.label} ${l.href}`).filter(
 
 <article
   id={hobby.id}
-  class="module flex scroll-mt-24 flex-col gap-4 p-6 sm:p-8"
+  class="card flex scroll-mt-24 flex-col gap-4 p-6 sm:p-8"
   aria-labelledby={`${hobby.id}-title`}
 >
-  <p class="placard flex flex-wrap items-center justify-between gap-3 text-ink-muted">
+  <p class="label flex flex-wrap items-center justify-between gap-3 text-ink-muted">
     <span>
       OFF DUTY {String(index + 1).padStart(2, "0")} · {hobbyCategoryLabels[data.category]}
     </span>
     {data.placeholder && <PlaceholderBadge label="Has placeholders" />}
   </p>
-  <h2 id={`${hobby.id}-title`} class="display text-[clamp(2rem,3.4vw,2.75rem)] leading-none">
+  <h2
+    id={`${hobby.id}-title`}
+    class="display text-[clamp(30px,3.4vw,44px)] leading-none tracking-[-0.03em]"
+  >
     {data.title}
   </h2>
   <p class="text-body-l font-semibold">{data.tagline}</p>
-  <div class="prose-kneeboard text-ink-muted">
+  <div class="prose-sheet text-ink-muted">
     <Content />
   </div>
   {stats.length > 0 && (
-    <dl class="mono grid grid-cols-2 gap-3 text-label sm:grid-cols-3">
+    <dl class="grid grid-cols-2 gap-3 sm:grid-cols-3">
       {stats.map((s) => (
-        <div class="face rounded-md px-4 py-3">
-          <dt class="text-[11px] text-marking-muted uppercase">{s.label}</dt>
-          <dd class="mt-1 font-bold text-select">{s.value}</dd>
+        <div class="rounded-sm bg-surface-sunken px-4 py-3">
+          <dt class="mono text-[12px] text-ink-muted uppercase">{s.label}</dt>
+          <dd class="mt-1 font-bold">{s.value}</dd>
         </div>
       ))}
     </dl>
@@ -60,7 +62,7 @@ const links = shownAll(data.links, (l) => `${l.label} ${l.href}`).filter(
   {links.length > 0 && (
     <p class="flex flex-wrap gap-4">
       {links.map((l) => (
-        <a href={l.href} class="link-ghost inline-flex min-h-11 items-center">
+        <a href={l.href} class="link-more">
           {l.label}
           <span aria-hidden="true">&nbsp;→</span>
         </a>

@@ -42,25 +42,25 @@ const categories = (Object.keys(categoryLabels) as Array<keyof typeof categoryLa
     align-items: center;
     gap: 8px;
     min-height: 44px;
-    padding-inline: 14px;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--panel-edge-strong);
-    background: var(--panel-raised);
+    padding-inline: 16px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line);
+    background: var(--surface);
     color: var(--ink);
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     cursor: pointer;
   }
   .filter:hover {
-    border-color: var(--ink);
+    border-color: var(--line-strong);
   }
   .filter[aria-pressed="true"] {
-    background: var(--face);
-    border-color: var(--face);
-    color: var(--select);
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
   }
 </style>
 

@@ -20,14 +20,14 @@ const links = [
 ---
 
 <article
-  class="grid gap-x-8 gap-y-3 border-b border-panel-edge py-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]"
+  class="grid gap-x-8 gap-y-3 border-b border-line py-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]"
   aria-labelledby={`code-${project.id}`}
 >
   <div class="flex flex-col gap-2">
-    <h3 id={`code-${project.id}`} class="text-title font-bold">
+    <h3 id={`code-${project.id}`} class="text-title">
       {data.title}
     </h3>
-    <p class="mono text-xs text-ink-muted uppercase">
+    <p class="mono text-[12px] text-ink-muted uppercase">
       {categoryLabels[data.category]} · {statusLabels[data.status].label}
     </p>
   </div>
@@ -44,11 +44,7 @@ const links = [
     )}
     <p class="flex flex-wrap gap-x-6">
       {links.map((l) => (
-        <a
-          href={l.href}
-          class="link-ghost inline-flex min-h-11 items-center"
-          rel="noopener noreferrer"
-        >
+        <a href={l.href} class="link-more" rel="noopener noreferrer">
           {l.label}
           <span aria-hidden="true">&nbsp;↗</span>
         </a>
