@@ -12,6 +12,7 @@ const tags = await getAllTags(posts);
 <BaseLayout
   title="Writing"
   description="Engineering notes on the JVM, identity, delivery and automation — plus the occasional lesson from the cockpit."
+  noindex={posts.length === 0}
 >
   <div class="band pt-8 pb-16 md:pt-10 md:pb-24">
     <div class="shell">
@@ -21,9 +22,11 @@ const tags = await getAllTags(posts);
           <p class="label text-ink-muted">Notes · articles</p>
           <h1 class="display mt-3 text-display-l">Writing</h1>
         </div>
-        <a href="/rss.xml" class="link-ghost inline-flex min-h-11 items-center">
-          RSS feed
-        </a>
+        {posts.length > 0 && (
+          <a href="/rss.xml" class="link-ghost inline-flex min-h-11 items-center">
+            RSS feed
+          </a>
+        )}
       </div>
       <p class="mt-5 max-w-[640px] text-body-l">
         Things I learned the hard way, written down so I don't have to learn them twice.
@@ -40,13 +43,7 @@ const tags = await getAllTags(posts);
       ) : (
         <div class="module mt-10 max-w-[720px] p-6">
           <p class="label text-ink">No entries logged yet</p>
-          <p class="mt-2 text-ink-muted">
-            New notes will appear here and in the{" "}
-            <a href="/rss.xml" class="link-inline text-ink">
-              RSS feed
-            </a>
-            .
-          </p>
+          <p class="mt-2 text-ink-muted">New notes will appear here.</p>
         </div>
       )}
     </div>

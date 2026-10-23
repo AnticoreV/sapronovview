@@ -5,6 +5,7 @@
  * email address as the primary button.
  */
 import ContactRoute from "@components/contact/ContactRoute.astro";
+import CopyEmail from "@components/ui/CopyEmail.astro";
 import { siteConfig } from "@config";
 import { contactRoutes } from "@data/contact";
 
@@ -41,6 +42,7 @@ const Heading = level === 1 ? "h1" : "h2";
       <a href={`mailto:${siteConfig.email}`} class="btn btn-primary min-h-[54px] max-w-full px-7">
         <span class="truncate">{siteConfig.email}</span>
       </a>
+      <CopyEmail />
       {siteConfig.social.linkedin && (
         <a
           href={siteConfig.social.linkedin}

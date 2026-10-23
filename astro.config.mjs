@@ -1,13 +1,20 @@
 // @ts-check
+import { fileURLToPath } from "node:url";
 import { defineConfig, fontProviders } from "astro/config";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { satteri } from "@astrojs/markdown-satteri";
 import { hidePlaceholders } from "./src/lib/markdown-hide-placeholders.mjs";
+import { hasPublishedWriting } from "./src/lib/writing-status.mjs";
 
 // Production URL — used for canonical URLs, the sitemap, the RSS feed and Open Graph metadata.
 const SITE_URL = "https://ivansapronov.com";
+
+// While no post is published, /writing (and its tag pages) stay out of the sitemap.
+const WRITING_PUBLISHED = hasPublishedWriting(
+  fileURLToPath(new URL("./src/content/writing", import.meta.url)),
+);
 
 /** Unicode ranges as published by Fontsource for the two subsets we ship. */
 const LATIN = [
@@ -62,10 +69,17 @@ export default defineConfig({
   site: SITE_URL,
   output: "static",
   trailingSlash: "never",
+  // Renamed pages keep working (static meta-refresh page; public/_redirects adds a real
+  // 301 on Cloudflare Pages).
+  redirects: {
+    "/projects/apex-line-market-research": "/projects/apexline",
+  },
   build: {
     format: "file",
     inlineStylesheets: "always",
   },
+  // No `security.csp`: Astro's per-page hash CSP blocks the next page's inline styles and
+  // scripts after a ClientRouter navigation (tested 2026-10-23). See README "Security headers".
   prefetch: {
     prefetchAll: false,
     defaultStrategy: "hover",
@@ -153,7 +167,9 @@ export default defineConfig({
   integrations: [
     mdx(),
     sitemap({
-      filter: (page) => !page.includes("/drafts/"),
+      filter: (page) =>
+        !page.includes("/drafts/") &&
+        (WRITING_PUBLISHED || !/^\/writing(\/|$)/.test(new URL(page).pathname)),
       changefreq: "weekly",
       priority: 0.7,
       lastmod: new Date(),

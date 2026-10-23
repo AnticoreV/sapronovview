@@ -7,6 +7,7 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
 import ContactForm from "@components/contact/ContactForm.astro";
 import ContactRoute from "@components/contact/ContactRoute.astro";
+import CopyEmail from "@components/ui/CopyEmail.astro";
 import { siteConfig } from "@config";
 import { contactRoutes, mailtoFor } from "@data/contact";
 
@@ -37,14 +38,7 @@ const connected = /^https:\/\/formspree\.io\/f\/[A-Za-z0-9]+$/.test(siteConfig.f
           >
             <span class="truncate">{siteConfig.email}</span>
           </a>
-          <button
-            type="button"
-            class="btn btn-secondary btn-sm"
-            data-copy-email={siteConfig.email}
-            aria-label="Copy email address"
-          >
-            <span data-copy-label>Copy</span>
-          </button>
+          <CopyEmail />
           {siteConfig.social.linkedin && (
             <a
               href={siteConfig.social.linkedin}
@@ -85,7 +79,7 @@ const connected = /^https:\/\/formspree\.io\/f\/[A-Za-z0-9]+$/.test(siteConfig.f
     <section class="band pb-16 md:pb-24" aria-label="Contact form">
       <div class="shell grid items-start gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <ContactForm />
-        <aside
+        <section
           class="flex flex-col gap-3 text-small text-ink-muted"
           aria-labelledby="privacy-heading"
         >
@@ -108,28 +102,8 @@ const connected = /^https:\/\/formspree\.io\/f\/[A-Za-z0-9]+$/.test(siteConfig.f
             This site sets no cookies and runs no analytics. Your day / night panel choice is kept
             in your browser's local storage and never leaves it.
           </p>
-        </aside>
+        </section>
       </div>
     </section>
   </div>
 </BaseLayout>
-
-<script>
-  function setupCopyEmail() {
-    document.querySelectorAll<HTMLButtonElement>("[data-copy-email]").forEach((button) => {
-      if (button.dataset.bound) return;
-      button.dataset.bound = "true";
-      const label = button.querySelector<HTMLElement>("[data-copy-label]");
-      button.addEventListener("click", async () => {
-        try {
-          await navigator.clipboard.writeText(button.dataset.copyEmail ?? "");
-          if (label) label.textContent = "Copied";
-          setTimeout(() => label && (label.textContent = "Copy"), 1800);
-        } catch {
-          if (label) label.textContent = "Select & copy";
-        }
-      });
-    });
-  }
-  document.addEventListener("astro:page-load", setupCopyEmail);
-</script>

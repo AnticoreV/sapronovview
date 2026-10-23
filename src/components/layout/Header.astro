@@ -7,9 +7,17 @@
  */
 import Annunciator from "@components/ui/Annunciator.astro";
 import ThemeKnob from "@components/ui/ThemeKnob.astro";
-import { navigation, primaryNav, siteConfig } from "@config";
+import { navigation, primaryNav, siteConfig, withWriting, writingFallbackNav } from "@config";
 import { contactRoutes } from "@data/contact";
+import { hasWriting } from "@lib/content";
 import { cleanPath } from "@lib/utils";
+
+// Until a post is published, CONTACT takes WRITING's slot and Writing leaves the sheet.
+const hasPosts = await hasWriting();
+const stripNav = hasPosts
+  ? primaryNav
+  : primaryNav.map((item) => (item.href === "/writing" ? writingFallbackNav : item));
+const sheetNav = withWriting(navigation, hasPosts);
 
 const pathname = cleanPath(Astro.url.pathname);
 const isActive = (match?: string) =>
@@ -18,7 +26,7 @@ const isCurrent = (href: string) =>
   href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 ---
 
-<header class="face-band sticky top-0 z-40" style="padding-top: env(safe-area-inset-top)">
+<header class="face-band pt-safe sticky top-0 z-40">
   <div class="band flex min-h-[64px] items-center justify-between gap-6 py-2.5">
     <a
       href="/"
@@ -31,8 +39,8 @@ const isCurrent = (href: string) =>
 
     <nav aria-label="Primary" class="max-nav:hidden">
       <ul class="mono flex items-center gap-[26px] text-[13px]">
-        {primaryNav.map((item) => {
-          const active = isActive("match" in item ? item.match : undefined);
+        {stripNav.map((item) => {
+          const active = isActive(item.match);
           return (
             <li>
               <a
@@ -52,9 +60,14 @@ const isCurrent = (href: string) =>
     </nav>
 
     <div class="flex items-center gap-2 sm:gap-3">
-      <span transition:persist="annunciator">
+      <a
+        href="/contact"
+        class="annunciator-link rounded-sm no-underline"
+        aria-label={`${siteConfig.availability.label} — contact`}
+        transition:persist="annunciator"
+      >
         <Annunciator blink />
-      </span>
+      </a>
       <ThemeKnob />
       <button
         type="button"
@@ -76,10 +89,7 @@ const isCurrent = (href: string) =>
     class="face-band m-0 h-dvh max-h-none w-full max-w-none p-0 backdrop:bg-black/50 open:flex open:flex-col nav:hidden"
     aria-label="Site navigation"
   >
-    <div
-      class="band flex min-h-[64px] shrink-0 items-center justify-between gap-4 border-b border-[#2a2f2e] py-2.5"
-      style="padding-top: max(10px, env(safe-area-inset-top))"
-    >
+    <div class="band pt-safe-10 flex min-h-[64px] shrink-0 items-center justify-between gap-4 border-b border-[#2a2f2e] pb-2.5">
       <span class="mono text-[13px] font-semibold tracking-[0.1em]">{siteConfig.callsign}</span>
       <button
         type="button"
@@ -94,7 +104,7 @@ const isCurrent = (href: string) =>
     </div>
     <nav aria-label="Mobile" class="band flex-1 overflow-y-auto py-6">
       <ol class="flex flex-col">
-        {navigation.map((item, i) => {
+        {sheetNav.map((item, i) => {
           const current = isCurrent(item.href);
           return (
             <li>
@@ -138,6 +148,14 @@ const isCurrent = (href: string) =>
 </header>
 
 <style>
+  .annunciator-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .annunciator-link:hover :global(.annunciator) {
+    filter: brightness(1.25);
+  }
   .nav-link {
     display: inline-flex;
     align-items: center;

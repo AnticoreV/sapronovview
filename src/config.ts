@@ -45,6 +45,8 @@ export const siteConfig = {
   ogLocale: "en_US",
   /** Default Open Graph image (1200×630), generated at build time — see src/lib/brand-images.ts. */
   ogImage: "/images/og-default.png",
+  /** Stable portrait URL for structured data (public/images/ivan-sapronov.jpg, 800px). */
+  personImage: "/images/ivan-sapronov.jpg",
   /** Public profile links. Leave a value empty ("") to hide it. */
   social: {
     github: "https://github.com/AnticoreV",
@@ -79,17 +81,28 @@ export const availabilityText: Record<Availability, { long: string; short: strin
   closed: { long: "NOT AVAILABLE", short: "CLOSED" },
 };
 
-/** Header strip navigation (mono, uppercase). `match` marks the active page. */
-export const primaryNav = [
+export type NavItem = { label: string; href: string; match?: string };
+
+/**
+ * Header strip navigation (mono, uppercase). `match` marks the active page.
+ * While no post is published, WRITING is swapped for `writingFallbackNav`
+ * (see Header.astro) and Writing disappears from the sheet and the footer.
+ */
+export const primaryNav: NavItem[] = [
   { label: "Products", href: "/#build" },
   { label: "Systems", href: "/#capabilities" },
   { label: "Cases", href: "/projects", match: "/projects" },
   { label: "Log", href: "/experience", match: "/experience" },
   { label: "Writing", href: "/writing", match: "/writing" },
-] as const;
+];
+export const writingFallbackNav: NavItem = {
+  label: "Contact",
+  href: "/contact",
+  match: "/contact",
+};
 
 /** Every page — used by the mobile sheet and the footer. */
-export const navigation = [
+export const navigation: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
   { label: "Projects", href: "/projects" },
@@ -99,7 +112,11 @@ export const navigation = [
   { label: "Adventures", href: "/adventures" },
   { label: "Now", href: "/now" },
   { label: "Contact", href: "/contact" },
-] as const;
+];
+
+/** Navigation with Writing removed while there is nothing to read. */
+export const withWriting = (items: NavItem[], hasPosts: boolean) =>
+  hasPosts ? items : items.filter((i) => !i.href.startsWith("/writing"));
 
 /**
  * Technologies you use most often, grouped so the list reads as a system

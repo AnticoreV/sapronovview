@@ -51,6 +51,19 @@ export async function getProjects(): Promise<Project[]> {
   });
 }
 
+/**
+ * Projects still being written up (placeholder: true) that have a public GitHub
+ * repository. /projects lists them as compact rows built only from their real
+ * fields (title, description, stack, repository links) — never as case studies.
+ */
+export async function getCodeProjects(): Promise<Project[]> {
+  const all = await getCollection(
+    "projects",
+    ({ data }) => data.placeholder && !data.draft && Boolean(data.github),
+  );
+  return all.sort((a, b) => a.data.order - b.data.order);
+}
+
 export async function getFeaturedProjects(limit = 4): Promise<Project[]> {
   const all = await getProjects();
   return all.filter((p) => p.data.featured).slice(0, limit);
@@ -61,6 +74,11 @@ export async function getFeaturedProjects(limit = 4): Promise<Project[]> {
 export async function getPosts(): Promise<Post[]> {
   const all = await getCollection("writing", ({ data }) => visible(data));
   return all.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+}
+
+/** True once at least one post is published (drives nav, RSS link, sitemap, noindex). */
+export async function hasWriting(): Promise<boolean> {
+  return (await getPosts()).length > 0;
 }
 
 export async function getAllTags(posts?: Post[]): Promise<Array<{ tag: string; count: number }>> {
