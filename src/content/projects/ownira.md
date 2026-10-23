@@ -45,7 +45,7 @@ Founder: product, architecture and the full stack.
 
 ## Architecture
 
-- **Backend.** Kotlin 2.2 on Java 21 with Spring Boot 4: eight independently deployable Spring Boot services behind a single API gateway, one PostgreSQL database per service with Flyway migrations.
+- **Backend.** Kotlin 2.2 on Java 21 with Spring Boot 4: eight independently deployable Spring Boot services behind a single API gateway, each with its own database where it persists data (PostgreSQL with Flyway migrations).
 - **Async first.** Services talk over Amazon SQS; documents are stored in S3.
 - **Identity.** Keycloak with OpenID Connect.
 - **AI under human review.** AI suggestions are advisory until a person accepts them.

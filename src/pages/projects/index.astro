@@ -1,19 +1,22 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
+import CodeRow from "@components/projects/CodeRow.astro";
 import InstrumentModule from "@components/projects/InstrumentModule.astro";
 import ProjectFilters from "@components/projects/ProjectFilters.astro";
 import ProjectRow from "@components/projects/ProjectRow.astro";
-import { getProjects } from "@lib/content";
+import { getCodeProjects, getProjects } from "@lib/content";
 
-const projects = await getProjects();
+const [all, code] = await Promise.all([getProjects(), getCodeProjects()]);
+// Entries still marked placeholder only appear as repository rows (also in dev).
+const projects = all.filter((p) => !p.data.placeholder);
 const featured = projects.filter((p) => p.data.featured);
 const rest = projects.filter((p) => !p.data.featured);
 ---
 
 <BaseLayout
   title="Projects"
-  description="Own products and client systems — Ownira, Apexline, a self-service menu platform, a dynamic form engine and greenfield Kotlin services — each written up as a case study."
+  description="Own products and client systems — Ownira, Apexline, a self-service menu platform, a dynamic form engine and greenfield Kotlin services — each written up as a case study, plus code on GitHub."
 >
   <div class="band pt-8 md:pt-10">
     <div class="shell">
@@ -25,7 +28,7 @@ const rest = projects.filter((p) => !p.data.featured);
         numbers that are real.
       </p>
       <div class="mt-8">
-        <ProjectFilters projects={projects} />
+        <ProjectFilters projects={[...projects, ...code]} />
       </div>
     </div>
   </div>
@@ -55,6 +58,26 @@ const rest = projects.filter((p) => !p.data.featured);
           {rest.map((p) => (
             <li data-category={p.data.category}>
               <ProjectRow project={p} />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  {code.length > 0 && (
+    <section class="band pb-16 md:pb-24" aria-labelledby="code-heading" data-project-group>
+      <div class="shell sheet px-[clamp(20px,4vw,56px)] py-10">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <h2 id="code-heading" class="display text-[clamp(1.75rem,3vw,2.5rem)]">
+            Code on GitHub
+          </h2>
+          <span class="label text-ink-muted">Public repositories</span>
+        </div>
+        <ul class="mt-6 border-t-2 border-ink">
+          {code.map((p) => (
+            <li data-category={p.data.category}>
+              <CodeRow project={p} />
             </li>
           ))}
         </ul>
