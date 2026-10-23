@@ -1,0 +1,55 @@
+---
+/**
+ * "Track record" (04) — every position as a RecordRow (years · company · role ·
+ * shipped), "CV on request" (or "Download CV" once the file exists) and
+ * "Full experience →".
+ */
+import RecordRow from "@components/experience/RecordRow.astro";
+import SectionHeader from "@components/ui/SectionHeader.astro";
+import type { Position } from "@lib/content";
+import { cvPath } from "@lib/cv";
+
+interface Props {
+  positions: Position[];
+}
+const { positions } = Astro.props;
+---
+
+<section id="experience" class="band section-gap" aria-labelledby="experience-heading" data-reveal>
+  <div class="shell flex flex-col gap-7">
+    <SectionHeader id="experience-heading" index="04" title="Track record">
+      {cvPath ? (
+        <a slot="action" href={cvPath} class="btn btn-secondary min-h-12 px-[22px]" download>
+          Download CV
+        </a>
+      ) : (
+        <a slot="action" href="/contact?topic=hiring" class="btn btn-secondary min-h-12 px-[22px]">
+          CV on request
+        </a>
+      )}
+    </SectionHeader>
+    <div class="flex flex-col">
+      <div
+        class="label grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-x-6 gap-y-1 border-b border-line py-3 text-ink-muted max-[640px]:hidden"
+        aria-hidden="true"
+      >
+        <span>Years</span>
+        <span>Company</span>
+        <span>Role</span>
+        <span>Shipped</span>
+      </div>
+      <ol>
+        {positions.map((p) => (
+          <li>
+            <RecordRow position={p} />
+          </li>
+        ))}
+      </ol>
+      <p class="mt-7">
+        <a href="/experience" class="link-more">
+          Full experience&nbsp;<span aria-hidden="true">→</span>
+        </a>
+      </p>
+    </div>
+  </div>
+</section>

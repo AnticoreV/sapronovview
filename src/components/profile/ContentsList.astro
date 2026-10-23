@@ -1,0 +1,47 @@
+---
+/**
+ * ContentsList — "Before you hire, invest or partner": the homepage contents as
+ * numbered rows (01 Products I build … 05 Get in touch), each → its section.
+ */
+import { contents } from "@data/home";
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<nav aria-label="On this page" class:list={["card flex flex-col gap-1 p-7", className]}>
+  <p class="label pb-2 text-ink-muted">Before you hire, invest or partner</p>
+  <ol class="flex flex-col">
+    {contents.map((item, i) => {
+      const last = i === contents.length - 1;
+      return (
+        <li>
+          <a
+            href={item.href}
+            class:list={[
+              "contents-link flex min-h-11 items-center justify-between gap-4 font-semibold no-underline",
+              !last && "border-b border-line",
+              last && "text-accent",
+            ]}
+          >
+            <span>
+              <span class="mono mr-3 text-[12px] font-normal text-ink-muted" aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              {item.label}
+            </span>
+            <span aria-hidden="true">→</span>
+          </a>
+        </li>
+      );
+    })}
+  </ol>
+</nav>
+
+<style>
+  .contents-link:hover {
+    color: var(--accent);
+  }
+</style>

@@ -1,28 +1,25 @@
 ---
 /**
- * Hero from the approved D4 artboard: eyebrow, name, lede, Email me + What I
- * build, and the live 3D instrument panel, with the panel's proof numbers repeated
- * underneath as legible LCD readouts (src/data/readouts.ts).
+ * Hero from the approved artboard (HeroV6): eyebrow, name in two lines, lede,
+ * Email me + What I build, and the live "Blueprint" scene with its legend.
  */
-import PanelStage from "@components/home/PanelStage.astro";
-import Readout from "@components/ui/Readout.astro";
+import HeroStage from "@components/home/HeroStage.astro";
 import { siteConfig } from "@config";
-import { heroReadouts } from "@data/readouts";
 
 const [first, ...rest] = siteConfig.name.split(" ");
 ---
 
-<section id="top" class="band pt-10 pb-10 md:pt-14" aria-labelledby="hero-heading">
-  <div class="shell flex flex-wrap items-center gap-8">
-    <div class="flex flex-[1_1_440px] flex-col gap-6">
-      <p class="mono text-label text-ink-muted">{siteConfig.hero.eyebrow}</p>
-      <h1 id="hero-heading" class="display text-display-xl uppercase">
+<section id="top" class="band pt-14 pb-6" aria-labelledby="hero-heading">
+  <div class="shell flex flex-wrap items-center gap-x-10 gap-y-6">
+    <div class="flex flex-[1_1_420px] flex-col gap-6">
+      <p class="meta tracking-[0.06em] text-ink-muted">{siteConfig.hero.eyebrow}</p>
+      <h1 id="hero-heading" class="display text-display-xl">
         {first}
         <br />
         {rest.join(" ")}
       </h1>
-      <p class="max-w-[540px] text-body-l">{siteConfig.hero.lede}</p>
-      <div class="flex flex-wrap items-center gap-4">
+      <p class="max-w-[520px] text-body-l">{siteConfig.hero.lede}</p>
+      <div class="flex flex-wrap items-center gap-3">
         <a href={`mailto:${siteConfig.email}`} class="btn btn-primary">
           Email me
         </a>
@@ -31,16 +28,6 @@ const [first, ...rest] = siteConfig.name.split(" ");
         </a>
       </div>
     </div>
-    <div class="min-w-0 flex-[999_1_640px]">
-      <PanelStage />
-    </div>
+    <HeroStage />
   </div>
-  {/* The panel's proof numbers as legible LCD readouts (2×2 on phones, one row from md). */}
-  <ul class="shell mt-6 grid grid-cols-2 gap-3 md:grid-cols-4" aria-label="Proof readouts">
-    {heroReadouts.map((r) => (
-      <li class="flex">
-        <Readout readout={r} class="w-full" />
-      </li>
-    ))}
-  </ul>
 </section>

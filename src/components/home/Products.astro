@@ -1,6 +1,6 @@
 ---
-/** "What I'm building" — own products as instrument modules (for partners and investors). */
-import InstrumentModule from "@components/projects/InstrumentModule.astro";
+/** "What I'm building" (01) — own products as wide ProductModules (for partners and investors). */
+import ProductModule from "@components/projects/ProductModule.astro";
 import SectionHeader from "@components/ui/SectionHeader.astro";
 import type { Project } from "@lib/content";
 
@@ -11,21 +11,18 @@ const { products } = Astro.props;
 ---
 
 {products.length > 0 && (
-  <section
-    id="build"
-    class="band section-y bg-panel-raised shadow-[inset_0_1px_0_var(--panel-edge),inset_0_-1px_0_var(--panel-edge)]"
-    aria-labelledby="build-heading"
-  >
-    <div class="shell flex flex-col gap-10">
+  <section id="build" class="band section-gap" aria-labelledby="build-heading" data-reveal>
+    <div class="shell flex flex-col gap-9">
       <SectionHeader
         id="build-heading"
+        index="01"
         title="What I'm building"
         tag={`${products.length > 1 ? "OWN PRODUCTS" : "OWN PRODUCT"} · FOR PARTNERS AND INVESTORS`}
       />
-      <ul class="grid grid-cols-[repeat(auto-fit,minmax(min(460px,100%),1fr))] gap-4">
+      <ul class="flex flex-col gap-4">
         {products.map((p) => (
           <li class="flex">
-            <InstrumentModule project={p} />
+            <ProductModule project={p} />
           </li>
         ))}
       </ul>

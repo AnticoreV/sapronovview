@@ -1,0 +1,68 @@
+---
+/**
+ * "Off duty" — hobbies as one line (an addition, not the subject) + "Hobbies & map →".
+ * While a post is published, the Writing rows render above it (same style as the cases).
+ */
+import type { Post } from "@lib/content";
+import SectionHeader from "@components/ui/SectionHeader.astro";
+
+interface Props {
+  posts: Post[];
+  countries: number;
+}
+const { posts, countries } = Astro.props;
+const offDuty = [
+  "ULL pilot in training",
+  "motorcycle touring",
+  `${countries} countries on the map`,
+  "sport",
+].join(" · ");
+---
+
+{posts.length > 0 && (
+  <section id="journal" class="band section-gap" aria-labelledby="journal-heading" data-reveal>
+    <div class="shell flex flex-col gap-7">
+      <SectionHeader id="journal-heading" title="Writing" href="/writing" linkLabel="All posts" />
+      <ul class="flex flex-col gap-3">
+        {posts.map((post) => (
+          <li>
+            <a
+              href={`/writing/${post.id}`}
+              class="post card lift grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] items-start gap-x-8 gap-y-3 p-7 no-underline"
+            >
+              <h3 class="text-[26px] leading-[1.15] font-bold tracking-[-0.02em]">
+                {post.data.title}
+              </h3>
+              <p class="text-ink-muted">{post.data.description}</p>
+              {post.data.tags.length > 0 && (
+                <span class="mono text-[12px] text-ink-muted uppercase">
+                  {post.data.tags.join(" · ")}
+                </span>
+              )}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}
+
+<section id="off-duty" class="band section-gap" aria-labelledby="off-duty-heading" data-reveal>
+  <div class="shell card flex flex-wrap items-center justify-between gap-x-8 gap-y-4 px-7 py-6">
+    <div class="flex flex-wrap items-baseline gap-x-5 gap-y-2">
+      <h2 id="off-duty-heading" class="label text-ink-muted">
+        Off duty
+      </h2>
+      <p class="text-[18px]">{offDuty}</p>
+    </div>
+    <a href="/hobbies" class="link-more">
+      Hobbies &amp; map&nbsp;<span aria-hidden="true">→</span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .post:hover {
+    color: var(--ink);
+  }
+</style>

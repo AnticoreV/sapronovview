@@ -1,6 +1,11 @@
 ---
-/** Selected case studies on a kneeboard sheet. */
+/**
+ * "Proof in production" (03) — the homepage case rows: title, summary, metric chips
+ * from src/data/readouts.ts and mono meta. "All projects →".
+ */
+import SectionHeader from "@components/ui/SectionHeader.astro";
 import { homeCases } from "@data/home";
+import { readouts } from "@data/readouts";
 import type { Project } from "@lib/content";
 
 interface Props {
@@ -11,29 +16,31 @@ const cases = homeCases.filter((c) => projects.some((p) => p.id === c.slug));
 ---
 
 {cases.length > 0 && (
-  <section id="work" class="band pb-16 md:pb-24" aria-labelledby="work-heading">
-    <div class="shell sheet flex flex-col gap-7 px-[clamp(20px,4vw,56px)] py-10 md:py-12">
-      <div class="flex flex-wrap items-end justify-between gap-4">
-        <h2 id="work-heading" class="display text-display-l">
-          Case studies
-        </h2>
-        <a href="/projects" class="link-ghost inline-flex min-h-11 items-center">
-          All projects<span aria-hidden="true">&nbsp;→</span>
-        </a>
-      </div>
-      <ul class="flex flex-col border-t-2 border-ink">
+  <section id="work" class="band section-gap" aria-labelledby="work-heading" data-reveal>
+    <div class="shell flex flex-col gap-7">
+      <SectionHeader
+        id="work-heading"
+        index="03"
+        title="Proof in production"
+        href="/projects"
+        linkLabel="All projects"
+      />
+      <ul class="flex flex-col gap-3">
         {cases.map((c) => (
           <li>
             <a
               href={`/projects/${c.slug}`}
-              class="case-row grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-x-8 gap-y-2 border-b border-panel-edge py-[26px] no-underline"
+              class="case card lift grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] items-start gap-x-8 gap-y-3 p-7 no-underline"
             >
-              <span class="text-[26px] leading-[1.1] font-bold">{c.title}</span>
-              <span class="text-ink-muted">{c.summary}</span>
-              <span class="mono text-xs leading-relaxed text-ink-muted uppercase">
-                {c.meta[0]}
-                <br />
-                {c.meta[1]}
+              <h3 class="text-[26px] leading-[1.15] font-bold tracking-[-0.02em]">{c.title}</h3>
+              <p class="text-ink-muted">{c.summary}</p>
+              <span class="flex flex-col gap-2.5">
+                <span class="flex flex-wrap gap-1.5">
+                  {c.chips.map((id) => (
+                    <span class="chip bg-bg uppercase">{readouts[id].chip}</span>
+                  ))}
+                </span>
+                <span class="mono text-[12px] text-ink-muted uppercase">{c.meta.join(" · ")}</span>
               </span>
             </a>
           </li>
@@ -44,7 +51,10 @@ const cases = homeCases.filter((c) => projects.some((p) => p.id === c.slug));
 )}
 
 <style>
-  .case-row:hover span:first-child {
+  .case:hover {
+    color: var(--ink);
+  }
+  .case:hover h3 {
     text-decoration: underline;
     text-decoration-thickness: 2px;
     text-underline-offset: 5px;

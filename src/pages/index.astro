@@ -1,26 +1,25 @@
 ---
 /**
- * Homepage — the approved D4 · Pre-flight artboard (PreflightDesktop.dc.html):
- * hero with the live 3D panel → crew card + checklist → products → systems →
- * case studies → logbook → writing + off duty → contact (from BaseLayout).
+ * Homepage — the approved design v2 artboards (screens/RuntimeDesktop.dc.html with the
+ * hero from screens/HeroV6.dc.html): hero with the live "Blueprint" → proof numbers
+ * → who I am + contents → what I'm building → what I can do → proof in production →
+ * track record → (writing) + off duty → contact panel (from BaseLayout).
  */
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Hero from "@components/home/Hero.astro";
-import CrewRow from "@components/home/CrewRow.astro";
+import Proof from "@components/home/Proof.astro";
+import WhoIAm from "@components/home/WhoIAm.astro";
 import Products from "@components/home/Products.astro";
-import Systems from "@components/home/Systems.astro";
+import Capabilities from "@components/home/Capabilities.astro";
 import Cases from "@components/home/Cases.astro";
-import Logbook from "@components/home/Logbook.astro";
-import WritingOffDuty from "@components/home/WritingOffDuty.astro";
+import TrackRecord from "@components/home/TrackRecord.astro";
+import OffDuty from "@components/home/OffDuty.astro";
 import { getPositions, getPosts, getProjects } from "@lib/content";
-import { adventures } from "@data/adventures";
+import { visitedCountryCount } from "@data/adventures";
 import { siteConfig } from "@config";
 
 const [projects, positions, posts] = await Promise.all([getProjects(), getPositions(), getPosts()]);
 const products = projects.filter((p) => p.data.tagline);
-const countries = new Set(
-  adventures.filter((a) => a.status === "visited").map((a) => a.countryCode),
-).size;
 ---
 
 <BaseLayout
@@ -28,12 +27,14 @@ const countries = new Set(
   titleTemplate={false}
   description={siteConfig.description}
   type="profile"
+  contactIndex="05"
 >
   <Hero />
-  <CrewRow />
+  <Proof />
+  <WhoIAm />
   <Products products={products} />
-  <Systems />
+  <Capabilities />
   <Cases projects={projects} />
-  <Logbook positions={positions} />
-  <WritingOffDuty posts={posts.slice(0, 3)} countries={countries} />
+  <TrackRecord positions={positions} />
+  <OffDuty posts={posts.slice(0, 3)} countries={visitedCountryCount} />
 </BaseLayout>
