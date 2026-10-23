@@ -59,11 +59,30 @@ const LATIN_EXT = [
 ];
 
 /** @param {string} subset */
-const saira = (subset) =>
-  `./node_modules/@fontsource-variable/saira/files/saira-${subset}-standard-normal.woff2`;
-/** @param {string} subset */
-const mono = (subset) =>
-  `./node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-${subset}-wght-normal.woff2`;
+const schibsted = (subset) =>
+  `./node_modules/@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-${subset}-wght-normal.woff2`;
+/** @param {string} subset @param {number} weight */
+const plexMono = (subset, weight) =>
+  `./node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-${subset}-${weight}-normal.woff2`;
+/**
+ * IBM Plex Mono is static: 400 (code), 500 (labels, meta), 600 (chips, 3D labels).
+ * @param {string} subset
+ * @param {[string, ...string[]]} unicodeRange
+ */
+const plexVariants = (subset, unicodeRange) => {
+  /** @param {number} weight */
+  const variant = (weight) => ({
+    src: /** @type {[string]} */ ([plexMono(subset, weight)]),
+    weight,
+    style: /** @type {"normal"} */ ("normal"),
+    unicodeRange,
+  });
+  return /** @type {[ReturnType<typeof variant>, ...ReturnType<typeof variant>[]]} */ ([
+    variant(400),
+    variant(500),
+    variant(600),
+  ]);
+};
 
 export default defineConfig({
   site: SITE_URL,
@@ -90,25 +109,24 @@ export default defineConfig({
     layout: "constrained",
     responsiveStyles: true,
   },
-  // Fonts are self-hosted from the Fontsource npm packages (variable, latin + latin-ext)
-  // so builds never depend on a third-party request. Saira ships the "standard" file
-  // (wght 100–900 + wdth 50–125) because the display type is set at width 112.
+  // Fonts are self-hosted from the Fontsource npm packages (latin + latin-ext) so builds
+  // never depend on a third-party request: Schibsted Grotesk (variable, wght 400–900) for
+  // display and text, IBM Plex Mono (static 400 / 500 / 600) for labels, numbers and code.
   //
   // Each typeface is split into two families: latin (preloaded, no fallback of its
   // own) and latin-ext (Czech diacritics, loaded on demand, carries the metric-matched
-  // fallback). global.css chains them: var(--font-saira), var(--font-saira-ext).
+  // fallback). global.css chains them: var(--font-schibsted), var(--font-schibsted-ext).
   fonts: [
     {
       provider: fontProviders.local(),
-      name: "Saira Variable",
-      cssVariable: "--font-saira",
+      name: "Schibsted Grotesk Variable",
+      cssVariable: "--font-schibsted",
       fallbacks: [],
       options: {
         variants: [
           {
-            src: [saira("latin")],
-            weight: "100 900",
-            stretch: "50% 125%",
+            src: [schibsted("latin")],
+            weight: "400 900",
             style: "normal",
             unicodeRange: /** @type {[string, ...string[]]} */ (LATIN),
           },
@@ -117,15 +135,14 @@ export default defineConfig({
     },
     {
       provider: fontProviders.local(),
-      name: "Saira Variable",
-      cssVariable: "--font-saira-ext",
-      fallbacks: ["Arial Narrow", "system-ui", "sans-serif"],
+      name: "Schibsted Grotesk Variable",
+      cssVariable: "--font-schibsted-ext",
+      fallbacks: ["system-ui", "sans-serif"],
       options: {
         variants: [
           {
-            src: [saira("latin-ext")],
-            weight: "100 900",
-            stretch: "50% 125%",
+            src: [schibsted("latin-ext")],
+            weight: "400 900",
             style: "normal",
             unicodeRange: /** @type {[string, ...string[]]} */ (LATIN_EXT),
           },
@@ -134,34 +151,20 @@ export default defineConfig({
     },
     {
       provider: fontProviders.local(),
-      name: "JetBrains Mono Variable",
-      cssVariable: "--font-jetbrains-mono",
+      name: "IBM Plex Mono",
+      cssVariable: "--font-plex-mono",
       fallbacks: [],
       options: {
-        variants: [
-          {
-            src: [mono("latin")],
-            weight: "100 800",
-            style: "normal",
-            unicodeRange: /** @type {[string, ...string[]]} */ (LATIN),
-          },
-        ],
+        variants: plexVariants("latin", /** @type {[string, ...string[]]} */ (LATIN)),
       },
     },
     {
       provider: fontProviders.local(),
-      name: "JetBrains Mono Variable",
-      cssVariable: "--font-jetbrains-mono-ext",
+      name: "IBM Plex Mono",
+      cssVariable: "--font-plex-mono-ext",
       fallbacks: ["ui-monospace", "Menlo", "monospace"],
       options: {
-        variants: [
-          {
-            src: [mono("latin-ext")],
-            weight: "100 800",
-            style: "normal",
-            unicodeRange: /** @type {[string, ...string[]]} */ (LATIN_EXT),
-          },
-        ],
+        variants: plexVariants("latin-ext", /** @type {[string, ...string[]]} */ (LATIN_EXT)),
       },
     },
   ],
@@ -182,7 +185,7 @@ export default defineConfig({
   markdown: {
     processor: satteri({ mdastPlugins: hidePlaceholders }),
     shikiConfig: {
-      // Code always sits on an instrument face (dark) in both themes.
+      // Code sits on #10141A with github-dark-dimmed in both themes (components.md, Sheet).
       theme: "github-dark-dimmed",
       wrap: false,
     },
