@@ -61,6 +61,26 @@ const { class: className, contactPanel = true, contactIndex, ...seo } = Astro.pr
         };
         apply();
         document.addEventListener("astro:after-swap", apply);
+        // Without a stored choice, follow OS theme changes live (pictures, 3D and the
+        // toggle listen to the class / the "themechange" event).
+        if (!window.__themeFollowsOs) {
+          window.__themeFollowsOs = true;
+          window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+            let stored = null;
+            try {
+              stored = localStorage.getItem("theme");
+            } catch {
+              /* storage unavailable */
+            }
+            if (stored) return;
+            apply();
+            document.dispatchEvent(
+              new CustomEvent("themechange", {
+                detail: { dark: document.documentElement.classList.contains("dark") },
+              }),
+            );
+          });
+        }
       })();
     </script>
     {/* Latin subsets are preloaded (mono: the 500 labels only); latin-ext (Czech
@@ -77,7 +97,7 @@ const { class: className, contactPanel = true, contactIndex, ...seo } = Astro.pr
   <body class="flex min-h-dvh flex-col">
     <a
       href="#main"
-      class="btn btn-primary btn-sm sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50"
+      class="btn btn-primary btn-sm sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-5 focus:py-2.5"
     >
       Skip to content
     </a>

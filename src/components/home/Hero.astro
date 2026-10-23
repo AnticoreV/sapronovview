@@ -7,12 +7,18 @@ import HeroStage from "@components/home/HeroStage.astro";
 import { siteConfig } from "@config";
 
 const [first, ...rest] = siteConfig.name.split(" ");
+// "A · B · C": a line may end with "·" but never start with it, and the last item keeps
+// its separator ("FOUNDER · PRAGUE" stays together on phones).
+const parts = siteConfig.hero.eyebrow.split(" · ");
+const eyebrow = parts
+  .map((p, i) => (i === 0 ? p : i === parts.length - 1 ? `\u00a0·\u00a0${p}` : `\u00a0· ${p}`))
+  .join("");
 ---
 
 <section id="top" class="band pt-14 pb-6" aria-labelledby="hero-heading">
   <div class="shell flex flex-wrap items-center gap-x-10 gap-y-6">
     <div class="flex flex-[1_1_420px] flex-col gap-6">
-      <p class="meta tracking-[0.06em] text-ink-muted">{siteConfig.hero.eyebrow}</p>
+      <p class="meta tracking-[0.06em] text-ink-muted">{eyebrow}</p>
       <h1 id="hero-heading" class="display text-display-xl">
         {first}
         <br />

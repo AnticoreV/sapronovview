@@ -79,4 +79,12 @@
     sync();
   }
   document.addEventListener("astro:page-load", setupThemeToggle);
+  // OS theme changes while nothing is stored (BaseLayout) keep aria-pressed in sync.
+  document.addEventListener("themechange", () =>
+    document
+      .querySelectorAll<HTMLButtonElement>("[data-theme-toggle]")
+      .forEach((b) =>
+        b.setAttribute("aria-pressed", String(document.documentElement.classList.contains("dark"))),
+      ),
+  );
 </script>
