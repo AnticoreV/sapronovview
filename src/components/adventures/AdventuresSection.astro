@@ -1,114 +1,103 @@
 ---
 /**
- * "Adventures" section: heading, interactive map, legend and details panel.
- *
- * Drop <AdventuresSection /> into any page. Data lives in src/data/adventures.ts.
- * Colours and sizes are exposed as CSS custom properties on the section so
- * they can be themed without touching the components.
+ * Adventures: the live paper globe (or, under reduced motion / without WebGL,
+ * the d3-geo SVG map) with the country list and details beside it.
+ * Data: src/data/adventures.ts.
  */
-import SectionHeading from "@components/ui/SectionHeading.astro";
-import AdventureMap from "@components/adventures/AdventureMap.astro";
 import AdventureDetails from "@components/adventures/AdventureDetails.astro";
+import AdventureMap from "@components/adventures/AdventureMap.astro";
+import GlobeStage from "@components/adventures/GlobeStage.astro";
 import MapLegend from "@components/adventures/MapLegend.astro";
 import { adventures } from "@data/adventures";
 
 interface Props {
-  id?: string;
-  title?: string;
-  description?: string;
-  eyebrow?: string;
-  /** Heading level for the section title (1 on a dedicated page). */
-  level?: 1 | 2;
-  /** Show breadcrumbs slot / extra top padding when used as a page. */
   class?: string;
 }
-const {
-  id = "adventures",
-  eyebrow = "Adventures",
-  title = "Places I've been, places I'm going",
-  description = "A map of the countries I've visited and the ones still on the list. Tap a marker for the story, or a highlighted country for everything in it.",
-  level = 2,
-  class: className,
-} = Astro.props;
+const { class: className } = Astro.props;
+const countries = new Set(
+  adventures.filter((a) => a.status === "visited").map((a) => a.countryCode),
+).size;
 ---
 
 <section
-  id={id}
-  class:list={["adventures container-site", className ?? "section reveal"]}
-  aria-labelledby={`${id}-heading`}
+  id="adventures"
+  class:list={["adventures band", className]}
+  aria-labelledby="adventures-heading"
   data-adventures
 >
-  <slot name="before" />
-  <SectionHeading
-    id={`${id}-heading`}
-    level={level}
-    eyebrow={eyebrow}
-    title={title}
-    description={description}
-  />
+  <div class="shell">
+    <slot name="before" />
+    <p class="label mt-8 text-ink-muted">Off duty · adventures</p>
+    <h1 id="adventures-heading" class="display mt-3 text-display-l">
+      {countries} countries on the map
+    </h1>
+    <p class="mt-5 max-w-[640px] text-body-l">
+      Where I've been, home in Prague, and the places still on the list. Drag the globe to turn it;
+      pick a country or a place in the list to fly there.
+    </p>
 
-  <div class="adventures__layout">
-    <div class="adventures__map card">
-      <AdventureMap locations={adventures} />
-      <div class="adventures__legend">
+    <div class="mt-10 grid items-start gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(300px,1fr)]">
+      <div class="adv-visual flex flex-col gap-4 lg:sticky lg:top-24" data-adv-visual>
+        <GlobeStage />
+        {/* Fallback map: parsed only when needed (reduced motion / no WebGL), so the
+            globe page does not carry ~45 KB of hidden SVG. */}
+        <template data-adv-fallback-template>
+          <div class="adv-fallback sheet p-2 sm:p-3">
+            <AdventureMap locations={adventures} />
+          </div>
+        </template>
         <MapLegend />
       </div>
+      <aside class="module p-6" aria-label="Countries and places">
+        <AdventureDetails locations={adventures} />
+      </aside>
     </div>
-    <aside class="adventures__details card" aria-label="Location details">
-      <AdventureDetails locations={adventures} headingLevel={level === 1 ? 2 : 3} />
-    </aside>
   </div>
 </section>
 
 <style>
   .adventures {
-    /* Theme hooks — override these on the section to restyle the map. */
-    --adventure-visited: var(--accent);
-    --adventure-wishlist: var(--fg-muted);
-    --adventure-marker-size: 12px;
+    --adventure-marker-size: 11px;
     --adventure-marker-hit: 32px;
-    --adventure-water: transparent;
-    --adventure-land: var(--surface-strong);
-    --adventure-land-active: color-mix(in oklab, var(--accent) 22%, var(--surface-strong));
-    --adventure-border: var(--surface);
+    --adventure-water: var(--panel-sheet);
+    --adventure-land: var(--panel-raised);
+    --adventure-land-active: var(--ink);
+    --adventure-border: var(--panel-edge-strong);
   }
   @media (pointer: coarse) {
     .adventures {
       --adventure-marker-hit: 44px;
     }
   }
-
-  .adventures__layout {
-    display: grid;
-    gap: 1.25rem;
-    align-items: start;
+  .adv-visual[data-globe="off"] :global(.globe-stage) {
+    display: none;
   }
-  @media (min-width: 64rem) {
-    .adventures__layout {
-      grid-template-columns: minmax(0, 1.9fr) minmax(280px, 1fr);
-    }
-  }
-
-  .adventures__map {
-    overflow: hidden;
-    padding: 0.5rem;
-  }
-  .adventures__legend {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 0.5rem 0.25rem;
-  }
-  .adventures__details {
-    padding: 1.25rem;
-    max-height: 32rem;
-    overflow-y: auto;
-  }
-  @media (min-width: 64rem) {
-    .adventures__details {
-      position: sticky;
-      top: 5.5rem;
-      max-height: calc(100vh - 6.5rem);
+  @media (prefers-reduced-motion: reduce) {
+    .adv-visual :global(.globe-stage) {
+      display: none;
     }
   }
 </style>
+
+<script>
+  /** Instantiate the SVG map when the globe cannot (or should not) run. */
+  function mountFallback() {
+    const visual = document.querySelector<HTMLElement>("[data-adv-visual]");
+    const template = visual?.querySelector<HTMLTemplateElement>("[data-adv-fallback-template]");
+    if (!visual || !template || visual.querySelector(".adv-fallback")) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduced && visual.dataset.globe !== "off") return;
+    template.after(template.content.cloneNode(true));
+    document.dispatchEvent(new CustomEvent("adventure:map-mounted"));
+  }
+  document.addEventListener("astro:page-load", () => {
+    mountFallback();
+    const visual = document.querySelector<HTMLElement>("[data-adv-visual]");
+    if (!visual || visual.dataset.fallbackWatch) return;
+    visual.dataset.fallbackWatch = "true";
+    new MutationObserver(mountFallback).observe(visual, {
+      attributes: true,
+      attributeFilter: ["data-globe"],
+    });
+  });
+</script>

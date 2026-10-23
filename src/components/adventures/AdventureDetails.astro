@@ -1,63 +1,78 @@
 ---
 /**
- * Details panel. Every location card and country card is rendered at build
- * time and hidden; the map script reveals the selected one. Without
- * JavaScript the grouped destination list stays visible and readable.
+ * Country list + details panel beside the globe / map. Every card is rendered at
+ * build time and hidden; the script reveals the selected one. Without JavaScript
+ * the grouped list stays visible. It is also the keyboard and screen-reader
+ * equivalent of the globe: picking a place here turns the globe to it.
+ *
+ * Events on the [data-adventures] section:
+ *   in  `adventure:pick`   { id } | { country } | {}  (from the map or globe)
+ *   out `adventure:select` { id, country, lat, lng }   (map + globe follow)
  */
-import { ArrowUpRight, X } from "lucide-astro";
-import {
-  groupByCountry,
-  placeLabel,
-  priorityLabels,
-  type AdventureLocation,
-} from "@data/adventures";
+import { groupByCountry, home, priorityLabels, type AdventureLocation } from "@data/adventures";
+import { shown } from "@lib/content";
 
 interface Props {
   locations: AdventureLocation[];
-  /** Heading level for group titles and card titles (one below the section heading). */
   headingLevel?: 2 | 3;
 }
-const { locations, headingLevel = 3 } = Astro.props;
+const { locations, headingLevel = 2 } = Astro.props;
 const H = `h${headingLevel}` as "h2" | "h3";
-const visited = locations.filter((l) => l.status === "visited");
-const wishlist = locations.filter((l) => l.status === "wishlist");
+const name = (a: AdventureLocation) => shown(a.city) ?? a.country;
+const visitedCountries = groupByCountry(locations.filter((l) => l.status === "visited"));
+const wishlistCountries = groupByCountry(locations.filter((l) => l.status === "wishlist"));
 const countries = groupByCountry(locations);
 const statusLabel = (s: AdventureLocation["status"]) =>
   s === "visited" ? "Visited" : "Want to visit";
+const groups = [
+  {
+    key: "visited",
+    title: `Visited · ${visitedCountries.length} countries`,
+    items: visitedCountries,
+  },
+  {
+    key: "wishlist",
+    title: `Want to visit · ${wishlistCountries.length}`,
+    items: wishlistCountries,
+  },
+];
 ---
 
 <div class="adv-details" data-adv-details>
   <p class="sr-only" aria-live="polite" data-adv-announce></p>
 
-  {/* Default view: grouped list. Also the no-JS fallback. */}
-  <div class="adv-details__list" data-adv-view="list">
-    <p class="adv-details__hint">Select a marker on the map, or pick a place below.</p>
-    {[
-      { key: "visited", title: "Visited", items: visited },
-      { key: "wishlist", title: "Want to visit", items: wishlist },
-    ].map((group) => (
-      <section aria-labelledby={`adv-group-${group.key}`}>
-        <H id={`adv-group-${group.key}`} class="adv-details__group-title">
-          <span
-            class:list={[
-              "adv-dot",
-              group.key === "visited" ? "adv-dot--visited" : "adv-dot--wishlist",
-            ]}
-            aria-hidden="true"
-          />
+  <div data-adv-view="list">
+    <p class="placard flex items-center gap-2 text-ink-muted">
+      <span class="adv-dot adv-dot--home" aria-hidden="true"></span>
+      Home base · {home.city}, {home.country}
+    </p>
+    {groups.map((group) => (
+      <section aria-labelledby={`adv-group-${group.key}`} class="mt-6">
+        <H id={`adv-group-${group.key}`} class="placard flex items-center gap-2 text-ink-muted">
+          <span class:list={["adv-dot", `adv-dot--${group.key}`]} aria-hidden="true" />
           {group.title}
         </H>
-        <ul class="adv-details__items">
-          {group.items.map((a) => (
-            <li>
-              <button type="button" class="adv-details__item" data-adv-select={a.id}>
-                <span class="adv-details__item-name">{a.city ?? a.country}</span>
-                <span class="adv-details__item-meta">
-                  {a.city ? a.country : ""}
-                  {a.visitedAt && ` · ${a.visitedAt}`}
-                  {a.priority && ` · ${priorityLabels[a.priority]}`}
-                </span>
+        <ul class="mt-2 flex flex-col">
+          {group.items.map((c) => (
+            <li class="border-b border-panel-edge py-1.5">
+              <button
+                type="button"
+                class="adv-item adv-item--country"
+                data-adv-country-select={c.countryCode}
+              >
+                {c.country}
               </button>
+              <ul class="flex flex-wrap gap-x-1 gap-y-0.5 pb-1">
+                {c.locations
+                  .filter((a) => shown(a.city))
+                  .map((a) => (
+                    <li>
+                      <button type="button" class="adv-item adv-item--place" data-adv-select={a.id}>
+                        {name(a)}
+                      </button>
+                    </li>
+                  ))}
+              </ul>
             </li>
           ))}
         </ul>
@@ -65,104 +80,84 @@ const statusLabel = (s: AdventureLocation["status"]) =>
     ))}
   </div>
 
-  {/* One card per location */}
   {locations.map((a) => (
     <article
       class="adv-card"
       data-adv-view="location"
       data-adv-id={a.id}
+      data-lat={a.coordinates.lat}
+      data-lng={a.coordinates.lng}
+      data-country={a.countryCode}
       aria-labelledby={`adv-title-${a.id}`}
       tabindex="-1"
       hidden
     >
-      <div class="adv-card__head">
-        <p class="adv-card__status">
-          <span
-            class:list={[
-              "adv-dot",
-              a.status === "visited" ? "adv-dot--visited" : "adv-dot--wishlist",
-            ]}
-            aria-hidden="true"
-          />
+      <div class="flex items-center justify-between gap-3">
+        <p class="placard flex items-center gap-2 text-ink-muted">
+          <span class:list={["adv-dot", `adv-dot--${a.status}`]} aria-hidden="true" />
           {statusLabel(a.status)}
-          {a.status === "visited" && a.visitedAt && (
-            <span class="adv-card__meta">· {a.visitedAt}</span>
-          )}
-          {a.status === "wishlist" && a.priority && (
-            <span class="adv-card__meta">· {priorityLabels[a.priority]}</span>
-          )}
+          {a.status === "visited" && shown(a.visitedAt) && <span>· {a.visitedAt}</span>}
+          {a.status === "wishlist" && a.priority && <span>· {priorityLabels[a.priority]}</span>}
         </p>
-        <button type="button" class="adv-card__close" data-adv-close aria-label="Close details">
-          <X size={16} aria-hidden="true" />
+        <button type="button" class="adv-close" data-adv-close aria-label="Close details">
+          <svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true">
+            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" />
+          </svg>
         </button>
       </div>
-      <H id={`adv-title-${a.id}`} class="adv-card__title">
-        {a.city ?? a.country}
+      <H id={`adv-title-${a.id}`} class="display mt-3 text-[2rem] leading-none">
+        {name(a)}
       </H>
-      {a.city && <p class="adv-card__country">{a.country}</p>}
-      {a.image && (
-        <img
-          class="adv-card__image"
-          src={a.image}
-          alt={a.imageAlt ?? placeLabel(a)}
-          width="640"
-          height="400"
-          loading="lazy"
-          decoding="async"
-        />
-      )}
-      {a.status === "visited" && a.description && <p class="adv-card__text">{a.description}</p>}
-      {a.status === "wishlist" && a.reason && (
-        <p class="adv-card__text">
-          <span class="adv-card__label">Why: </span>
+      {shown(a.city) && <p class="mt-1 text-ink-muted">{a.country}</p>}
+      {a.status === "visited" && shown(a.description) && <p class="mt-4">{a.description}</p>}
+      {a.status === "wishlist" && shown(a.reason) && (
+        <p class="mt-4">
+          <span class="font-semibold">Why: </span>
           {a.reason}
         </p>
       )}
       {a.href && (
-        <a
-          class="adv-card__link"
-          href={a.href}
-          {...(a.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-        >
+        <a href={a.href} class="link-ghost mt-4 inline-flex min-h-11 items-center">
           {a.hrefLabel ?? "Read more"}
-          <ArrowUpRight size={14} aria-hidden="true" />
+          <span aria-hidden="true">&nbsp;→</span>
         </a>
       )}
     </article>
   ))}
 
-  {/* One card per country, shown when a country outline is clicked */}
   {countries.map((c) => (
     <article
       class="adv-card"
       data-adv-view="country"
       data-adv-country={c.countryCode}
+      data-lat={c.locations[0]!.coordinates.lat}
+      data-lng={c.locations[0]!.coordinates.lng}
       aria-labelledby={`adv-country-${c.countryCode}`}
       tabindex="-1"
       hidden
     >
-      <div class="adv-card__head">
-        <p class="adv-card__status">Country</p>
-        <button type="button" class="adv-card__close" data-adv-close aria-label="Close details">
-          <X size={16} aria-hidden="true" />
+      <div class="flex items-center justify-between gap-3">
+        <p class="placard text-ink-muted">Country</p>
+        <button type="button" class="adv-close" data-adv-close aria-label="Close details">
+          <svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true">
+            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" />
+          </svg>
         </button>
       </div>
-      <H id={`adv-country-${c.countryCode}`} class="adv-card__title">
+      <H id={`adv-country-${c.countryCode}`} class="display mt-3 text-[2rem] leading-none">
         {c.country}
       </H>
-      <ul class="adv-details__items">
+      <ul class="mt-4 flex flex-col">
         {c.locations.map((a) => (
-          <li>
-            <button type="button" class="adv-details__item" data-adv-select={a.id}>
-              <span
-                class:list={[
-                  "adv-dot",
-                  a.status === "visited" ? "adv-dot--visited" : "adv-dot--wishlist",
-                ]}
-                aria-hidden="true"
-              />
-              <span class="adv-details__item-name">{a.city ?? a.country}</span>
-              <span class="adv-details__item-meta">{statusLabel(a.status)}</span>
+          <li class="border-b border-panel-edge">
+            <button
+              type="button"
+              class="adv-item flex w-full items-center gap-2"
+              data-adv-select={a.id}
+            >
+              <span class:list={["adv-dot", `adv-dot--${a.status}`]} aria-hidden="true" />
+              <span class="font-semibold">{name(a)}</span>
+              <span class="mono text-xs text-ink-muted uppercase">{statusLabel(a.status)}</span>
             </button>
           </li>
         ))}
@@ -172,168 +167,185 @@ const statusLabel = (s: AdventureLocation["status"]) =>
 </div>
 
 <style>
-  .adv-details {
-    min-height: 100%;
-  }
-  .adv-details__hint {
-    margin: 0 0 1rem;
-    font-size: 0.875rem;
-    color: var(--fg-subtle);
-  }
-  .adv-details__group-title {
-    display: flex;
+  .adv-item {
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    margin: 1rem 0 0.5rem;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    font-weight: 500;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--fg-muted);
-  }
-  .adv-details__items {
-    display: grid;
-    gap: 0.25rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  .adv-details__item {
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 0.25rem 0.5rem;
-    width: 100%;
-    padding: 0.45rem 0.6rem;
-    border: 1px solid transparent;
-    border-radius: 0.6rem;
+    min-height: 32px;
+    padding: 2px 6px;
+    margin-left: -6px;
+    border: 0;
+    border-radius: var(--radius-sm);
     background: transparent;
-    color: var(--fg);
+    color: var(--ink);
     font: inherit;
     text-align: left;
     cursor: pointer;
-    transition:
-      background-color 0.2s ease,
-      border-color 0.2s ease;
   }
-  .adv-details__item:hover {
-    background: var(--surface-muted);
+  .adv-item--country {
+    min-height: 40px;
+    font-weight: 700;
   }
-  .adv-details__item[aria-current="true"] {
-    background: var(--accent-soft);
-    border-color: color-mix(in oklab, var(--accent) 35%, transparent);
+  .adv-item--place {
+    color: var(--ink-muted);
+    font-size: var(--text-small);
   }
-  .adv-details__item-name {
-    font-weight: 500;
+  .adv-item:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
   }
-  .adv-details__item-meta {
-    font-size: 0.8rem;
-    color: var(--fg-subtle);
+  .adv-item[aria-current="true"] {
+    background: var(--face);
+    color: var(--select);
   }
-
   .adv-dot {
     display: inline-block;
-    width: 0.6rem;
-    height: 0.6rem;
+    width: 10px;
+    height: 10px;
     border-radius: 999px;
-    box-sizing: border-box;
     flex: none;
-    align-self: center;
   }
   .adv-dot--visited {
-    background: var(--adventure-visited);
+    background: var(--ink);
+  }
+  .adv-dot--home {
+    background: var(--route);
   }
   .adv-dot--wishlist {
-    border: 2px solid var(--adventure-wishlist);
+    border: 2px dashed var(--route);
   }
-
   .adv-card {
     outline: none;
   }
-  .adv-card__head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-  }
-  .adv-card__status {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--accent-strong);
-  }
-  .adv-card__meta {
-    color: var(--fg-subtle);
-    letter-spacing: 0.06em;
-    text-transform: none;
-  }
-  .adv-card__close {
+  .adv-close {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    background: var(--surface);
-    color: var(--fg-muted);
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--panel-edge-strong);
+    border-radius: var(--radius-sm);
+    background: var(--panel-raised);
+    color: var(--ink);
     cursor: pointer;
-    transition:
-      color 0.2s ease,
-      border-color 0.2s ease;
   }
-  .adv-card__close:hover {
-    color: var(--fg);
-    border-color: var(--border-strong);
-  }
-  .adv-card__title {
-    margin: 0.75rem 0 0;
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
-  }
-  .adv-card__country {
-    margin: 0.15rem 0 0;
-    color: var(--fg-muted);
-  }
-  .adv-card__image {
-    display: block;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 10;
-    object-fit: cover;
-    margin-top: 1rem;
-    border: 1px solid var(--border);
-    border-radius: 0.75rem;
-  }
-  .adv-card__text {
-    margin: 1rem 0 0;
-    color: var(--fg-muted);
-    line-height: 1.6;
-  }
-  .adv-card__label {
-    color: var(--fg);
-    font-weight: 500;
-  }
-  .adv-card__link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    margin-top: 1rem;
-    color: var(--accent-strong);
-    font-weight: 500;
-    text-decoration: underline;
-    text-decoration-color: color-mix(in oklab, var(--accent) 50%, transparent);
-    text-underline-offset: 4px;
-  }
-  .adv-card .adv-details__items {
-    margin-top: 1rem;
+  .adv-close:hover {
+    border-color: var(--ink);
   }
 </style>
+
+<script>
+  type Pick = { id?: string | null; country?: string | null };
+
+  function setupDetails(details: HTMLElement) {
+    if (details.dataset.bound) return;
+    details.dataset.bound = "true";
+    const section = details.closest<HTMLElement>("[data-adventures]") ?? document.body;
+    const announce = details.querySelector<HTMLElement>("[data-adv-announce]");
+    const placeButtons = [...details.querySelectorAll<HTMLButtonElement>("[data-adv-select]")];
+    const countryButtons = [
+      ...details.querySelectorAll<HTMLButtonElement>("[data-adv-country-select]"),
+    ];
+    let lastTrigger: HTMLElement | null = null;
+
+    const view = (name: "list" | "location" | "country", key?: string) => {
+      details.querySelectorAll<HTMLElement>("[data-adv-view]").forEach((el) => {
+        el.hidden = !(
+          el.dataset.advView === name &&
+          (name === "list" || el.dataset.advId === key || el.dataset.advCountry === key)
+        );
+      });
+    };
+    const mark = (id: string | null, country: string | null) => {
+      placeButtons.forEach((b) =>
+        b.dataset.advSelect === id
+          ? b.setAttribute("aria-current", "true")
+          : b.removeAttribute("aria-current"),
+      );
+      countryButtons.forEach((b) =>
+        !id && b.dataset.advCountrySelect === country
+          ? b.setAttribute("aria-current", "true")
+          : b.removeAttribute("aria-current"),
+      );
+    };
+    const emit = (detail: Record<string, unknown>) =>
+      section.dispatchEvent(new CustomEvent("adventure:select", { detail }));
+
+    const selectLocation = (id: string, focus = false) => {
+      const card = details.querySelector<HTMLElement>(`[data-adv-id="${id}"]`);
+      if (!card) return;
+      view("location", id);
+      mark(id, null);
+      history.replaceState(null, "", `#adventure-${id}`);
+      if (announce)
+        announce.textContent = `${card.querySelector("h2, h3")?.textContent ?? id}. Details shown.`;
+      if (focus) card.focus({ preventScroll: true });
+      emit({
+        id,
+        country: card.dataset.country,
+        lat: Number(card.dataset.lat),
+        lng: Number(card.dataset.lng),
+      });
+    };
+    const selectCountry = (code: string, focus = false) => {
+      const card = details.querySelector<HTMLElement>(`[data-adv-country="${code}"]`);
+      if (!card) return;
+      view("country", code);
+      mark(null, code);
+      history.replaceState(null, "", location.pathname + location.search);
+      if (announce)
+        announce.textContent = `${card.querySelector("h2, h3")?.textContent ?? code}. Details shown.`;
+      if (focus) card.focus({ preventScroll: true });
+      emit({
+        id: null,
+        country: code,
+        lat: Number(card.dataset.lat),
+        lng: Number(card.dataset.lng),
+      });
+    };
+    const clear = () => {
+      view("list");
+      mark(null, null);
+      history.replaceState(null, "", location.pathname + location.search);
+      if (announce) announce.textContent = "Details closed.";
+      emit({ id: null, country: null });
+      lastTrigger?.focus({ preventScroll: true });
+      lastTrigger = null;
+    };
+
+    placeButtons.forEach((b) =>
+      b.addEventListener("click", () => {
+        lastTrigger = b;
+        selectLocation(b.dataset.advSelect!, true);
+      }),
+    );
+    countryButtons.forEach((b) =>
+      b.addEventListener("click", () => {
+        lastTrigger = b;
+        selectCountry(b.dataset.advCountrySelect!, true);
+      }),
+    );
+    details
+      .querySelectorAll<HTMLButtonElement>("[data-adv-close]")
+      .forEach((b) => b.addEventListener("click", clear));
+    section.addEventListener("keydown", (e) => {
+      if (
+        (e as KeyboardEvent).key === "Escape" &&
+        details.querySelector('[data-adv-view="list"][hidden]')
+      )
+        clear();
+    });
+    section.addEventListener("adventure:pick", (e: Event) => {
+      const { id, country } = (e as CustomEvent<Pick>).detail ?? {};
+      if (id) selectLocation(id);
+      else if (country) selectCountry(country);
+      else clear();
+    });
+
+    const hash = location.hash.match(/^#adventure-(.+)$/);
+    if (hash?.[1]) selectLocation(hash[1]);
+  }
+
+  const init = () =>
+    document.querySelectorAll<HTMLElement>("[data-adv-details]").forEach(setupDetails);
+  document.addEventListener("astro:page-load", init);
+</script>

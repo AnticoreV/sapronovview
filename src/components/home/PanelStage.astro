@@ -1,0 +1,173 @@
+---
+/**
+ * The live 3D instrument panel. The poster is the LCP element and the fallback:
+ * under reduced motion, without WebGL or without JS it is all there is, and
+ * three.js is never downloaded. Otherwise the scene (src/scripts/panel3d.ts)
+ * loads lazily — when the stage is visible and the visitor first moves the
+ * pointer, scrolls, types or touches — renders a frame that matches the poster
+ * and fades in over it.
+ */
+import ThemePicture from "@components/ui/ThemePicture.astro";
+import posterDay from "@/assets/hero/panel-day.png";
+import posterNight from "@/assets/hero/panel-night.png";
+import { availabilityText, siteConfig } from "@config";
+import { panelDescription } from "@data/readouts";
+
+// Measured: the stage is ~700px wide next to the 118px name at 1440, full width below ~1180px.
+const sizes = "(min-width: 1180px) 700px, 92vw";
+const widths = [480, 700, 960, 1394];
+---
+
+<div
+  class="panel-stage relative w-full"
+  data-panel-stage
+  data-annunciator={availabilityText[siteConfig.availability.status].long}
+  role="img"
+  aria-label={panelDescription}
+>
+  <span class="poster">
+    <ThemePicture
+      day={posterDay}
+      night={posterNight}
+      alt=""
+      widths={widths}
+      sizes={sizes}
+      loading="eager"
+      fetchpriority="high"
+    />
+  </span>
+  <canvas class="panel-canvas" aria-hidden="true"></canvas>
+</div>
+
+<style>
+  .panel-stage {
+    aspect-ratio: 1400 / 800;
+  }
+  .poster,
+  .panel-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .poster :global(picture) {
+    display: contents;
+  }
+  .poster :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .panel-canvas {
+    display: block;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .panel-stage[data-live] .panel-canvas {
+    opacity: 1;
+  }
+  .panel-stage[data-live-settled] .poster {
+    visibility: hidden;
+  }
+</style>
+
+<script>
+  import type { PanelHandle } from "@/scripts/panel3d";
+
+  let handle: PanelHandle | undefined;
+
+  const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /** Cheap WebGL probe so three.js is never fetched when it could not run. */
+  function hasWebGL(): boolean {
+    try {
+      const c = document.createElement("canvas");
+      const gl = (c.getContext("webgl2") || c.getContext("webgl")) as WebGLRenderingContext | null;
+      gl?.getExtension("WEBGL_lose_context")?.loseContext();
+      return Boolean(gl);
+    } catch {
+      return false;
+    }
+  }
+
+  function whenIdle(cb: () => void) {
+    if ("requestIdleCallback" in window) window.requestIdleCallback(cb, { timeout: 2500 });
+    else setTimeout(cb, 300);
+  }
+
+  /**
+   * Start on the first sign of a person: a pointer move (the panel follows the cursor),
+   * scroll, key or touch — then on idle. Until then the poster shows the same
+   * instruments, so nobody pays for WebGL they never interact with.
+   */
+  function whenReady(cb: () => void) {
+    const events = ["pointermove", "pointerdown", "scroll", "keydown", "wheel"] as const;
+    const go = () => {
+      events.forEach((e) => window.removeEventListener(e, go));
+      whenIdle(cb);
+    };
+    events.forEach((e) => window.addEventListener(e, go, { once: true, passive: true }));
+  }
+
+  async function start(stage: HTMLElement, capture?: { dpr: number }) {
+    const canvas = stage.querySelector<HTMLCanvasElement>(".panel-canvas");
+    if (!canvas) return;
+    // Probe WebGL only now (creating a context can be slow on GPU-less machines).
+    if (!capture && !hasWebGL()) return;
+    try {
+      const { mountPanel } = await import("@/scripts/panel3d");
+      if (!stage.isConnected) return;
+      handle = await mountPanel(canvas, {
+        annunciator: stage.dataset.annunciator ?? "OPEN TO PROJECTS",
+        capture,
+        onFirstFrame: () => {
+          stage.dataset.live = "";
+          window.setTimeout(() => (stage.dataset.liveSettled = ""), 500);
+          if (capture) (window as unknown as { __panelReady?: boolean }).__panelReady = true;
+        },
+      });
+    } catch (err) {
+      // Keep the poster — it shows the same instruments.
+      console.warn("[panel3d] staying on the poster:", err);
+    }
+  }
+
+  function init() {
+    const stage = document.querySelector<HTMLElement>("[data-panel-stage]");
+    if (!stage || stage.dataset.bound) return;
+    stage.dataset.bound = "true";
+
+    // Poster capture for scripts/render-posters.mjs: render now at a fixed DPR.
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("panel-capture")) {
+      void start(stage, { dpr: Number(params.get("panel-capture")) || 2 });
+      return;
+    }
+    if (reducedMotion()) return;
+
+    const io = new IntersectionObserver((entries) => {
+      if (!entries.some((e) => e.isIntersecting)) return;
+      io.disconnect();
+      whenReady(() => void start(stage));
+    });
+    io.observe(stage);
+  }
+
+  function teardown() {
+    handle?.dispose();
+    handle = undefined;
+  }
+
+  document.addEventListener("astro:page-load", init);
+  document.addEventListener("astro:before-swap", teardown);
+  window.matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", (e) => {
+    if (!e.matches) return;
+    teardown();
+    const stage = document.querySelector<HTMLElement>("[data-panel-stage]");
+    if (stage) {
+      delete stage.dataset.live;
+      delete stage.dataset.liveSettled;
+    }
+  });
+</script>
