@@ -33,7 +33,7 @@ export type AdventureLocation = {
   hrefLabel?: string;
 };
 
-/** Home base — magenta on the globe; every route starts here. */
+/** Home base — accent on the globe; every route starts here. */
 export const home = {
   country: "Czech Republic",
   countryCode: "CZ",
@@ -306,3 +306,8 @@ export function groupByCountry(list: AdventureLocation[] = adventures) {
 export function placeLabel(a: AdventureLocation): string {
   return a.city ? `${a.city}, ${a.country}` : a.country;
 }
+
+/** Number of visited countries ("11 countries on the map"). */
+export const visitedCountryCount = new Set(
+  adventures.filter((a) => a.status === "visited").map((a) => a.countryCode),
+).size;

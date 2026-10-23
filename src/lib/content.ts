@@ -150,19 +150,20 @@ export const categoryLabels: Record<Project["data"]["category"], string> = {
   hobby: "Hobby project",
 };
 
-export type LampTone = "ok" | "caution" | "off";
+export type StatusTone = "ok" | "caution" | "off";
 
-/** Project status as an annunciator word + lamp colour (avionics code). */
-export const statusLabels: Record<Project["data"]["status"], { label: string; tone: LampTone }> = {
-  active: { label: "Live", tone: "ok" },
-  pilot: { label: "Pilot", tone: "ok" },
-  "in-progress": { label: "In progress", tone: "caution" },
-  validating: { label: "Validating", tone: "caution" },
-  research: { label: "Research", tone: "caution" },
-  completed: { label: "Completed", tone: "off" },
-  paused: { label: "Paused", tone: "off" },
-  archived: { label: "Archived", tone: "off" },
-};
+/** Project status as a pill: word + tone (ok = mint, caution = butter, off = neutral). */
+export const statusLabels: Record<Project["data"]["status"], { label: string; tone: StatusTone }> =
+  {
+    active: { label: "Live", tone: "ok" },
+    pilot: { label: "Pilot", tone: "ok" },
+    "in-progress": { label: "In progress", tone: "caution" },
+    validating: { label: "Validating", tone: "caution" },
+    research: { label: "Research", tone: "caution" },
+    completed: { label: "Completed", tone: "off" },
+    paused: { label: "Paused", tone: "off" },
+    archived: { label: "Archived", tone: "off" },
+  };
 
 export const employmentLabels: Record<Position["data"]["employmentType"], string> = {
   "full-time": "Full-time",
@@ -196,14 +197,14 @@ export const hobbyCategoryLabels: Record<Hobby["data"]["category"], string> = {
   experiments: "Side experiments",
 };
 
-/* Logbook helpers ----------------------------------------------------------- */
+/* Track record helpers ------------------------------------------------------ */
 
-/** "CCA Group a.s." → "CCA Group" (legal suffixes are noise in a logbook). */
+/** "CCA Group a.s." → "CCA Group" (legal suffixes are noise in a track record). */
 export function shortCompany(company: string): string {
   return company.replace(/,?\s+(s\.\s?r\.\s?o\.|a\.\s?s\.|GmbH|Ltd\.?|Inc\.?)$/i, "").trim();
 }
 
-/** "2022–24", "2026" — the YEARS cell of a logbook row. */
+/** "2022–24", "2026" — the YEARS cell of a track-record row. */
 export function yearsLabel(start: Date, end?: Date): string {
   const a = start.getUTCFullYear();
   const b = (end ?? new Date()).getUTCFullYear();

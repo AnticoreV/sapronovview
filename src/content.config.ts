@@ -52,12 +52,17 @@ const projects = defineCollection({
     z.object({
       title: z.string(),
       description: z.string().max(220),
-      /** One-line product promise, shown in the instrument module (e.g. Ownira's tagline). */
+      /** One-line product promise, shown in the product module (e.g. Ownira's tagline). */
       tagline: z.string().optional(),
       /** Short module copy for the product cards (falls back to `description`). */
       summary: z.string().optional(),
       /** Product domain shown as text in the module label (not linked until `website` is set). */
       domain: z.string().optional(),
+      /**
+       * Facts list in the product module (e.g. FOR · MY ROLE). Status and web come from
+       * `status` and `domain`; only real values — placeholders are hidden in production.
+       */
+      facts: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
       /** Used for ordering and the "year" label. */
       date: z.coerce.date(),
       featured: z.boolean().default(false),
@@ -131,10 +136,10 @@ const experience = defineCollection({
     companyUrl: z.url().optional(),
     achievements: z.array(z.string()).default([]),
     /**
-     * Logbook "LOGGED" cell: a shortened form of a real achievement above —
+     * Track record "SHIPPED" cell: a shortened form of a real achievement above —
      * never a new claim. Falls back to the first achievement.
      */
-    logged: z.string().optional(),
+    shipped: z.string().optional(),
     technologies: z.array(z.string()).default([]),
     /** Show on the homepage "career highlights" strip. */
     highlight: z.boolean().default(false),

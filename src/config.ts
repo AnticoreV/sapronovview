@@ -13,25 +13,24 @@ export type Availability = "open" | "limited" | "closed";
 export const siteConfig = {
   /** Full name, used in the header, hero, footer and structured data. */
   name: "Ivan Sapronov",
-  /** Header callsign (aircraft-registration style) and home base (ICAO code of Prague). */
-  callsign: "I.SAPRONOV",
-  base: "LKPR",
   /** Short professional title, used in <title>, Open Graph and JSON-LD. */
   title: "Backend & Fullstack Engineer · Founder",
   /** Meta description (from the approved hero lede). */
   description:
     "Backend & fullstack engineer and founder in Prague. I build backend systems and products, set up AI agents and automation, and ship services to production.",
-  /** Hero copy, approved with the D4 · Pre-flight design (2026-10-22). */
+  /** Hero copy, approved with design v2 (R2-C Runtime + V6 Blueprint hero, 2026-10-23). */
   hero: {
-    eyebrow: "PRE-FLIGHT ✓ · BACKEND & FULLSTACK ENGINEER · FOUNDER",
-    lede: "I build backend systems and products, set up AI agents and automation, and ship services to production. Instruments, not adjectives — every number on this panel is real.",
+    eyebrow: "BACKEND & FULLSTACK ENGINEER · FOUNDER · PRAGUE",
+    lede: "I build backend systems and products, set up AI agents and automation, and ship services to production. Every number on this page is real.",
   },
   /** Where you are based. */
   location: "Prague, Czech Republic",
   city: "Prague",
+  /** "Based in" line on the profile card (approved artboard wording). */
+  basedIn: "Prague, Czechia",
   /** Public contact email (the professional address from the CV). */
   email: "sapronovivanprace@gmail.com",
-  /** Availability: drives the annunciator in the header, hero panel and crew card. */
+  /** Availability: drives the status pill in the header and the profile card. */
   availability: {
     status: "open" as Availability,
     label: "Open to projects",
@@ -58,7 +57,7 @@ export const siteConfig = {
   },
   /** Handle used in <meta name="twitter:creator"> if you have an X/Twitter account. */
   twitterHandle: "",
-  /** Spoken languages, shown on the About page and the crew card. */
+  /** Spoken languages, shown on the About page and the profile card. */
   languages: [
     { name: "English", code: "EN", level: "Professional" },
     { name: "Czech", code: "CS", level: "Professional" },
@@ -74,34 +73,42 @@ export const siteConfig = {
 
 export type SocialKey = keyof typeof siteConfig.social;
 
-/** Annunciator wording for each availability state (long + short for mobile). */
-export const availabilityText: Record<Availability, { long: string; short: string }> = {
-  open: { long: "OPEN TO PROJECTS", short: "OPEN" },
-  limited: { long: "LIMITED AVAILABILITY", short: "LIMITED" },
-  closed: { long: "NOT AVAILABLE", short: "CLOSED" },
+/** Status-pill wording and tone for each availability state. */
+export const availabilityText: Record<
+  Availability,
+  { long: string; tone: "ok" | "caution" | "off" }
+> = {
+  open: { long: "OPEN TO PROJECTS", tone: "ok" },
+  limited: { long: "LIMITED AVAILABILITY", tone: "caution" },
+  closed: { long: "NOT AVAILABLE", tone: "off" },
 };
 
 export type NavItem = { label: string; href: string; match?: string };
 
 /**
- * Header strip navigation (mono, uppercase). `match` marks the active page.
- * While no post is published, WRITING is swapped for `writingFallbackNav`
- * (see Header.astro) and Writing disappears from the sheet and the footer.
+ * Header navigation (approved artboard): Products · Capabilities · Cases · Experience ·
+ * About. `match` marks the active page. Writing is not in the header; it joins the
+ * mobile sheet once a post is published (see SiteHeader.astro).
  */
 export const primaryNav: NavItem[] = [
   { label: "Products", href: "/#build" },
-  { label: "Systems", href: "/#capabilities" },
+  { label: "Capabilities", href: "/#capabilities" },
   { label: "Cases", href: "/projects", match: "/projects" },
-  { label: "Log", href: "/experience", match: "/experience" },
-  { label: "Writing", href: "/writing", match: "/writing" },
+  { label: "Experience", href: "/experience", match: "/experience" },
+  { label: "About", href: "/about", match: "/about" },
 ];
-export const writingFallbackNav: NavItem = {
-  label: "Contact",
-  href: "/contact",
-  match: "/contact",
-};
 
-/** Every page — used by the mobile sheet and the footer. */
+/** Footer links (approved artboard): Projects · About · Experience · Hobbies · RSS · Sitemap. */
+export const footerNav: NavItem[] = [
+  { label: "Projects", href: "/projects" },
+  { label: "About", href: "/about" },
+  { label: "Experience", href: "/experience" },
+  { label: "Hobbies", href: "/hobbies" },
+  { label: "RSS", href: "/rss.xml" },
+  { label: "Sitemap", href: "/sitemap-index.xml" },
+];
+
+/** Every page — used by the mobile menu sheet. */
 export const navigation: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
@@ -114,9 +121,9 @@ export const navigation: NavItem[] = [
   { label: "Contact", href: "/contact" },
 ];
 
-/** Navigation with Writing removed while there is nothing to read. */
+/** Navigation with Writing (and the RSS feed) removed while there is nothing to read. */
 export const withWriting = (items: NavItem[], hasPosts: boolean) =>
-  hasPosts ? items : items.filter((i) => !i.href.startsWith("/writing"));
+  hasPosts ? items : items.filter((i) => !i.href.startsWith("/writing") && i.href !== "/rss.xml");
 
 /**
  * Technologies you use most often, grouped so the list reads as a system

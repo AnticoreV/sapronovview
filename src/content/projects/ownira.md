@@ -4,6 +4,11 @@ description: "A compliance operations inbox for official Czech data-box mail (da
 summary: "Official Czech data-box mail under control for accounting and tax practices. Product, architecture and the full stack."
 tagline: "From datová schránka to done."
 domain: "ownira.cz"
+facts:
+  - label: "For"
+    value: "Accounting and tax practices in Czechia"
+  - label: "My role"
+    value: "Founder — product, architecture, full stack"
 date: 2026-06-01
 featured: true
 status: pilot

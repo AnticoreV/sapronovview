@@ -1,6 +1,6 @@
 /**
- * Contact routes — the three audiences the site is for. Used by the night-panel
- * contact block on every page, the footer and the topic select on /contact
+ * Contact routes — the three audiences the site is for. Used by the accent
+ * contact panel on every page, the menu sheet and the topic select on /contact
  * (preselected from `?topic=`).
  */
 

@@ -1,33 +1,31 @@
 /**
- * Proof readouts — the only numbers on the instrument panel.
+ * Proof numbers — the only numbers on the site.
  *
- * One source of truth for the HTML (hero readout strip, case studies, the
- * panel's accessible description) and the live 3D panel (src/scripts/panel3d.ts).
- * Every value must be real and carry its source; every source is a position in
- * src/content/experience/. Never add a number that isn't in the CV.
+ * One source of truth for the homepage proof row, the case-study ProofNumbers,
+ * the metric chips on the case rows and the Open Graph card. Every value must be
+ * real and carry its source; every source is a position in src/content/experience/.
+ * Never add a number that isn't in the CV.
  *
- * `count` lets the HTML readout count up once (prefix + 0→to + suffix); values
+ * `count` lets the HTML number count up once (prefix + 0→to + suffix); values
  * without it are shown as they are.
  */
 
 export type Readout = {
   id: string;
-  /** What is measured (mono label). */
+  /** What is measured (mono label under the number). */
   label: string;
-  /** Where it comes from — employer or client, as in the logbook. */
+  /** Where it comes from — employer or client, as in the track record. */
   source: string;
-  /** Display value, exactly as on the panel. */
+  /** Display value, exactly as shown. */
   value: string;
-  /** Optional count-up for the HTML readout. */
+  /** Optional count-up for the HTML number. */
   count?: { prefix?: string; to: number; suffix?: string };
   /** One-line context in words, used for screen readers and case studies. */
   detail: string;
   /** Case study the number belongs to (src/content/projects/<slug>.md). */
   project?: string;
-  /** Shorter label for the 3D panel's LCD, where space is tight. */
-  panel?: string;
-  /** Shorter value for the 3D panel's LCD (e.g. "≈ ½" for "≈ halved"). */
-  panelValue?: string;
+  /** Metric chip on the homepage case rows (mono, uppercase), e.g. "~2M users". */
+  chip?: string;
 };
 
 export const readouts = {
@@ -40,37 +38,36 @@ export const readouts = {
     detail:
       "Enterprise system serving around two million users, run on GCP with full observability.",
     project: "self-service-menu-platform",
-    panel: "NCR VOYIX",
+    chip: "~2M users",
   },
   downstream: {
     id: "downstream",
-    label: "Downstream · BFF",
+    label: "Services behind one BFF",
     source: "NCR Voyix",
     value: "up to 8",
     count: { prefix: "up to ", to: 8 },
     detail: "One backend-for-frontend and aggregator over up to eight downstream services.",
     project: "self-service-menu-platform",
-    panel: "DOWNSTREAM · BFF",
+    chip: "up to 8 services",
   },
   p95: {
     id: "p95",
-    label: "p95 latency",
+    label: "p95 latency, roughly halved",
     source: "CCA Group",
-    value: "≈ halved",
-    panelValue: "≈ ½",
+    value: "≈ ½",
     detail:
       "Kotlin coroutines ran independent downstream calls concurrently — p95 latency roughly halved under peak load.",
     project: "dynamic-form-engine",
-    panel: "p95 · CCA GROUP",
+    chip: "p95 ≈ halved",
   },
   ciQueue: {
     id: "ci-queue",
-    label: "CI queue",
+    label: "CI queue time",
     source: "CreativeDock",
     value: "h → min",
     detail: "GitLab CI build queue times cut from hours to minutes.",
     project: "creativedock-greenfield-services",
-    panel: "CI QUEUE · CREATIVEDOCK",
+    chip: "CI h → min",
   },
   formTypes: {
     id: "form-types",
@@ -79,6 +76,7 @@ export const readouts = {
     value: "days → h",
     detail: "Effort to create a new form type went from days to hours.",
     project: "dynamic-form-engine",
+    chip: "days → hours",
   },
   services: {
     id: "services",
@@ -89,10 +87,13 @@ export const readouts = {
     detail:
       "Ticketing, booking and subscription services built from scratch in a three-month engagement.",
     project: "creativedock-greenfield-services",
+    chip: "3 services",
   },
 } satisfies Record<string, Readout>;
 
-/** The four readouts on the homepage panel, in panel order. */
+export type ReadoutId = keyof typeof readouts;
+
+/** The four proof numbers under the homepage hero, in order. */
 export const heroReadouts: Readout[] = [
   readouts.users,
   readouts.p95,
@@ -100,23 +101,7 @@ export const heroReadouts: Readout[] = [
   readouts.downstream,
 ];
 
-/** Career span on the altimeter-style "career · yrs" instrument (first and latest logbook year). */
-export const careerSpan = { from: 2021, to: 2026, source: "Logbook" } as const;
-
 /** Readouts that belong to a case study. */
 export function readoutsFor(projectSlug: string): Readout[] {
   return Object.values(readouts).filter((r: Readout) => r.project === projectSlug);
 }
-
-/** Plain-language description of the hero panel (alt text for the poster). */
-export const panelDescription =
-  "Instrument panel: " +
-  [
-    `${readouts.users.value} users served at ${readouts.users.source}`,
-    "an attitude indicator",
-    `career years ${careerSpan.from} to ${careerSpan.to}`,
-    `p95 latency roughly halved at ${readouts.p95.source}`,
-    `CI queue from hours to minutes at ${readouts.ciQueue.source}`,
-    `up to 8 downstream services behind one BFF`,
-  ].join(", ") +
-  ".";

@@ -12,7 +12,7 @@ achievements:
   - "Refactored performance-critical backend services from Java to Kotlin, using coroutines to run independent downstream calls concurrently rather than sequentially — roughly halving p95 latency under peak load"
   - "Built a library of reusable, strongly-typed Angular components and shared services, improving consistency and code reuse across the admin panel and customer-facing app"
   - "Owned the integration between the Angular frontend and Spring backend, implementing secure authentication and well-versioned REST API contracts documented with OpenAPI/Swagger"
-logged: "form engine · p95 latency ≈ halved"
+shipped: "form engine · p95 latency ≈ halved"
 technologies:
   - Java
   - Kotlin
