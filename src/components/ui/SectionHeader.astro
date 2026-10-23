@@ -1,33 +1,42 @@
 ---
 /**
- * Section title row from the artboard: display heading left, a mono placard or a
- * ghost link ("ALL PROJECTS →") right.
+ * Section title row from the artboard: a 1px ink rule, the mono section index
+ * ("01"), the display-l heading, and a mono tag or a "→" link (or any action) right.
  */
 interface Props {
   id?: string;
   title: string;
-  /** Mono placard on the right (e.g. "WHAT I CAN DO FOR YOU"). */
+  /** Mono section index, e.g. "01". */
+  index?: string;
+  /** Mono tag on the right (e.g. "OWN PRODUCT · FOR PARTNERS AND INVESTORS"). */
   tag?: string;
-  /** Ghost link on the right instead of the placard. */
+  /** "→" link on the right instead of the tag. */
   href?: string;
   linkLabel?: string;
   level?: 1 | 2;
   class?: string;
 }
-const { id, title, tag, href, linkLabel, level = 2, class: className } = Astro.props;
+const { id, title, index, tag, href, linkLabel, level = 2, class: className } = Astro.props;
 const Heading = level === 1 ? "h1" : "h2";
 ---
 
-<div class:list={["flex flex-wrap items-end justify-between gap-4", className]}>
-  <Heading id={id} class="display text-display-l">
-    {title}
-  </Heading>
+<div class:list={["section-head", className]}>
+  <div class="flex flex-wrap items-baseline gap-5">
+    {index && (
+      <span class="meta text-ink-muted" aria-hidden="true">
+        {index}
+      </span>
+    )}
+    <Heading id={id} class="display text-display-l">
+      {title}
+    </Heading>
+  </div>
   {href ? (
-    <a href={href} class="link-ghost inline-flex min-h-11 items-center">
-      {linkLabel} <span aria-hidden="true">&nbsp;→</span>
+    <a href={href} class="link-more">
+      {linkLabel}&nbsp;<span aria-hidden="true">→</span>
     </a>
   ) : (
-    tag && <span class="label font-normal text-ink-muted">{tag}</span>
+    tag && <span class="label text-ink-muted">{tag}</span>
   )}
   <slot name="action" />
 </div>

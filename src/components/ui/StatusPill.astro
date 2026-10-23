@@ -1,0 +1,61 @@
+---
+/**
+ * StatusPill — availability from `siteConfig.availability` (open → OPEN TO PROJECTS,
+ * limited, closed): a surface pill with a coloured dot and the state in words
+ * (never colour alone). Header and profile card.
+ */
+import { availabilityText, siteConfig } from "@config";
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+const text = availabilityText[siteConfig.availability.status];
+---
+
+<span class:list={["status inline-flex items-center", `status--${text.tone}`, className]}>
+  <i class="status__dot" aria-hidden="true"></i>
+  <span class="sr-only">Availability: </span>
+  {text.long}
+</span>
+
+<style>
+  /* No `display` here: it is the inline-flex utility, so `class` can hide the pill. */
+  .status {
+    gap: 8px;
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line);
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .status__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex: none;
+  }
+  .status--ok {
+    color: var(--ok-ink);
+  }
+  .status--ok .status__dot {
+    background: var(--clay-mint);
+  }
+  .status--caution {
+    color: var(--ink);
+  }
+  .status--caution .status__dot {
+    background: var(--caution);
+  }
+  .status--off {
+    color: var(--ink-muted);
+  }
+  .status--off .status__dot {
+    background: var(--clay-grey);
+  }
+</style>

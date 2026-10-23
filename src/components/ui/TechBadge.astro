@@ -1,5 +1,5 @@
 ---
-/** Mono chip for a technology or tag. Renders a link when `href` is set. */
+/** Mono chip for a technology or tag (surface-sunken). Renders a link when `href` is set. */
 interface Props {
   label: string;
   href?: string;
@@ -10,11 +10,7 @@ const { label, href, current = false, class: className } = Astro.props;
 ---
 
 {href ? (
-  <a
-    href={href}
-    class:list={["chip no-underline", className]}
-    aria-current={current ? "page" : undefined}
-  >
+  <a href={href} class:list={["chip", className]} aria-current={current ? "page" : undefined}>
     {label}
   </a>
 ) : (

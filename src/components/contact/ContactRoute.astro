@@ -1,7 +1,7 @@
 ---
 /**
- * ContactRoute — one audience route into contact, on the night panel.
- * Hover / focus: a 2px cyan inset ring.
+ * ContactRoute — one audience route into contact (Hiring / Investing / Partnering):
+ * a surface card on the accent contact panel. Hover: lift.
  */
 interface Props {
   route: { id: string; label: string; title: string; text: string };
@@ -15,20 +15,21 @@ const Title = level === 2 ? "h2" : "h3";
 
 <a
   href={href}
-  class="route flex w-full flex-col gap-2 rounded-lg bg-panel-raised p-7 text-ink no-underline"
+  class="route lift flex w-full flex-col gap-2 rounded-md bg-surface p-6 text-ink no-underline"
 >
-  <span class="label text-xs text-select">{route.label}</span>
-  <Title class="text-title font-bold">{route.title}</Title>
+  <span class="mono text-[12px] font-semibold tracking-[0.06em] text-accent uppercase">
+    {route.label}
+  </span>
+  <Title class="text-[21px] leading-[1.25] font-bold">{route.title}</Title>
   <span class="text-small text-ink-muted">{route.text}</span>
 </a>
 
 <style>
-  .route {
-    box-shadow: inset 0 0 0 1px var(--panel-edge);
-    transition: box-shadow 0.15s ease;
+  .route:hover {
+    color: var(--ink);
   }
-  .route:hover,
   .route:focus-visible {
-    box-shadow: inset 0 0 0 2px var(--select);
+    outline: 2px solid var(--on-accent);
+    outline-offset: 3px;
   }
 </style>

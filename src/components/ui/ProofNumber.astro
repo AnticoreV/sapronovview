@@ -1,0 +1,36 @@
+---
+/**
+ * ProofNumber — a big numeral (Schibsted 800, tabular) over a mono caption naming
+ * the source ("USERS SERVED · NCR VOYIX"). Only real, sourced numbers from
+ * src/data/readouts.ts. Values with `count` count up once when first seen (static
+ * under reduced motion).
+ */
+import type { Readout } from "@data/readouts";
+
+interface Props {
+  readout: Readout;
+  /** "lg" = homepage proof row (numeral scale), "md" = case studies. */
+  size?: "md" | "lg";
+  class?: string;
+}
+const { readout, size = "lg", class: className } = Astro.props;
+const count = readout.count;
+---
+
+<div class:list={["flex flex-col gap-2", className]}>
+  <span
+    class:list={[
+      "display tabular leading-none tracking-[-0.04em]",
+      size === "lg" ? "text-numeral" : "text-[clamp(36px,4vw,48px)]",
+    ]}
+    data-count-to={count?.to}
+    data-count-prefix={count?.prefix}
+    data-count-suffix={count?.suffix}
+  >
+    {readout.value}
+  </span>
+  <span class="mono text-[12px] font-medium tracking-[0.04em] text-ink-muted uppercase">
+    {readout.label} · {readout.source}
+  </span>
+  <span class="sr-only">— {readout.detail}</span>
+</div>

@@ -25,13 +25,16 @@ const jsonLd = {
 };
 ---
 
-<nav aria-label="Breadcrumb" class:list={["label text-xs text-ink-muted", className]}>
+<nav aria-label="Breadcrumb" class:list={["label text-ink-muted", className]}>
   <ol class="flex flex-wrap items-center gap-x-2 gap-y-1">
     {all.map((c, i) => (
       <li class="flex items-center gap-2">
         {i > 0 && <span aria-hidden="true">/</span>}
         {c.href && i < all.length - 1 ? (
-          <a href={c.href} class="inline-flex min-h-8 items-center hover:text-ink hover:underline">
+          <a
+            href={c.href}
+            class="inline-flex min-h-11 items-center hover:text-accent hover:underline"
+          >
             {c.label}
           </a>
         ) : (
