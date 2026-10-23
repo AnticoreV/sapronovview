@@ -1,0 +1,45 @@
+---
+/**
+ * Section title row from the artboard: a 1px ink rule, the mono section index
+ * ("01"), the display-l heading, and a mono tag or a "→" link (or any action) right.
+ */
+import Arrow from "@components/ui/Arrow.astro";
+
+interface Props {
+  id?: string;
+  title: string;
+  /** Mono section index, e.g. "01". */
+  index?: string;
+  /** Mono tag on the right (e.g. "OWN PRODUCT · FOR PARTNERS AND INVESTORS"). */
+  tag?: string;
+  /** "→" link on the right instead of the tag. */
+  href?: string;
+  linkLabel?: string;
+  level?: 1 | 2;
+  class?: string;
+}
+const { id, title, index, tag, href, linkLabel, level = 2, class: className } = Astro.props;
+const Heading = level === 1 ? "h1" : "h2";
+---
+
+<div class:list={["section-head", className]}>
+  <div class="flex flex-wrap items-baseline gap-5">
+    {index && (
+      <span class="meta text-ink-muted" aria-hidden="true">
+        {index}
+      </span>
+    )}
+    <Heading id={id} class="display text-display-l">
+      {title}
+    </Heading>
+  </div>
+  {href ? (
+    <a href={href} class="link-more">
+      {linkLabel}
+      <Arrow class="ml-[0.4em]" />
+    </a>
+  ) : (
+    tag && <span class="label text-ink-muted">{tag}</span>
+  )}
+  <slot name="action" />
+</div>

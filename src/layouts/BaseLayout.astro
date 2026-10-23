@@ -1,70 +1,165 @@
 ---
 /**
- * Root layout: <head> (fonts, SEO, theme bootstrap), header, footer,
- * skip link and view transitions.
+ * Root layout: <head> (fonts, SEO, theme bootstrap), the sticky site header, the
+ * accent contact panel that closes every page, footer, skip link, section reveals
+ * and view transitions.
  */
 import { ClientRouter } from "astro:transitions";
 import { Font } from "astro:assets";
 import SEO, { type Props as SEOProps } from "@components/seo/SEO.astro";
-import Header from "@components/layout/Header.astro";
+import SiteHeader from "@components/layout/SiteHeader.astro";
 import Footer from "@components/layout/Footer.astro";
+import ContactPanel from "@components/layout/ContactPanel.astro";
 import { siteConfig } from "@config";
 import "@styles/global.css";
 
 interface Props extends SEOProps {
   /** Extra classes for <main>. */
   class?: string;
+  /** Every page ends with the contact panel; /contact renders it itself as the page head. */
+  contactPanel?: boolean;
+  /** Section index shown on the contact panel ("05 · GET IN TOUCH" on the homepage). */
+  contactIndex?: string;
 }
-const { class: className, ...seo } = Astro.props;
+const { class: className, contactPanel = true, contactIndex, ...seo } = Astro.props;
 ---
 
 <!doctype html>
-<html lang={siteConfig.locale} class="scroll-pt-24">
+<html lang={siteConfig.locale}>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#fbfaf8" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#151311" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#eef1f4" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    {/* Theme bootstrap — runs before paint to avoid a flash of the wrong theme. */}
+    {/* Theme bootstrap — runs before paint so there is no flash of the wrong theme.
+        Stored choice wins; otherwise the OS preference decides. `motion` enables the
+        one-time section reveals (never under reduced motion or without JS). */}
     <script is:inline>
       (() => {
-        const applyTheme = () => {
+        const apply = () => {
+          let stored = null;
           try {
-            const stored = localStorage.getItem("theme");
-            const dark = stored
-              ? stored === "dark"
-              : window.matchMedia("(prefers-color-scheme: dark)").matches;
-            document.documentElement.classList.toggle("dark", dark);
+            stored = localStorage.getItem("theme");
           } catch {
             /* storage unavailable */
           }
+          const dark = stored
+            ? stored === "dark"
+            : window.matchMedia("(prefers-color-scheme: dark)").matches;
+          const root = document.documentElement;
+          root.classList.toggle("dark", dark);
+          root.classList.toggle(
+            "motion",
+            "IntersectionObserver" in window &&
+              !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+          );
         };
-        applyTheme();
-        document.addEventListener("astro:after-swap", applyTheme);
+        apply();
+        document.addEventListener("astro:after-swap", apply);
+        // Without a stored choice, follow OS theme changes live (pictures, 3D and the
+        // toggle listen to the class / the "themechange" event).
+        if (!window.__themeFollowsOs) {
+          window.__themeFollowsOs = true;
+          window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+            let stored = null;
+            try {
+              stored = localStorage.getItem("theme");
+            } catch {
+              /* storage unavailable */
+            }
+            if (stored) return;
+            apply();
+            document.dispatchEvent(
+              new CustomEvent("themechange", {
+                detail: { dark: document.documentElement.classList.contains("dark") },
+              }),
+            );
+          });
+        }
       })();
     </script>
-    <Font cssVariable="--font-family-display" preload />
-    <Font cssVariable="--font-family-sans" preload />
+    {/* Latin subsets are preloaded (mono: the 500 labels only); latin-ext (Czech
+        diacritics) and the other mono weights load on demand. */}
+    <Font cssVariable="--font-schibsted" preload />
+    <Font cssVariable="--font-schibsted-ext" />
+    <Font cssVariable="--font-plex-mono" preload={[{ weight: 500 }]} />
+    <Font cssVariable="--font-plex-mono-ext" />
 
     <SEO {...seo} />
     <ClientRouter fallback="swap" />
+    <slot name="head" />
   </head>
   <body class="flex min-h-dvh flex-col">
     <a
       href="#main"
-      class="bg-accent text-on-accent sr-only rounded-pill px-4 py-2 font-medium focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50"
+      class="btn btn-primary btn-sm sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-5 focus:py-2.5"
     >
       Skip to content
     </a>
-    <Header />
-    <main id="main" class:list={["flex-1", className]} tabindex="-1">
+    <SiteHeader />
+    <main id="main" class:list={["flex-1 outline-none", className]} tabindex="-1">
       <slot />
     </main>
+    {contactPanel && <ContactPanel index={contactIndex} />}
     <Footer />
   </body>
 </html>
+
+<script>
+  /**
+   * Motion (design system v2): sections marked [data-reveal] rise 12px and fade in
+   * once (600 ms ease-out); numbers with [data-count-to] count up once. Both only
+   * when the head script set `html.motion` (JS + no reduced motion).
+   */
+  function setupMotion() {
+    const root = document.documentElement;
+    const reveals = [
+      ...document.querySelectorAll<HTMLElement>("[data-reveal]:not([data-revealed])"),
+    ];
+    if (!root.classList.contains("motion")) {
+      reveals.forEach((el) => (el.dataset.revealed = ""));
+      return;
+    }
+    const counters = [
+      ...document.querySelectorAll<HTMLElement>("[data-count-to]:not([data-counted])"),
+    ];
+    const countUp = (el: HTMLElement) => {
+      const to = Number(el.dataset.countTo);
+      const prefix = el.dataset.countPrefix ?? "";
+      const suffix = el.dataset.countSuffix ?? "";
+      const final = el.textContent ?? "";
+      const start = performance.now();
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / 600);
+        const eased = 1 - Math.pow(1 - t, 3);
+        el.textContent = t < 1 ? `${prefix}${Math.round(to * eased)}${suffix}` : final;
+        if (t < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const el = entry.target as HTMLElement;
+          io.unobserve(el);
+          if ("reveal" in el.dataset) el.dataset.revealed = "";
+          else countUp(el);
+        }
+      },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.01 },
+    );
+    reveals.forEach((el) => io.observe(el));
+    counters.forEach((el) => {
+      el.dataset.counted = "";
+      io.observe(el);
+    });
+    document.addEventListener("astro:before-swap", () => io.disconnect(), { once: true });
+  }
+  document.addEventListener("astro:page-load", setupMotion);
+</script>

@@ -1,16 +1,14 @@
 ---
-/**
- * Layout for /writing/[slug]: article header, body, prev/next and related.
- */
+/** Article on a Sheet (surface, 68ch); code blocks use the github-light / github-dark-dimmed pair. */
 import { Image } from "astro:assets";
-import { ArrowLeft, ArrowRight, Clock } from "lucide-astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
-import CTASection from "@components/ui/CTASection.astro";
+import Arrow from "@components/ui/Arrow.astro";
 import FormattedDate from "@components/ui/FormattedDate.astro";
 import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
 import TechBadge from "@components/ui/TechBadge.astro";
-import ArticleCard from "@components/writing/ArticleCard.astro";
+import ArticleRow from "@components/writing/ArticleRow.astro";
+import SectionHeader from "@components/ui/SectionHeader.astro";
 import JsonLd from "@components/seo/JsonLd.astro";
 import type { Post } from "@lib/content";
 import { cleanPath, readingTime } from "@lib/utils";
@@ -57,18 +55,20 @@ const jsonLd = {
   tags={data.tags}
   noindex={data.draft}
 >
-  <article>
-    <header class="container-prose pt-10 sm:pt-14">
+  <article class="band section-gap pt-8">
+    <div class="shell">
       <Breadcrumbs items={[{ label: "Writing", href: "/writing" }, { label: data.title }]} />
-      <div class="text-fg-subtle mt-8 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-xs">
+    </div>
+    <div class="sheet mx-auto mt-6 max-w-[848px] px-[clamp(16px,6vw,64px)] py-10 md:py-16">
+      <p class="label flex flex-wrap items-center gap-x-2 gap-y-1 text-ink-muted">
+        <span>Article</span>
+        <span aria-hidden="true">·</span>
         <FormattedDate
           date={data.pubDate}
-          format={{ year: "numeric", month: "long", day: "numeric" }}
+          format={{ year: "numeric", month: "short", day: "numeric" }}
         />
         <span aria-hidden="true">·</span>
-        <span class="inline-flex items-center gap-1">
-          <Clock size={12} aria-hidden="true" /> {minutes} min read
-        </span>
+        <span>{minutes} min read</span>
         {data.updatedDate && (
           <>
             <span aria-hidden="true">·</span>
@@ -79,19 +79,16 @@ const jsonLd = {
         )}
         {data.draft && <PlaceholderBadge label="Draft" />}
         {data.placeholder && <PlaceholderBadge label="Sample" />}
-      </div>
-      <h1
-        class="mt-4 text-4xl leading-[1.08] sm:text-5xl"
-        transition:name={`post-title-${post.id}`}
-      >
+      </p>
+      <h1 class="display mt-4 text-[clamp(36px,5vw,56px)] leading-[1] tracking-[-0.04em]">
         {data.title}
       </h1>
-      <p class="text-fg-muted mt-5 text-lg leading-relaxed sm:text-xl">{data.description}</p>
+      <p class="mt-4 text-body-l">{data.description}</p>
       {data.tags.length > 0 && (
         <ul class="mt-6 flex flex-wrap gap-2" aria-label="Tags">
           {data.tags.map((t) => (
             <li>
-              <TechBadge label={t} size="md" href={`/writing/tags/${t}`} />
+              <TechBadge label={t} href={`/writing/tags/${t}`} />
             </li>
           ))}
         </ul>
@@ -103,63 +100,54 @@ const jsonLd = {
           width={1200}
           height={675}
           widths={[600, 900, 1200]}
-          sizes="(min-width: 768px) 720px, 100vw"
+          sizes="(min-width: 848px) 720px, 100vw"
           loading="eager"
-          class="border-border mt-10 aspect-video w-full rounded-card border object-cover"
+          class="mt-8 aspect-video w-full rounded-md object-cover"
         />
       )}
-    </header>
-
-    <div class="container-prose prose-site py-10 sm:py-12">
-      <slot />
+      <div class="prose-sheet mt-10">
+        <slot />
+      </div>
     </div>
 
-    <footer class="container-prose">
-      <nav
-        aria-label="Adjacent articles"
-        class="border-border grid gap-4 border-t pt-8 sm:grid-cols-2"
-      >
-        {prev ? (
-          <a href={`/writing/${prev.id}`} class="card card-hover group p-5">
-            <span class="text-fg-subtle inline-flex items-center gap-1 font-mono text-xs">
-              <ArrowLeft size={12} aria-hidden="true" /> Previous
-            </span>
-            <span class="text-fg group-hover:text-accent-strong mt-2 block font-medium leading-snug transition-colors">
-              {prev.data.title}
-            </span>
-          </a>
-        ) : (
-          <div />
-        )}
-        {next && (
-          <a href={`/writing/${next.id}`} class="card card-hover group p-5 text-right">
-            <span class="text-fg-subtle inline-flex items-center gap-1 font-mono text-xs">
-              Next <ArrowRight size={12} aria-hidden="true" />
-            </span>
-            <span class="text-fg group-hover:text-accent-strong mt-2 block font-medium leading-snug transition-colors">
-              {next.data.title}
-            </span>
-          </a>
-        )}
-      </nav>
-    </footer>
+    <nav aria-label="Adjacent articles" class="shell mt-10 grid gap-4 sm:grid-cols-2">
+      {prev ? (
+        <a href={`/writing/${prev.id}`} class="card lift flex flex-col gap-1 p-5 no-underline">
+          <span class="label text-ink-muted">
+            <Arrow dir="left" class="mr-[0.4em]" />
+            Previous
+          </span>
+          <span class="font-semibold">{prev.data.title}</span>
+        </a>
+      ) : (
+        <span />
+      )}
+      {next && (
+        <a
+          href={`/writing/${next.id}`}
+          class="card lift flex flex-col gap-1 p-5 text-right no-underline"
+        >
+          <span class="label text-ink-muted">
+            Next
+            <Arrow class="ml-[0.4em]" />
+          </span>
+          <span class="font-semibold">{next.data.title}</span>
+        </a>
+      )}
+    </nav>
 
     {related.length > 0 && (
-      <section class="container-site section" aria-labelledby="related-posts">
-        <h2 id="related-posts" class="mb-8 text-2xl sm:text-3xl">
-          Related posts
-        </h2>
-        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <section class="shell mt-16 flex flex-col gap-6" aria-labelledby="related-posts">
+        <SectionHeader id="related-posts" title="Related notes" />
+        <ul class="flex flex-col gap-3">
           {related.map((p) => (
-            <ArticleCard post={p} />
+            <li>
+              <ArticleRow post={p} />
+            </li>
           ))}
-        </div>
+        </ul>
       </section>
     )}
   </article>
-  <CTASection
-    title="Enjoyed this? Say hello."
-    description="I write when I learn something worth keeping. If a post helped, or you disagree with it, I'd like to hear from you."
-  />
   <JsonLd data={jsonLd} />
 </BaseLayout>

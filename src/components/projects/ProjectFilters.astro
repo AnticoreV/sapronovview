@@ -1,8 +1,8 @@
 ---
 /**
- * Category filter for the project archive. Works without JavaScript (all
- * projects are visible), and a small script hides non-matching cards
- * when a filter is chosen. The chosen filter is reflected in the URL hash.
+ * Category filter for the project archive. Works without JavaScript (everything
+ * visible); a small script hides non-matching items when a filter is chosen and
+ * mirrors the choice in the URL hash.
  */
 import { categoryLabels, type Project } from "@lib/content";
 
@@ -17,59 +17,76 @@ const categories = (Object.keys(categoryLabels) as Array<keyof typeof categoryLa
 );
 ---
 
-<div
-  class="flex flex-wrap items-center gap-2"
-  role="group"
-  aria-label="Filter projects by category"
-  data-project-filters
->
-  <button type="button" data-filter="all" aria-pressed="true" class="filter-chip">
-    All <span class="text-fg-subtle ml-1 font-mono text-[0.7rem]">{projects.length}</span>
-  </button>
-  {categories.map((c) => (
-    <button type="button" data-filter={c} aria-pressed="false" class="filter-chip">
-      {categoryLabels[c]}{" "}
-      <span class="text-fg-subtle ml-1 font-mono text-[0.7rem]">{counts.get(c)}</span>
+{categories.length > 1 && (
+  <div
+    class="flex flex-wrap items-center gap-2"
+    role="group"
+    aria-label="Filter projects by category"
+    data-project-filters
+  >
+    <button type="button" data-filter="all" aria-pressed="true" class="filter">
+      All <span class="tabular opacity-70">{projects.length}</span>
     </button>
-  ))}
-  <p class="sr-only" aria-live="polite" data-filter-status></p>
-</div>
+    {categories.map((c) => (
+      <button type="button" data-filter={c} aria-pressed="false" class="filter">
+        {categoryLabels[c]} <span class="tabular opacity-70">{counts.get(c)}</span>
+      </button>
+    ))}
+    <p class="sr-only" aria-live="polite" data-filter-status />
+  </div>
+)}
 
 <style>
-  @reference "@styles/global.css";
-  .filter-chip {
-    @apply inline-flex h-9 items-center rounded-pill border border-border bg-surface px-3.5 text-sm font-medium text-fg-muted transition-colors;
+  .filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding-inline: 16px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
   }
-  .filter-chip:hover {
-    @apply border-border-strong text-fg;
+  .filter:hover {
+    border-color: var(--line-strong);
   }
-  .filter-chip[aria-pressed="true"] {
-    @apply border-fg bg-fg text-bg;
+  .filter[aria-pressed="true"] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
   }
 </style>
 
 <script>
   function setupProjectFilters() {
     const root = document.querySelector<HTMLElement>("[data-project-filters]");
-    const grid = document.querySelector<HTMLElement>("[data-project-grid]");
-    if (!root || !grid || root.dataset.bound) return;
+    if (!root || root.dataset.bound) return;
     root.dataset.bound = "true";
 
     const buttons = [...root.querySelectorAll<HTMLButtonElement>("[data-filter]")];
     const status = root.querySelector<HTMLElement>("[data-filter-status]");
-    const cards = [...grid.querySelectorAll<HTMLElement>("[data-category]")];
+    const items = [...document.querySelectorAll<HTMLElement>("[data-category]")];
+    const groups = [...document.querySelectorAll<HTMLElement>("[data-project-group]")];
 
     const apply = (filter: string) => {
-      let shown = 0;
-      cards.forEach((card) => {
-        const match = filter === "all" || card.dataset.category === filter;
-        card.hidden = !match;
-        if (match) shown++;
+      let count = 0;
+      items.forEach((item) => {
+        const match = filter === "all" || item.dataset.category === filter;
+        item.hidden = !match;
+        if (match) count++;
+      });
+      groups.forEach((g) => {
+        g.hidden = !g.querySelector("[data-category]:not([hidden])");
       });
       buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.filter === filter)));
-      if (status) status.textContent = `${shown} project${shown === 1 ? "" : "s"} shown`;
-      const empty = grid.parentElement?.querySelector<HTMLElement>("[data-filter-empty]");
-      if (empty) empty.hidden = shown !== 0;
+      if (status) status.textContent = `${count} project${count === 1 ? "" : "s"} shown`;
     };
 
     buttons.forEach((b) =>
@@ -83,6 +100,5 @@ const categories = (Object.keys(categoryLabels) as Array<keyof typeof categoryLa
     const initial = location.hash.slice(1);
     if (initial && buttons.some((b) => b.dataset.filter === initial)) apply(initial);
   }
-  setupProjectFilters();
   document.addEventListener("astro:page-load", setupProjectFilters);
 </script>

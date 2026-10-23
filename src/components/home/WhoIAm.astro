@@ -1,0 +1,12 @@
+---
+/** "Who I am": the profile card + the "Before you hire, invest or partner" contents. */
+import ProfileCard from "@components/profile/ProfileCard.astro";
+import ContentsList from "@components/profile/ContentsList.astro";
+---
+
+<section id="about" class="band section-gap" aria-label="Who I am" data-reveal>
+  <div class="shell flex flex-wrap gap-4">
+    <ProfileCard class="flex-[999_1_560px]" initial="green" />
+    <ContentsList class="flex-[1_1_320px]" />
+  </div>
+</section>

@@ -1,0 +1,165 @@
+---
+/**
+ * One <picture> with a light and a dark image (and optionally separate small-screen
+ * renders below `smallMedia`, e.g. the hero poster with phone-sized labels). Dark
+ * sources match `(prefers-color-scheme: dark)`, which is also the default theme, so the
+ * browser downloads only the image it shows. When the stored theme overrides the OS (or
+ * the header toggle is used), the dark sources are re-targeted to the `.dark` class:
+ * synchronously by the inline script right after </picture> (before first paint, so a
+ * returning visitor never sees the other theme's poster) and by the module script after
+ * ClientRouter swaps and theme changes.
+ */
+import { getImage } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  light: ImageMetadata;
+  dark: ImageMetadata;
+  /** Optional renders for small screens (art direction), used below `smallMedia`. */
+  lightSmall?: ImageMetadata;
+  darkSmall?: ImageMetadata;
+  smallMedia?: string;
+  smallWidths?: number[];
+  alt: string;
+  widths: number[];
+  sizes: string;
+  loading?: "eager" | "lazy";
+  fetchpriority?: "high" | "auto";
+  class?: string;
+}
+const {
+  light,
+  dark,
+  lightSmall,
+  darkSmall,
+  smallMedia = "(max-width: 599px)",
+  smallWidths = [375, 750],
+  alt,
+  widths,
+  sizes,
+  loading = "lazy",
+  fetchpriority,
+  class: className,
+} = Astro.props;
+
+const variant = async (src: ImageMetadata, format: "avif" | "webp", list = widths) =>
+  getImage({ src, widths: list.filter((w) => w <= src.width), format });
+const [lightAvif, lightWebp, darkAvif, darkWebp] = await Promise.all([
+  variant(light, "avif"),
+  variant(light, "webp"),
+  variant(dark, "avif"),
+  variant(dark, "webp"),
+]);
+const small =
+  lightSmall && darkSmall
+    ? await Promise.all([
+        variant(lightSmall, "avif", smallWidths),
+        variant(lightSmall, "webp", smallWidths),
+        variant(darkSmall, "avif", smallWidths),
+        variant(darkSmall, "webp", smallWidths),
+      ])
+    : undefined;
+const DARK = "(prefers-color-scheme: dark)";
+const smallDark = `${smallMedia} and ${DARK}`;
+---
+
+<picture data-theme-picture>
+  {small && (
+    <>
+      <source
+        data-theme-source="dark"
+        data-base-media={smallMedia}
+        media={smallDark}
+        type="image/avif"
+        srcset={small[2].srcSet.attribute}
+        sizes="100vw"
+      />
+      <source
+        data-theme-source="dark"
+        data-base-media={smallMedia}
+        media={smallDark}
+        type="image/webp"
+        srcset={small[3].srcSet.attribute}
+        sizes="100vw"
+      />
+    </>
+  )}
+  <source
+    data-theme-source="dark"
+    media={DARK}
+    type="image/avif"
+    srcset={darkAvif.srcSet.attribute}
+    sizes={sizes}
+  />
+  <source
+    data-theme-source="dark"
+    media={DARK}
+    type="image/webp"
+    srcset={darkWebp.srcSet.attribute}
+    sizes={sizes}
+  />
+  {small && (
+    <>
+      <source
+        media={smallMedia}
+        type="image/avif"
+        srcset={small[0].srcSet.attribute}
+        sizes="100vw"
+      />
+      <source
+        media={smallMedia}
+        type="image/webp"
+        srcset={small[1].srcSet.attribute}
+        sizes="100vw"
+      />
+    </>
+  )}
+  <source type="image/avif" srcset={lightAvif.srcSet.attribute} sizes={sizes} />
+  <source type="image/webp" srcset={lightWebp.srcSet.attribute} sizes={sizes} />
+  <img
+    src={lightWebp.src}
+    alt={alt}
+    width={light.width}
+    height={light.height}
+    loading={loading}
+    decoding={loading === "eager" ? "sync" : "async"}
+    fetchpriority={fetchpriority}
+    class={className}
+  />
+</picture>
+{/* Before first paint: follow the stored theme when it differs from the OS. */}
+<script is:inline>
+  (function () {
+    const p = document.currentScript && document.currentScript.previousElementSibling;
+    if (!p) return;
+    const dark = document.documentElement.classList.contains("dark");
+    const os = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if (dark === os) return;
+    p.querySelectorAll('source[data-theme-source="dark"]').forEach(function (s) {
+      const base = s.getAttribute("data-base-media");
+      s.media = dark ? base || "all" : "not all";
+    });
+  })();
+</script>
+
+<script>
+  /** Point dark sources at the `.dark` class instead of the OS preference. */
+  function syncThemePictures() {
+    const dark = document.documentElement.classList.contains("dark");
+    const osDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    document.querySelectorAll<HTMLSourceElement>("[data-theme-source='dark']").forEach((s) => {
+      const base = s.dataset.baseMedia;
+      const media =
+        dark === osDark
+          ? base
+            ? `${base} and (prefers-color-scheme: dark)`
+            : "(prefers-color-scheme: dark)"
+          : dark
+            ? base || "all"
+            : "not all";
+      if (s.media !== media) s.media = media;
+    });
+  }
+  document.addEventListener("astro:page-load", syncThemePictures);
+  document.addEventListener("themechange", syncThemePictures);
+</script>

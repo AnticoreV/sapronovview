@@ -1,0 +1,22 @@
+---
+/**
+ * "Approximately" glyph (≈) as inline SVG — missing from the fonts' Latin subsets, like
+ * the arrows. Sized in em, drawn in currentColor, decorative (aria-hidden).
+ */
+interface Props {
+  weight?: "text" | "bold" | "heavy";
+  class?: string;
+}
+const { weight = "text", class: className } = Astro.props;
+const stroke = { text: 1.6, bold: 2, heavy: 2.5 }[weight];
+---
+
+<svg
+  class:list={["glyph glyph-approx", className]}
+  viewBox="0 0 16 12"
+  stroke-width={stroke}
+  aria-hidden="true"
+  focusable="false"
+>
+  <path d="M1.5 4.3C3.5 2.3 5.5 2.3 8 4.3s4.5 2 6.5 0M1.5 9C3.5 7 5.5 7 8 9s4.5 2 6.5 0" />
+</svg>

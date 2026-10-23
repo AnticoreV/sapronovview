@@ -1,0 +1,25 @@
+---
+/**
+ * Proof — the four sourced numbers under the hero (src/data/readouts.ts) on a 1px
+ * ink rule, then the "worked with" byline.
+ */
+import ProofNumber from "@components/ui/ProofNumber.astro";
+import { heroReadouts } from "@data/readouts";
+import { workedWith } from "@data/home";
+---
+
+<section class="band pt-10 pb-16" aria-label="Proof in numbers" data-reveal>
+  <div class="shell flex flex-col gap-[18px]">
+    <ul
+      class="grid grid-cols-[repeat(auto-fit,minmax(min(250px,100%),1fr))] border-t border-ink"
+      aria-label="Proof numbers"
+    >
+      {heroReadouts.map((r, i) => (
+        <li class:list={["flex border-b border-line py-6", i < heroReadouts.length - 1 && "pr-6"]}>
+          <ProofNumber readout={r} />
+        </li>
+      ))}
+    </ul>
+    <p class="label text-ink-muted">{workedWith}</p>
+  </div>
+</section>

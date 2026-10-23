@@ -1,0 +1,70 @@
+---
+/**
+ * "Proof in production" (03) — the homepage case rows: title, summary, metric chips
+ * from src/data/readouts.ts and mono meta. "All projects →".
+ */
+import Glyphs from "@components/ui/Glyphs.astro";
+import SectionHeader from "@components/ui/SectionHeader.astro";
+import { homeCases } from "@data/home";
+import { readouts, type Readout, type ReadoutId } from "@data/readouts";
+import type { Project } from "@lib/content";
+
+interface Props {
+  projects: Project[];
+}
+const { projects } = Astro.props;
+const cases = homeCases.filter((c) => projects.some((p) => p.id === c.slug));
+const readout = (id: ReadoutId): Readout => readouts[id];
+---
+
+{cases.length > 0 && (
+  <section id="work" class="band section-gap" aria-labelledby="work-heading" data-reveal>
+    <div class="shell flex flex-col gap-7">
+      <SectionHeader
+        id="work-heading"
+        index="03"
+        title="Proof in production"
+        href="/projects"
+        linkLabel="All projects"
+      />
+      <ul class="flex flex-col gap-3">
+        {cases.map((c) => (
+          <li>
+            <a
+              href={`/projects/${c.slug}`}
+              class="case card lift grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] items-start gap-x-8 gap-y-3 p-7 no-underline"
+            >
+              <h3 class="text-[26px] leading-[1.15] font-bold tracking-[-0.02em]">{c.title}</h3>
+              <p class="text-ink-muted">{c.summary}</p>
+              <span class="flex flex-col gap-2.5">
+                <span class="flex flex-wrap gap-1.5">
+                  {c.chips.map((id) => (
+                    <span class="chip bg-bg uppercase">
+                      <Glyphs
+                        text={readout(id).chip ?? readout(id).value}
+                        spoken={readout(id).chipSpoken}
+                        weight="bold"
+                      />
+                    </span>
+                  ))}
+                </span>
+                <span class="mono text-[12px] text-ink-muted uppercase">{c.meta.join(" · ")}</span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}
+
+<style>
+  .case:hover {
+    color: var(--ink);
+  }
+  .case:hover h3 {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+  }
+</style>

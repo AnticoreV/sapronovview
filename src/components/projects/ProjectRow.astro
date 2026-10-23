@@ -1,0 +1,43 @@
+---
+/** A project as a row card (as on the homepage): title, one-line description, mono meta. */
+import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
+import { categoryLabels, shortCompany, shown, statusLabels, type Project } from "@lib/content";
+
+interface Props {
+  project: Project;
+}
+const { project } = Astro.props;
+const { data } = project;
+const org = shown(data.organization);
+const meta = [
+  org ? shortCompany(org) : categoryLabels[data.category],
+  shown(data.timeframe),
+  statusLabels[data.status].label,
+  ...data.technologies.slice(0, 4),
+]
+  .filter(Boolean)
+  .join(" · ");
+---
+
+<a
+  href={`/projects/${project.id}`}
+  class="row card lift grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] items-start gap-x-8 gap-y-3 p-7 no-underline"
+>
+  <span class="text-[26px] leading-[1.15] font-bold tracking-[-0.02em]">{data.title}</span>
+  <span class="text-ink-muted">{data.description}</span>
+  <span class="mono text-[12px] leading-relaxed text-ink-muted uppercase">
+    {meta}
+    {data.placeholder && <PlaceholderBadge />}
+  </span>
+</a>
+
+<style>
+  .row:hover {
+    color: var(--ink);
+  }
+  .row:hover span:first-child {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+  }
+</style>

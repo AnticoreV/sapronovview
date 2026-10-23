@@ -1,62 +1,62 @@
 ---
 title: "Ownira"
-description: "[PROJECT DESCRIPTION — what Ownira is, who it serves and what problem it solves.] My most recent and most ambitious project."
+description: "A compliance operations inbox for official Czech data-box mail (datová schránka): every message becomes tracked work for accounting and tax practices. In pilot."
+summary: "Official Czech data-box mail under control for accounting and tax practices. Product, architecture and the full stack."
+tagline: "From datová schránka to done."
+domain: "ownira.cz"
+facts:
+  - label: "For"
+    value: "Accounting and tax practices in Czechia"
+  - label: "My role"
+    value: "Founder — product, architecture, full stack"
 date: 2026-06-01
 featured: true
-status: in-progress
+status: pilot
 category: professional
-technologies: ["[TECHNOLOGY]", "[TECHNOLOGY]", "[TECHNOLOGY]"]
-role: "[YOUR ROLE — e.g. Founder & lead engineer]"
+technologies:
+  - Kotlin
+  - Java 21
+  - Spring Boot
+  - PostgreSQL
+  - Flyway
+  - AWS SQS
+  - AWS S3
+  - Keycloak (OIDC)
+  - Testcontainers
+  - Terraform
+  - GitHub Actions
+  - React
+  - TypeScript
+role: "Founder"
 organization: "Ownira"
+# Start date not confirmed yet — stays hidden until filled in.
 timeframe: "[2025 — present]"
 order: 1
-placeholder: true
 ---
 
 ## Overview
 
-[Describe Ownira in two or three sentences: what it is, who it is for and what stage it is at.]
+Ownira keeps official Czech data-box mail — the _datová schránka_ (ISDS) — under control. Official messages and their attachments become tracked work: cases, tasks, deadlines, comments, labels and approvals, with outbound replies and delivery tracking, notifications and an append-only audit trail.
 
-## Problem
+It is built for accounting and tax practices that look after their clients' data boxes. Ownira is in pilot.
 
-[What gap in the market or workflow does Ownira address? What did people do before?]
+## The problem
 
-## Context
-
-[Team size, stage of the company, constraints such as budget, regulation or timeline.]
+A practice can run the data boxes of dozens of clients, and the deadlines often live in a spreadsheet. An unread message counts as delivered on the tenth day, and the statutory clock starts whether or not anyone looked in the mailbox. Ownira gives every message a named owner, a tracked deadline and an audit trail — and flags a message that is still waiting before the ten days run out, without opening it.
 
 ## My role
 
-[What you personally own — product direction, architecture, backend, infrastructure, hiring…]
-
-## Goals
-
-- [Goal 1 — e.g. ship a working MVP to the first pilot customers]
-- [Goal 2]
-- [Goal 3]
-
-## Technical approach
-
-[Explain the overall approach: monolith vs. services, how identity and payments are handled, what is bought vs. built.]
+Founder: product, architecture and the full stack.
 
 ## Architecture
 
-[List the main components and how data flows between them. Replace the placeholder below with a real diagram once you have one.]
+- **Backend.** Kotlin 2.2 on Java 21 with Spring Boot 4: eight independently deployable Spring Boot services behind a single API gateway, each with its own database where it persists data (PostgreSQL with Flyway migrations).
+- **Async first.** Services talk over Amazon SQS; documents are stored in S3.
+- **Identity.** Keycloak with OpenID Connect.
+- **AI under human review.** AI suggestions are advisory until a person accepts them.
+- **Frontend.** A React and TypeScript single-page app that talks only to the gateway.
+- **Delivery.** Integration tests with Testcontainers, Terraform for the messaging infrastructure, CI on GitHub Actions.
 
-<img src="/images/projects/placeholder-architecture.svg" alt="Architecture diagram placeholder" width="1200" height="600" loading="lazy" />
+## For investors and partners
 
-## Challenges
-
-[The hardest technical or product problems so far.]
-
-## Decisions & trade-offs
-
-[Key decisions and what they cost — e.g. choosing a managed identity provider over a custom one.]
-
-## Results
-
-[Only real, measurable outcomes: users, transactions, uptime, revenue. Leave blank rather than invent.]
-
-## Lessons learned
-
-[What building Ownira has taught you so far.]
+Stage, progress and plans — [let's talk](/contact?topic=investing).

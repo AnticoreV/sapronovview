@@ -1,0 +1,31 @@
+---
+/** "What I'm building" (01) — own products as wide ProductModules (for partners and investors). */
+import ProductModule from "@components/projects/ProductModule.astro";
+import SectionHeader from "@components/ui/SectionHeader.astro";
+import type { Project } from "@lib/content";
+
+interface Props {
+  products: Project[];
+}
+const { products } = Astro.props;
+---
+
+{products.length > 0 && (
+  <section id="build" class="band section-gap" aria-labelledby="build-heading" data-reveal>
+    <div class="shell flex flex-col gap-9">
+      <SectionHeader
+        id="build-heading"
+        index="01"
+        title="What I'm building"
+        tag={`${products.length > 1 ? "OWN PRODUCTS" : "OWN PRODUCT"} · FOR PARTNERS AND INVESTORS`}
+      />
+      <ul class="flex flex-col gap-4">
+        {products.map((p) => (
+          <li class="flex">
+            <ProductModule project={p} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}

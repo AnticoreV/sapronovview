@@ -1,0 +1,55 @@
+---
+/**
+ * A repository-only project: title, description, stack chips and links to the
+ * code. No case-study page (the write-up still has placeholders); only fields
+ * without [placeholders] render.
+ */
+import Arrow from "@components/ui/Arrow.astro";
+import TechBadge from "@components/ui/TechBadge.astro";
+import { categoryLabels, isPlaceholder, statusLabels, type Project } from "@lib/content";
+
+interface Props {
+  project: Project;
+}
+const { project } = Astro.props;
+const { data } = project;
+const stack = data.technologies.filter((t) => !isPlaceholder(t));
+const links = [
+  data.github && { label: "GitHub", href: data.github },
+  ...data.links.filter((l) => !isPlaceholder(l.label)),
+].filter(Boolean) as Array<{ label: string; href: string }>;
+---
+
+<article
+  class="grid gap-x-8 gap-y-3 border-b border-line py-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]"
+  aria-labelledby={`code-${project.id}`}
+>
+  <div class="flex flex-col gap-2">
+    <h3 id={`code-${project.id}`} class="text-title">
+      {data.title}
+    </h3>
+    <p class="mono text-[12px] text-ink-muted uppercase">
+      {categoryLabels[data.category]} · {statusLabels[data.status].label}
+    </p>
+  </div>
+  <div class="flex flex-col gap-3">
+    <p class="text-ink-muted">{data.description}</p>
+    {stack.length > 0 && (
+      <ul class="flex flex-wrap gap-1.5" aria-label="Stack">
+        {stack.map((t) => (
+          <li>
+            <TechBadge label={t} />
+          </li>
+        ))}
+      </ul>
+    )}
+    <p class="flex flex-wrap gap-x-6">
+      {links.map((l) => (
+        <a href={l.href} class="link-more" rel="noopener noreferrer">
+          {l.label}
+          <Arrow dir="up-right" class="ml-[0.35em]" />
+        </a>
+      ))}
+    </p>
+  </div>
+</article>

@@ -1,0 +1,78 @@
+---
+/**
+ * A hobby card — "off duty". Only real fields render: anything still holding a
+ * [placeholder] (stats, favourites, photos, links, paragraphs) is hidden in production.
+ * While an entry is `placeholder: true`, production shows only its title and tagline —
+ * the write-up stays hidden until Ivan confirms it (2026-10-23).
+ */
+import { render } from "astro:content";
+import Arrow from "@components/ui/Arrow.astro";
+import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
+import { hidePlaceholders, hobbyCategoryLabels, shownAll, type Hobby } from "@lib/content";
+
+interface Props {
+  hobby: Hobby;
+  index: number;
+}
+const { hobby, index } = Astro.props;
+const { data } = hobby;
+const { Content } = await render(hobby);
+const showProse = !(hidePlaceholders && data.placeholder);
+const stats = shownAll(data.stats, (s) => `${s.label} ${s.value}`);
+const favorites = shownAll(data.favorites);
+const links = shownAll(data.links, (l) => `${l.label} ${l.href}`).filter(
+  (l) => !l.href.includes("example.com"),
+);
+---
+
+<article
+  id={hobby.id}
+  class="card flex scroll-mt-24 flex-col gap-4 p-6 sm:p-8"
+  aria-labelledby={`${hobby.id}-title`}
+>
+  <p class="label flex flex-wrap items-center justify-between gap-3 text-ink-muted">
+    <span>
+      OFF DUTY {String(index + 1).padStart(2, "0")} · {hobbyCategoryLabels[data.category]}
+    </span>
+    {data.placeholder && <PlaceholderBadge label="Has placeholders" />}
+  </p>
+  <h2
+    id={`${hobby.id}-title`}
+    class="display text-[clamp(30px,3.4vw,44px)] leading-none tracking-[-0.03em]"
+  >
+    {data.title}
+  </h2>
+  <p class="text-body-l font-semibold">{data.tagline}</p>
+  {showProse && (
+    <div class="prose-sheet text-ink-muted">
+      <Content />
+    </div>
+  )}
+  {stats.length > 0 && (
+    <dl class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      {stats.map((s) => (
+        <div class="rounded-sm bg-surface-sunken px-4 py-3">
+          <dt class="mono text-[12px] text-ink-muted uppercase">{s.label}</dt>
+          <dd class="mt-1 font-bold">{s.value}</dd>
+        </div>
+      ))}
+    </dl>
+  )}
+  {favorites.length > 0 && (
+    <ul class="flex flex-wrap gap-2">
+      {favorites.map((f) => (
+        <li class="chip">{f}</li>
+      ))}
+    </ul>
+  )}
+  {links.length > 0 && (
+    <p class="flex flex-wrap gap-4">
+      {links.map((l) => (
+        <a href={l.href} class="link-more">
+          {l.label}
+          <Arrow class="ml-[0.4em]" />
+        </a>
+      ))}
+    </p>
+  )}
+</article>

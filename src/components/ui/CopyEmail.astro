@@ -1,0 +1,57 @@
+---
+/**
+ * "Copy" button next to a mailto link: copies the address, says "Copied".
+ * `tone="accent"` = outline on the accent contact panel (artboard), default = secondary.
+ */
+import { siteConfig } from "@config";
+
+interface Props {
+  tone?: "accent" | "default";
+  class?: string;
+}
+const { tone = "default", class: className } = Astro.props;
+---
+
+<button
+  type="button"
+  class:list={["btn btn-sm", tone === "accent" ? "copy--accent" : "btn-secondary", className]}
+  data-copy-email={siteConfig.email}
+  aria-label="Copy email address"
+>
+  <span data-copy-label aria-live="polite">
+    Copy
+  </span>
+</button>
+
+<style>
+  .copy--accent {
+    padding-inline: 18px;
+    background: transparent;
+    border: 1px solid var(--accent-soft);
+    color: var(--on-accent);
+  }
+  .copy--accent:hover {
+    background: color-mix(in srgb, var(--on-accent) 12%, transparent);
+    color: var(--on-accent);
+  }
+</style>
+
+<script>
+  function setupCopyEmail() {
+    document.querySelectorAll<HTMLButtonElement>("[data-copy-email]").forEach((button) => {
+      if (button.dataset.bound) return;
+      button.dataset.bound = "true";
+      const label = button.querySelector<HTMLElement>("[data-copy-label]");
+      button.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(button.dataset.copyEmail ?? "");
+          if (label) label.textContent = "Copied";
+          setTimeout(() => label && (label.textContent = "Copy"), 1800);
+        } catch {
+          if (label) label.textContent = "Select & copy";
+        }
+      });
+    });
+  }
+  document.addEventListener("astro:page-load", setupCopyEmail);
+</script>

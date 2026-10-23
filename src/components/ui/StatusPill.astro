@@ -1,36 +1,61 @@
 ---
 /**
- * Coloured dot + label, used for availability and project status.
+ * StatusPill — availability from `siteConfig.availability` (open → OPEN TO PROJECTS,
+ * limited, closed): a surface pill with a coloured dot and the state in words
+ * (never colour alone). Header and profile card.
  */
+import { availabilityText, siteConfig } from "@config";
+
 interface Props {
-  label: string;
-  tone?: "green" | "amber" | "gray" | "accent";
-  pulse?: boolean;
   class?: string;
 }
-const { label, tone = "green", pulse = false, class: className } = Astro.props;
-const dot = {
-  green: "bg-[oklch(70%_0.17_150)]",
-  amber: "bg-[oklch(78%_0.16_80)]",
-  gray: "bg-fg-subtle",
-  accent: "bg-accent",
-}[tone];
+const { class: className } = Astro.props;
+const text = availabilityText[siteConfig.availability.status];
 ---
 
-<span
-  class:list={[
-    "border-border bg-surface text-fg-muted inline-flex items-center gap-2 rounded-pill border px-3 py-1 text-xs font-medium",
-    className,
-  ]}
->
-  <span class="relative flex size-2">
-    {pulse && (
-      <span
-        class:list={["absolute inline-flex size-full animate-ping rounded-full opacity-60", dot]}
-        aria-hidden="true"
-      ></span>
-    )}
-    <span class:list={["relative inline-flex size-2 rounded-full", dot]}></span>
-  </span>
-  {label}
+<span class:list={["status inline-flex items-center", `status--${text.tone}`, className]}>
+  <i class="status__dot" aria-hidden="true"></i>
+  <span class="sr-only">Availability: </span>
+  {text.long}
 </span>
+
+<style>
+  /* No `display` here: it is the inline-flex utility, so `class` can hide the pill. */
+  .status {
+    gap: 8px;
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line);
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .status__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex: none;
+  }
+  .status--ok {
+    color: var(--ok-ink);
+  }
+  .status--ok .status__dot {
+    background: var(--clay-mint);
+  }
+  .status--caution {
+    color: var(--ink);
+  }
+  .status--caution .status__dot {
+    background: var(--caution);
+  }
+  .status--off {
+    color: var(--ink-muted);
+  }
+  .status--off .status__dot {
+    background: var(--clay-grey);
+  }
+</style>

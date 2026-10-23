@@ -1,5 +1,6 @@
 ---
 import TechBadge from "@components/ui/TechBadge.astro";
+
 interface Props {
   tags: Array<{ tag: string; count?: number }>;
   active?: string;
@@ -8,14 +9,15 @@ interface Props {
 const { tags, active, class: className } = Astro.props;
 ---
 
-<nav aria-label="Tags" class:list={["flex flex-wrap gap-2", className]}>
-  <TechBadge label="All" size="md" tone={active ? "neutral" : "accent"} href="/writing" />
-  {tags.map(({ tag, count }) => (
-    <TechBadge
-      label={count ? `${tag} (${count})` : tag}
-      size="md"
-      tone={active === tag ? "accent" : "neutral"}
-      href={`/writing/tags/${tag}`}
-    />
-  ))}
-</nav>
+{tags.length > 0 && (
+  <nav aria-label="Tags" class:list={["flex flex-wrap gap-2", className]}>
+    <TechBadge label="All" href="/writing" current={!active} />
+    {tags.map(({ tag, count }) => (
+      <TechBadge
+        label={count ? `${tag} · ${count}` : tag}
+        href={`/writing/tags/${tag}`}
+        current={active === tag}
+      />
+    ))}
+  </nav>
+)}

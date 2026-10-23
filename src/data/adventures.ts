@@ -33,6 +33,14 @@ export type AdventureLocation = {
   hrefLabel?: string;
 };
 
+/** Home base — accent on the globe; every route starts here. */
+export const home = {
+  country: "Czech Republic",
+  countryCode: "CZ",
+  city: "Prague",
+  coordinates: { lat: 50.0755, lng: 14.4378 },
+} as const;
+
 /** Named views the map can zoom to. Bounds are [west, south, east, north] in degrees. */
 export type MapView = {
   id: string;
@@ -298,3 +306,8 @@ export function groupByCountry(list: AdventureLocation[] = adventures) {
 export function placeLabel(a: AdventureLocation): string {
   return a.city ? `${a.city}, ${a.country}` : a.country;
 }
+
+/** Number of visited countries ("11 countries on the map"). */
+export const visitedCountryCount = new Set(
+  adventures.filter((a) => a.status === "visited").map((a) => a.countryCode),
+).size;

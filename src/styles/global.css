@@ -2,131 +2,169 @@
 @plugin "@tailwindcss/typography";
 
 /* ------------------------------------------------------------------ */
-/* Dark mode: class-based so the toggle wins over the OS preference.   */
+/* Ivan Sapronov Design System v2 — R2-C Runtime + hero V6 Blueprint      */
+/* https://claude.ai/artifact/4JaRi2cConboCJrfRywX2j                    */
+/* Tokens ported 1:1 from claude-design-system/tokens.css (tokens.json) */
+/*                                                                      */
+/* Light = default (:root). Dark = `.dark` on <html> (header toggle;    */
+/* default follows prefers-color-scheme — see the inline script in      */
+/* BaseLayout).                                                         */
 /* ------------------------------------------------------------------ */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ------------------------------------------------------------------ */
-/* Design tokens                                                        */
-/*                                                                      */
-/* Raw values live on :root / .dark. Tailwind reads them through the   */
-/* `@theme inline` block below, so utilities like `bg-surface` or      */
-/* `text-accent` automatically follow the active theme.                */
-/*                                                                      */
-/* To change the accent colour, edit --accent-* in both blocks.        */
-/* ------------------------------------------------------------------ */
 :root {
   color-scheme: light;
+  --bg: #eef1f4;
+  --surface: #ffffff;
+  --surface-sunken: #e9edf2;
+  --line: #d4dae1;
+  --line-strong: #7d879a;
+  --ink: #10141a;
+  --ink-muted: #4d5662;
+  --accent: #2450ff;
+  --accent-hover: #1a3fe0;
+  --on-accent: #ffffff;
+  --accent-soft: #e6ebff;
+  --ok-ink: #1c7a4a;
+  --ok-soft: #e4f4ea;
+  --caution: #f4cc52;
+  --error-ink: #b42318;
+  --focus: #2450ff;
+  --clay-white: #f6f7f8;
+  --clay-grey: #c7cdd5;
+  --clay-blue: #3d63ff;
+  --clay-mint: #59c990;
+  --clay-butter: #f4cc52;
+  --clay-rose: #ee8597;
+  --shadow-pop: 0 12px 32px rgba(16, 20, 26, 0.08);
+  --shadow-focus: 0 0 0 2px #eef1f4, 0 0 0 4px #2450ff;
 
-  --bg: oklch(98.6% 0.004 80);
-  --surface: oklch(100% 0 0);
-  --surface-muted: oklch(96.4% 0.006 75);
-  --surface-strong: oklch(93% 0.008 75);
-
-  --fg: oklch(21% 0.012 55);
-  --fg-muted: oklch(46% 0.016 55);
-  --fg-subtle: oklch(53% 0.014 55);
-
-  --border: oklch(90.5% 0.008 70);
-  --border-strong: oklch(83% 0.012 70);
-
-  /* Signal orange — a nod to aviation and the open road. */
-  --accent: oklch(58% 0.19 40);
-  --accent-strong: oklch(50% 0.18 40);
-  --accent-soft: oklch(95.5% 0.03 55);
-  --accent-glow: oklch(75% 0.16 50 / 0.35);
-  --on-accent: oklch(99% 0 0);
-
-  --ring: oklch(58% 0.19 40);
-  --selection: oklch(90% 0.07 55);
-
-  --shadow-color: oklch(30% 0.02 55 / 0.08);
+  /* Page gutter and content width from the approved artboard. */
+  --gutter: clamp(16px, 4vw, 56px);
+  --content-max: 1328px;
+  /* Code blocks (website.md / components.md: code on #10141A in both themes). */
+  --code-bg: #10141a;
 }
 
 .dark {
   color-scheme: dark;
-
-  --bg: oklch(15.5% 0.008 60);
-  --surface: oklch(19% 0.009 60);
-  --surface-muted: oklch(23% 0.01 60);
-  --surface-strong: oklch(28% 0.012 60);
-
-  --fg: oklch(94.5% 0.006 80);
-  --fg-muted: oklch(71% 0.012 70);
-  --fg-subtle: oklch(65% 0.012 70);
-
-  --border: oklch(27% 0.01 60);
-  --border-strong: oklch(35% 0.012 60);
-
-  --accent: oklch(75% 0.17 48);
-  --accent-strong: oklch(81% 0.15 58);
-  --accent-soft: oklch(27% 0.05 45);
-  --accent-glow: oklch(70% 0.17 48 / 0.3);
-  --on-accent: oklch(16% 0.02 45);
-
-  --ring: oklch(75% 0.17 48);
-  --selection: oklch(38% 0.08 45);
-
-  --shadow-color: oklch(0% 0 0 / 0.45);
+  --bg: #0e1116;
+  --surface: #171b22;
+  --surface-sunken: #12161c;
+  --line: #2a313b;
+  --line-strong: #6b7686;
+  --ink: #eef1f4;
+  --ink-muted: #a3acb8;
+  --accent: #7d9bff;
+  --accent-hover: #9cb3ff;
+  --on-accent: #0e1116;
+  --accent-soft: #1c2440;
+  --ok-ink: #59c990;
+  --ok-soft: #12301f;
+  --caution: #f4cc52;
+  --error-ink: #ff7b72;
+  --focus: #7d9bff;
+  --clay-white: #e3e7ec;
+  --clay-grey: #8c96a4;
+  --clay-blue: #5b7cff;
+  --clay-mint: #59c990;
+  --clay-butter: #f4cc52;
+  --clay-rose: #ee8597;
+  --shadow-pop: 0 12px 32px rgba(0, 0, 0, 0.4);
+  --shadow-focus: 0 0 0 2px #0e1116, 0 0 0 4px #7d9bff;
 }
 
 @theme inline {
   --color-*: initial;
   --color-bg: var(--bg);
   --color-surface: var(--surface);
-  --color-surface-muted: var(--surface-muted);
-  --color-surface-strong: var(--surface-strong);
-  --color-fg: var(--fg);
-  --color-fg-muted: var(--fg-muted);
-  --color-fg-subtle: var(--fg-subtle);
-  --color-border: var(--border);
-  --color-border-strong: var(--border-strong);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
   --color-accent: var(--accent);
-  --color-accent-strong: var(--accent-strong);
-  --color-accent-soft: var(--accent-soft);
+  --color-accent-hover: var(--accent-hover);
   --color-on-accent: var(--on-accent);
-  --color-ring: var(--ring);
-  --color-white: #fff;
-  --color-black: #000;
+  --color-accent-soft: var(--accent-soft);
+  --color-ok-ink: var(--ok-ink);
+  --color-ok-soft: var(--ok-soft);
+  --color-caution: var(--caution);
+  --color-error-ink: var(--error-ink);
+  --color-focus: var(--focus);
+  --color-clay-white: var(--clay-white);
+  --color-clay-grey: var(--clay-grey);
+  --color-clay-blue: var(--clay-blue);
+  --color-clay-mint: var(--clay-mint);
+  --color-clay-butter: var(--clay-butter);
+  --color-clay-rose: var(--clay-rose);
+  --color-white: #ffffff;
+  --color-black: #000000;
   --color-transparent: transparent;
   --color-current: currentColor;
 
-  --font-display: var(--font-family-display);
-  --font-sans: var(--font-family-sans);
-  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  /* Families come from Astro's font config (self-hosted Fontsource files):
+     latin face first, then the latin-ext face that carries the fallbacks.
+     tokens.json: display / sans = "Schibsted Grotesk Variable", mono = "IBM Plex Mono". */
+  --font-display: var(--font-schibsted), var(--font-schibsted-ext);
+  --font-sans: var(--font-schibsted), var(--font-schibsted-ext);
+  --font-mono: var(--font-plex-mono), var(--font-plex-mono-ext);
 
-  --radius-card: 1.25rem;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
   --radius-pill: 999px;
 
-  --shadow-card: 0 1px 2px var(--shadow-color), 0 8px 24px -12px var(--shadow-color);
-  --shadow-card-hover: 0 2px 4px var(--shadow-color), 0 18px 40px -16px var(--shadow-color);
+  --shadow-pop: var(--shadow-pop);
+  --shadow-focus: var(--shadow-focus);
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --duration-fast: 160ms;
+  --duration-base: 240ms;
+  --duration-reveal: 600ms;
 
-  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Type scale (tokens.json): display-xl 116/0.92 w800 · display-l 64/1 w800 ·
+     display-m 80/1 w800 · numeral 64/1 w800 · heading 26/1.2 w700 · title 21/1.3 w700 ·
+     body-l 20/1.5 · body 17/1.55 · small 15/1.5 · label 12/1.4 mono w500 ·
+     meta 13/1.5 mono w500 · code 15/1.6 mono. Fluid sizes as specified there. */
+  --text-display-xl: clamp(56px, 7.6vw, 116px);
+  --text-display-xl--line-height: 0.9;
+  --text-display-xl--letter-spacing: -0.045em;
+  --text-display-xl--font-weight: 800;
+  --text-display-l: clamp(38px, 4.4vw, 64px);
+  --text-display-l--line-height: 1;
+  --text-display-l--letter-spacing: -0.04em;
+  --text-display-l--font-weight: 800;
+  --text-display-m: clamp(48px, 5.4vw, 80px);
+  --text-display-m--line-height: 1;
+  --text-display-m--letter-spacing: -0.04em;
+  --text-display-m--font-weight: 800;
+  --text-numeral: clamp(44px, 4.4vw, 64px);
+  --text-numeral--line-height: 1;
+  --text-numeral--letter-spacing: -0.04em;
+  --text-numeral--font-weight: 800;
+  --text-heading: 26px;
+  --text-heading--line-height: 1.2;
+  --text-heading--letter-spacing: -0.02em;
+  --text-heading--font-weight: 700;
+  --text-title: 21px;
+  --text-title--line-height: 1.3;
+  --text-title--letter-spacing: -0.01em;
+  --text-title--font-weight: 700;
+  --text-body-l: clamp(18px, 1.5vw, 21px);
+  --text-body-l--line-height: 1.5;
+  --text-body: 17px;
+  --text-body--line-height: 1.55;
+  --text-small: 15px;
+  --text-small--line-height: 1.5;
+  --text-label: 12px;
+  --text-label--line-height: 1.4;
+  --text-meta: 13px;
+  --text-meta--line-height: 1.5;
+  --text-code: 15px;
+  --text-code--line-height: 1.6;
 
-  --animate-fade-up: fade-up 0.7s var(--ease-out-soft) both;
-  --animate-fade-in: fade-in 0.6s ease-out both;
-
-  --breakpoint-xs: 30rem;
-}
-
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  /* Header nav collapses into the menu at ≤ 860px (artboard media query). */
+  --breakpoint-nav: 53.8125rem;
 }
 
 /* ------------------------------------------------------------------ */
@@ -134,30 +172,37 @@
 /* ------------------------------------------------------------------ */
 @layer base {
   html {
-    scroll-behavior: smooth;
+    background: var(--bg);
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    scroll-padding-top: 6rem;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 
   body {
-    @apply bg-bg font-sans text-fg antialiased;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    transition:
-      background-color 0.25s ease,
-      color 0.25s ease;
   }
 
   ::selection {
-    background: var(--selection);
-    color: var(--fg);
+    background: var(--accent-soft);
+    color: var(--ink);
   }
 
   h1,
   h2,
   h3,
   h4 {
-    @apply font-display font-semibold tracking-tight text-fg;
     text-wrap: balance;
   }
 
@@ -165,29 +210,40 @@
     text-wrap: pretty;
   }
 
-  :focus-visible {
-    @apply ring-2 ring-ring ring-offset-2 ring-offset-bg outline-none;
-    border-radius: 0.375rem;
+  a {
+    color: inherit;
+  }
+  a:hover {
+    color: var(--accent);
   }
 
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: var(--border-strong);
-    border-radius: 999px;
-    border: 2px solid var(--bg);
+  /* tokens.json focus: 2px outline, 2px offset. */
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
   }
 
   img,
-  video {
+  video,
+  canvas {
     max-width: 100%;
-    height: auto;
   }
 
   [hidden] {
     display: none !important;
+  }
+
+  /* Safe-area padding for notched phones (classes instead of inline styles). */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  .pb-safe {
+    padding-bottom: max(40px, env(safe-area-inset-bottom));
+  }
+
+  /* Numbers line up in tables and proof rows. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
   }
 }
 
@@ -195,128 +251,425 @@
 /* Components                                                           */
 /* ------------------------------------------------------------------ */
 @layer components {
-  .container-site {
-    @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
+  /* Layout: full-bleed band with the artboard gutter + 1328px content. */
+  .band {
+    padding-inline: var(--gutter);
+  }
+  .shell {
+    width: 100%;
+    max-width: var(--content-max);
+    margin-inline: auto;
+  }
+  /* Section rhythm: 112px between homepage sections on desktop (space-28). */
+  .section-gap {
+    padding-bottom: 72px;
+  }
+  @media (min-width: 48rem) {
+    .section-gap {
+      padding-bottom: 112px;
+    }
   }
 
-  .container-prose {
-    @apply mx-auto w-full max-w-3xl px-5 sm:px-8;
+  /* Type */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 800;
+  }
+  /* Mono label: eyebrows, section tags, table heads, legends, chips. */
+  .label {
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    line-height: var(--text-label--line-height);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  /* Mono meta: dates, stacks, small facts. */
+  .meta {
+    font-family: var(--font-mono);
+    font-size: var(--text-meta);
+    line-height: var(--text-meta--line-height);
+    font-weight: 500;
+  }
+  .mono {
+    font-family: var(--font-mono);
   }
 
-  .section {
-    @apply py-16 sm:py-20 lg:py-24;
-  }
-
-  .eyebrow {
-    @apply font-mono text-[0.72rem] font-medium tracking-[0.16em] text-accent-strong uppercase;
-  }
-
+  /* Surfaces: cards and rows always carry a 1px line border (tokens.json `surface`). */
   .card {
-    @apply rounded-card border border-border bg-surface shadow-card;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+  }
+  /* Hover lift for linked cards and rows: translateY(-2px) + shadow-pop, never at rest. */
+  .lift {
     transition:
-      transform 0.35s var(--ease-out-soft),
-      box-shadow 0.35s var(--ease-out-soft),
-      border-color 0.25s ease;
+      transform var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out);
+  }
+  .lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-pop);
+    color: inherit;
+  }
+  /* Long reading (articles, case studies, /now): surface, radius-md, 68ch measure. */
+  .sheet {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
   }
 
-  .card-hover:hover {
-    @apply border-border-strong shadow-card-hover;
-    transform: translateY(-3px);
+  /* Section title row: 1px ink rule, mono index, display-l heading, tag / link right. */
+  .section-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    padding-top: 20px;
+    border-top: 1px solid var(--ink);
   }
 
-  .link-underline {
-    @apply relative inline-block;
-    background-image: linear-gradient(currentColor, currentColor);
-    background-size: 0% 1px;
-    background-position: 0 100%;
-    background-repeat: no-repeat;
-    transition: background-size 0.3s var(--ease-out-soft);
+  /* Buttons — pills. Primary: accent fill. Secondary: surface with a 1px line border. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 52px;
+    padding-inline: 28px;
+    border-radius: var(--radius-pill);
+    font-family: var(--font-sans);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.1;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
   }
-  .link-underline:hover,
-  .link-underline:focus-visible {
-    background-size: 100% 1px;
+  .btn-primary {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  .btn-primary:hover {
+    background: var(--accent-hover);
+    color: var(--on-accent);
+  }
+  .btn-primary:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+  }
+  .btn-secondary {
+    padding-inline: 24px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .btn-secondary:hover {
+    border-color: var(--line-strong);
+    color: var(--ink);
+  }
+  /* Ink pill (header Contact). */
+  .btn-ink {
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .btn-ink:hover {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    background: var(--surface-sunken);
+    color: var(--ink-muted);
+    border-color: var(--line);
+    cursor: not-allowed;
+  }
+  .btn-sm {
+    min-height: 44px;
+    padding-inline: 20px;
+    font-size: 15px;
   }
 
-  .link-accent {
-    @apply text-accent-strong underline decoration-accent/50 decoration-1 underline-offset-4 transition-colors hover:decoration-accent-strong;
+  /* Round 44px icon button (theme, menu). */
+  .icon-btn {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .icon-btn:hover {
+    border-color: var(--line-strong);
+    color: var(--ink);
   }
 
-  .grid-bg {
-    background-image:
-      linear-gradient(to right, var(--border) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--border) 1px, transparent 1px);
-    background-size: 48px 48px;
-    mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 30%, transparent 100%);
+  /* Mono link with an arrow: "ALL PROJECTS →". */
+  .link-more {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--font-mono);
+    font-size: var(--text-meta);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 6px;
+  }
+  .link-more:hover {
+    text-decoration-thickness: 2px;
   }
 
-  .accent-glow {
-    background: radial-gradient(60% 50% at 50% 0%, var(--accent-glow), transparent 70%);
+  .link-inline {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+  .link-inline:hover {
+    text-decoration-thickness: 2px;
   }
 
-  /* Prose: map Tailwind Typography onto our tokens. */
-  .prose-site {
-    @apply prose prose-lg max-w-none;
-    --tw-prose-body: var(--fg-muted);
-    --tw-prose-headings: var(--fg);
-    --tw-prose-lead: var(--fg-muted);
-    --tw-prose-links: var(--accent-strong);
-    --tw-prose-bold: var(--fg);
-    --tw-prose-counters: var(--fg-subtle);
-    --tw-prose-bullets: var(--border-strong);
-    --tw-prose-hr: var(--border);
-    --tw-prose-quotes: var(--fg);
-    --tw-prose-quote-borders: var(--accent);
-    --tw-prose-captions: var(--fg-subtle);
-    --tw-prose-code: var(--fg);
-    --tw-prose-pre-code: var(--fg);
-    --tw-prose-pre-bg: var(--surface-muted);
-    --tw-prose-th-borders: var(--border-strong);
-    --tw-prose-td-borders: var(--border);
+  /* Mono chip: metric chips, stack chips, tags. */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--surface-sunken);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: 0.02em;
   }
-  .prose-site :where(h2, h3, h4) {
-    @apply font-display tracking-tight;
+  a.chip {
+    min-height: 44px;
+    padding-inline: 14px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    text-decoration: none;
+  }
+  a.chip:hover {
+    border-color: var(--line-strong);
+    color: var(--ink);
+  }
+  a.chip[aria-current="page"] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
+  }
+
+  /* Status pill: dot + word (never colour alone). */
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .status-pill::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    flex: none;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .status-pill--ok {
+    background: var(--ok-soft);
+    color: var(--ok-ink);
+  }
+  .status-pill--caution {
+    background: var(--caution);
+    color: #10141a;
+  }
+  .status-pill--off {
+    background: var(--surface-sunken);
+    color: var(--ink-muted);
+  }
+
+  /* Inline-SVG glyphs for → ← ↗ ≈ (not in the fonts' Latin subsets): em-sized, currentColor. */
+  .glyph {
+    display: inline-block;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    overflow: visible;
+  }
+  .glyph-arrow {
+    width: 0.92em;
+    height: 0.55em;
+    vertical-align: 0.02em;
+  }
+  .glyph-arrow--up-right {
+    width: 0.6em;
+    height: 0.6em;
+    vertical-align: 0;
+  }
+  .glyph-approx {
+    width: 0.66em;
+    height: 0.5em;
+    vertical-align: 0.04em;
+  }
+
+  /* Dot for legends and status lines. */
+  .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    flex: none;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* Prose for long reading on a sheet (articles, case studies, /now). */
+  .prose-sheet {
+    max-width: 68ch;
+    color: var(--ink);
+    font-size: var(--text-body);
+    line-height: 1.65;
+  }
+  .prose-sheet > * + * {
+    margin-top: 1em;
+  }
+  .prose-sheet :where(h2) {
+    margin-top: 2.2em;
+    font-size: var(--text-heading);
+    line-height: var(--text-heading--line-height);
+    letter-spacing: -0.02em;
+    font-weight: 700;
     scroll-margin-top: 6rem;
   }
-  .prose-site :where(a) {
-    @apply decoration-accent/40 underline-offset-4 transition-colors hover:text-accent;
+  .prose-sheet :where(h3) {
+    margin-top: 1.8em;
+    font-size: var(--text-title);
+    line-height: var(--text-title--line-height);
+    font-weight: 700;
+    scroll-margin-top: 6rem;
   }
-  .prose-site :where(code):not(pre code) {
-    @apply rounded-md border border-border bg-surface-muted px-1.5 py-0.5 font-mono text-[0.85em] font-normal;
+  .prose-sheet :where(h2 + *, h3 + *) {
+    margin-top: 0.6em;
   }
-  .prose-site :where(code):not(pre code)::before,
-  .prose-site :where(code):not(pre code)::after {
-    content: none;
+  .prose-sheet :where(ul, ol) {
+    padding-left: 1.25em;
   }
-  .prose-site :where(pre) {
-    @apply rounded-xl border border-border text-sm;
+  .prose-sheet :where(ul) {
+    list-style: disc;
   }
-  .prose-site :where(img) {
-    @apply rounded-xl border border-border;
+  .prose-sheet :where(ol) {
+    list-style: decimal;
   }
-  .prose-site :where(blockquote p:first-of-type)::before,
-  .prose-site :where(blockquote p:last-of-type)::after {
-    content: none;
+  .prose-sheet :where(li + li) {
+    margin-top: 0.4em;
+  }
+  .prose-sheet :where(li)::marker {
+    color: var(--ink-muted);
+  }
+  .prose-sheet :where(strong) {
+    font-weight: 700;
+  }
+  .prose-sheet :where(a) {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+  .prose-sheet :where(a:hover) {
+    text-decoration-thickness: 2px;
+  }
+  .prose-sheet :where(blockquote) {
+    padding: 16px 20px;
+    border-radius: var(--radius-md);
+    background: var(--surface-sunken);
+    color: var(--ink-muted);
+  }
+  .prose-sheet :where(code):not(pre code) {
+    padding: 1px 6px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-sunken);
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+  }
+  .prose-sheet :where(pre) {
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    line-height: var(--text-code--line-height);
+    overflow-x: auto;
+  }
+  .prose-sheet :where(pre code) {
+    font-family: inherit;
+  }
+  .prose-sheet :where(img) {
+    border-radius: var(--radius-md);
+  }
+  .prose-sheet :where(hr) {
+    border: 0;
+    border-top: 1px solid var(--line);
+  }
+  .prose-sheet :where(table) {
+    width: 100%;
+    font-size: var(--text-small);
+    border-collapse: collapse;
+  }
+  .prose-sheet :where(th, td) {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+  }
+  .prose-sheet :where(th) {
+    background: var(--surface-sunken);
   }
 }
 
-/* Shiki dual themes */
-.dark .astro-code,
-.dark .astro-code span {
-  color: var(--shiki-dark) !important;
-  background-color: var(--shiki-dark-bg) !important;
+/* Code blocks: github-dark-dimmed on #10141A in both themes (components.md, Sheet). */
+.prose-sheet .astro-code {
+  background-color: var(--code-bg) !important;
+  border-color: var(--code-bg);
+  color: #adbac7;
 }
 
 /* ------------------------------------------------------------------ */
-/* Motion                                                               */
-/*                                                                      */
-/* Section reveal uses CSS scroll-driven animations — zero JavaScript. */
-/* Browsers without support simply show the content.                   */
+/* Motion: sections reveal once (opacity + 12px rise, 600ms ease-out).  */
+/* Only when JS runs and motion is allowed (html.motion, set in the     */
+/* head); otherwise everything is simply there.                          */
 /* ------------------------------------------------------------------ */
-@supports (animation-timeline: view()) {
-  .reveal {
-    animation: fade-up linear both;
-    animation-timeline: view();
-    animation-range: entry 0% entry 28%;
+@media (prefers-reduced-motion: no-preference) {
+  .motion [data-reveal]:not([data-revealed]) {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  .motion [data-reveal] {
+    transition:
+      opacity var(--duration-reveal) var(--ease-out),
+      transform var(--duration-reveal) var(--ease-out);
   }
 }
 
@@ -329,8 +682,8 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .reveal {
-    animation: none;
+  .lift:hover {
+    transform: none;
   }
   ::view-transition-group(*),
   ::view-transition-old(*),
@@ -339,8 +692,7 @@
   }
 }
 
-/* View transitions: keep the header pinned during page swaps. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 0.22s;
+  animation-duration: 0.18s;
 }

@@ -14,7 +14,8 @@ export const philosophy = [
   },
   {
     title: "Checklists over heroics",
-    text: "Flying taught me that good people make bad mistakes when routine is skipped. Runbooks, reviews and tests are the software version of a walk-around.",
+    // v2 (2026-10-23): the flying metaphor was removed (no aviation outside the hobby pages).
+    text: "Good people make bad mistakes when routine is skipped. Runbooks, reviews and tests are how I keep the routine.",
   },
   {
     title: "Ship, then write it down",
@@ -52,7 +53,6 @@ export const facts = [
 
 export const currentInterests = [
   "Ownira",
-  "Apex line market research",
   "Ultralight aviation",
   "Motorcycle touring",
   "Country visiting",
