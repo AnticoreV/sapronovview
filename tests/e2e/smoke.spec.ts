@@ -19,7 +19,7 @@ const threeRequests = (page: Page) =>
     performance
       .getEntriesByType("resource")
       .map((e) => e.name)
-      .filter((n) => /\/(three\.module|panel3d|globe3d)\.[^/]*\.js/.test(n)),
+      .filter((n) => /\/(three\.module|hero3d|globe3d)\.[^/]*\.js/.test(n)),
   );
 
 for (const route of routes) {
@@ -41,22 +41,37 @@ for (const route of routes) {
   });
 }
 
+test("no aviation vocabulary outside the hobby pages", async ({ page }) => {
+  const banned =
+    /callsign|LKPR|pre-?flight|annunciator|kneeboard|logbook|crew card|cleared for|off course|systems online|instrument/i;
+  for (const route of ["/", "/about", "/projects", "/experience", "/contact", "/no-such-page"]) {
+    await page.goto(route);
+    expect(await page.locator("body").innerText(), route).not.toMatch(banned);
+  }
+});
+
 test("unknown route shows the 404 page", async ({ page }) => {
   const response = await page.goto("/no-such-page");
   expect(response?.status()).toBe(404);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Off course.");
-  await expect(page.getByRole("link", { name: "Return to base" })).toHaveAttribute("href", "/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "404 — this route isn't deployed.",
+  );
+  await expect(page.getByRole("link", { name: "Back to home" })).toHaveAttribute("href", "/");
+  expect(await threeRequests(page)).toEqual([]);
 });
 
-test("every page ends with the contact routes", async ({ page }) => {
+test("every page ends with the contact panel and its routes", async ({ page }) => {
   await page.goto("/about");
-  const block = page.locator("#contact");
-  await expect(block.getByText("Cleared for")).toBeVisible();
-  await expect(block.locator('a[href="/contact?topic=hiring"]')).toBeVisible();
-  await expect(block.locator('a[href="/contact?topic=investing"]')).toContainText(
+  const panel = page.locator("#contact");
+  await expect(
+    panel.getByRole("heading", { name: /Ready to ship\s*your project\./ }),
+  ).toBeVisible();
+  await expect(panel.locator('a[href="/contact?topic=hiring"]')).toBeVisible();
+  await expect(panel.locator('a[href="/contact?topic=investing"]')).toContainText(
     "Stage, progress and plans — let's talk.",
   );
-  await expect(block.locator('a[href="/contact?topic=partnering"]')).toBeVisible();
+  await expect(panel.locator('a[href="/contact?topic=partnering"]')).toBeVisible();
+  await expect(panel.locator('a[href^="mailto:"]').first()).toBeVisible();
 });
 
 test("contact form: topic from ?topic=, field errors, honest not-connected state", async ({
@@ -65,6 +80,8 @@ test("contact form: topic from ?topic=, field errors, honest not-connected state
   await page.goto("/contact?topic=investing");
   await expect(page.locator("#cf-topic")).toHaveValue("investing");
   await expect(page.getByText("Form not connected yet", { exact: true })).toBeVisible();
+  // On /contact the routes are emails with the subject filled in.
+  await expect(page.locator('#contact a[href*="subject=Investing"]')).toBeVisible();
 
   const submit = page.locator("[data-contact-form] button[type=submit]");
   await submit.click();
@@ -88,16 +105,41 @@ test("contact form: topic from ?topic=, field errors, honest not-connected state
   await expect(page.locator("#cf-message")).toHaveValue(/smoke test/);
 });
 
-test("theme knob switches to the night panel and remembers it", async ({ page }) => {
+test("theme toggle switches to dark and remembers it", async ({ page }) => {
   await page.goto("/");
-  const knob = page.locator("[data-theme-knob]");
-  const wasNight = await page.evaluate(() => document.documentElement.classList.contains("dark"));
-  await knob.click();
-  await expect(page.locator("html")).toHaveClass(wasNight ? /^(?!.*\bdark\b)/ : /\bdark\b/);
-  await expect(knob).toHaveAttribute("aria-pressed", String(!wasNight));
+  const toggle = page.locator("[data-theme-toggle]");
+  const wasDark = await page.evaluate(() => document.documentElement.classList.contains("dark"));
+  await toggle.click();
+  await expect(page.locator("html")).toHaveClass(wasDark ? /^(?!.*\bdark\b)/ : /\bdark\b/);
+  await expect(toggle).toHaveAttribute("aria-pressed", String(!wasDark));
   await page.reload();
-  const isNight = await page.evaluate(() => document.documentElement.classList.contains("dark"));
-  expect(isNight).toBe(!wasNight);
+  const isDark = await page.evaluate(() => document.documentElement.classList.contains("dark"));
+  expect(isDark).toBe(!wasDark);
+});
+
+test.describe("dark theme", () => {
+  test.use({ colorScheme: "dark" });
+
+  test("follows the OS preference: dark tokens, pressed toggle, dark poster", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("html")).toHaveClass(/\bdark\b/);
+    await expect(page.locator("[data-theme-toggle]")).toHaveAttribute("aria-pressed", "true");
+    const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    expect(bg).toBe("rgb(14, 17, 22)");
+    const poster = page.locator("[data-hero-stage] img");
+    await expect(poster).toHaveJSProperty("complete", true);
+    expect(await poster.evaluate((img: HTMLImageElement) => img.currentSrc)).toMatch(
+      /blueprint-dark/,
+    );
+  });
+
+  test("a stored light choice wins over the OS preference", async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("theme", "light"));
+    await page.goto("/about");
+    await expect(page.locator("html")).not.toHaveClass(/\bdark\b/);
+    const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    expect(bg).toBe("rgb(238, 241, 244)");
+  });
 });
 
 test("three.js is never requested outside / and /adventures", async ({ page }) => {
@@ -122,10 +164,13 @@ test.describe("reduced motion", () => {
 
   test("home keeps the poster and never downloads three.js", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("[data-panel-stage] img").first()).toBeVisible();
+    await expect(page.locator("[data-hero-stage] img").first()).toBeVisible();
     await page.mouse.move(400, 300);
+    await page.mouse.wheel(0, 400);
     await page.waitForTimeout(1500);
     expect(await threeRequests(page)).toEqual([]);
+    // Sections are simply there (no reveal state).
+    await expect(page.locator("#capabilities")).toHaveCSS("opacity", "1");
   });
 
   test("adventures shows the flat map instead of the globe", async ({ page }) => {
@@ -141,14 +186,13 @@ test.describe("reduced motion", () => {
 });
 
 test.describe("while no post is published", () => {
-  test("Writing leaves the nav, CONTACT takes its slot, RSS is hidden", async ({ page }) => {
+  test("Writing stays out of the header, menu and footer; RSS is hidden", async ({ page }) => {
     await page.goto("/");
     const posts = await page.evaluate(
       () => document.querySelectorAll('a[href^="/writing/"]').length,
     );
     test.skip(posts > 0, "a post is published");
-    const header = page.locator("header").first();
-    await expect(header.locator('a[href="/writing"]')).toHaveCount(0);
+    await expect(page.locator("header a[href='/writing']")).toHaveCount(0);
     await expect(page.locator("footer a[href='/rss.xml']")).toHaveCount(0);
     await expect(page.locator("footer a[href='/writing']")).toHaveCount(0);
     await expect(page.locator('link[type="application/rss+xml"]')).toHaveCount(0);
@@ -168,30 +212,86 @@ test.describe("while no post is published", () => {
   });
 });
 
-test("annunciator links to contact with a matching accessible name", async ({ page }) => {
+test("header: availability pill, nav and the menu on phones", async ({ page, isMobile }) => {
   await page.goto("/about");
-  const link = page.getByRole("link", { name: /open to projects — contact/i });
-  await expect(link).toHaveAttribute("href", "/contact");
+  const header = page.locator("header").first();
+  if (isMobile) {
+    await expect(header.getByText("OPEN TO PROJECTS")).toBeHidden();
+    await header.getByRole("button", { name: "Open menu" }).click();
+    const menu = page.getByRole("dialog", { name: "Site menu" });
+    await expect(menu).toBeVisible();
+    await expect(menu.getByRole("link", { name: "Hobbies" })).toBeVisible();
+    await expect(menu.getByRole("link", { name: "Now" })).toBeVisible();
+    await menu.getByRole("button", { name: "Close menu" }).click();
+    await expect(menu).toBeHidden();
+  } else {
+    await expect(header.getByText("OPEN TO PROJECTS")).toBeVisible();
+    const nav = header.getByRole("navigation", { name: "Main" });
+    await expect(nav.getByRole("link")).toHaveText([
+      "Products",
+      "Capabilities",
+      "Cases",
+      "Experience",
+      "About",
+    ]);
+    await expect(nav.getByRole("link", { name: "About" })).toHaveAttribute("aria-current", "page");
+    await expect(header.getByRole("link", { name: "Contact" })).toHaveAttribute("href", "/contact");
+  }
 });
 
-test("hero shows the four sourced readouts", async ({ page }) => {
+test("hero: V6 blueprint poster, legend and the four sourced proof numbers", async ({ page }) => {
   await page.goto("/");
-  const readouts = page.getByRole("list", { name: "Proof readouts" }).locator("li");
-  await expect(readouts).toHaveCount(4);
-  await expect(readouts.nth(1)).toContainText("p95 latency · CCA Group");
-  await expect(readouts.nth(1)).toContainText("≈ halved");
-  for (let i = 0; i < 4; i++) await expect(readouts.nth(i)).toBeVisible();
+  const legend = page.locator(".hero-media figcaption");
+  await expect(legend).toContainText("DRAWN");
+  await expect(legend).toContainText("REVIEW · AGENT LOOP");
+  await expect(legend).toContainText("SKETCH → BUILD → SHIP → LEARN");
+  await expect(page.locator("[data-hero-stage]")).toHaveAttribute(
+    "aria-label",
+    /isometric technical drawing builds itself/,
+  );
+  const numbers = page.getByRole("list", { name: "Proof numbers" }).locator("li");
+  await expect(numbers).toHaveCount(4);
+  await expect(numbers.nth(1)).toContainText("p95 latency, roughly halved · CCA Group");
+  await expect(numbers.nth(1)).toContainText("≈ ½");
+  for (let i = 0; i < 4; i++) await expect(numbers.nth(i)).toBeVisible();
+  await expect(page.getByText(/^WORKED WITH NCR VOYIX/)).toBeVisible();
 });
 
-test("about: heading, ProfilePage structured data", async ({ page }) => {
+test("homepage sections in the approved order", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("main h2")).toHaveText([
+    "Engineer and founder.",
+    "What I'm building",
+    "What I can do",
+    "Proof in production",
+    "Track record",
+    "Off duty",
+  ]);
+  await expect(page.locator("#build").getByText("From datová schránka to done.")).toBeVisible();
+  await expect(page.locator("#capabilities li")).toHaveCount(4);
+  await expect(page.locator("#work li")).toHaveCount(3);
+});
+
+test("about: heading, portrait switch, ProfilePage structured data", async ({ page }) => {
   await page.goto("/about");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Engineer and founder.");
+  await page.getByText("Black", { exact: true }).click();
+  await expect(page.locator('[data-portrait="black"] img')).toBeVisible();
+  await expect(page.locator('[data-portrait="turtleneck"] img')).toBeHidden();
   const ld = await page
     .locator('script[type="application/ld+json"]')
     .evaluateAll((els) => els.map((e) => JSON.parse(e.textContent ?? "{}")));
   const profile = ld.find((d) => d["@type"] === "ProfilePage");
   expect(profile?.mainEntity?.["@id"]).toMatch(/#person$/);
   expect(profile?.mainEntity?.image).toMatch(/\/images\/ivan-sapronov\.jpg$/);
+});
+
+test("home: Person and WebSite structured data", async ({ page }) => {
+  await page.goto("/");
+  const types = await page
+    .locator('script[type="application/ld+json"]')
+    .evaluateAll((els) => els.map((e) => JSON.parse(e.textContent ?? "{}")["@type"]));
+  expect(types).toEqual(expect.arrayContaining(["Person", "WebSite"]));
 });
 
 test("removed Apexline pages forward to /projects", async ({ page }) => {
