@@ -1,21 +1,94 @@
 /**
  * Build-time generated brand images (Open Graph card and touch icon) in the
  * D4 · Pre-flight look: day panel, dark instrument faces, cyan = selectable.
- * Rendered from SVG with sharp; the OG card composites the hero panel poster so
- * it always shows the same instruments as the homepage.
+ *
+ * Text is set in the site's own typefaces — Saira for the name, JetBrains Mono
+ * for labels and readouts — converted to vector paths with opentype.js, so the
+ * card looks the same on every build machine. Glyphs outside the latin subset
+ * (≈, →) fall back to a system monospace in their fixed-width cell. The cut-out
+ * portrait is composited on the right.
  *
  * To use your own artwork instead, delete the matching endpoint in src/pages/
  * and drop a static file into public/ with the same path.
  */
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import opentype, { type Font } from "opentype.js";
 import sharp, { type OverlayOptions } from "sharp";
-import { fileURLToPath } from "node:url";
 import { availabilityText, siteConfig } from "@config";
 import { heroReadouts } from "@data/readouts";
 
+const root = process.cwd();
+const loadFont = (file: string): Font => {
+  const buf = readFileSync(join(root, "node_modules", file));
+  return opentype.parse(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
+};
+
+let fonts: { display: Font; body: Font; mono: Font; monoBold: Font } | undefined;
+const getFonts = () =>
+  (fonts ??= {
+    display: loadFont("@fontsource/saira/files/saira-latin-800-normal.woff"),
+    body: loadFont("@fontsource/saira/files/saira-latin-500-normal.woff"),
+    mono: loadFont("@fontsource/jetbrains-mono/files/jetbrains-mono-latin-600-normal.woff"),
+    monoBold: loadFont("@fontsource/jetbrains-mono/files/jetbrains-mono-latin-700-normal.woff"),
+  });
+
 const escape = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-const SANS = "Helvetica Neue, Helvetica, Arial, sans-serif";
-const MONO = "Menlo, DejaVu Sans Mono, monospace";
+/**
+ * One glyph outline drawn at the origin and cached. opentype.js 2.0 emits NaN
+ * coordinates for some glyphs at some fractional positions, so glyphs are always
+ * generated at (0, 0) and placed with an SVG translate.
+ */
+const glyphCache = new WeakMap<Font, Map<string, string>>();
+function glyphPath(font: Font, ch: string, size: number): string {
+  let cache = glyphCache.get(font);
+  if (!cache) glyphCache.set(font, (cache = new Map()));
+  const key = `${ch}@${size}`;
+  const cached = cache.get(key);
+  if (cached !== undefined) return cached;
+  const d = font.getPath(ch, 0, 0, size, { kerning: false }).toPathData(2);
+  if (/NaN|Infinity/.test(d)) throw new Error(`Invalid glyph path for "${ch}"`);
+  cache.set(key, d);
+  return d;
+}
+
+/**
+ * Text as SVG paths in `font`, tracked by `letterSpacing` (em), placed glyph by glyph
+ * (opentype.js's own letterSpacing / kerning options also emit NaN with these fonts).
+ * Glyphs missing from the latin subset are drawn as system-font <text>.
+ */
+function text(
+  font: Font,
+  value: string,
+  x: number,
+  y: number,
+  size: number,
+  fill: string,
+  letterSpacing = 0,
+): string {
+  const glyphs: string[] = [];
+  const fallbacks: string[] = [];
+  const track = letterSpacing * size;
+  const cell = font.getAdvanceWidth("M", size, { kerning: false });
+  let cursor = x;
+  for (const ch of value) {
+    if (ch === " " || font.charToGlyphIndex(ch) > 0) {
+      if (ch !== " ") {
+        glyphs.push(
+          `<path transform="translate(${cursor.toFixed(2)} ${y})" d="${glyphPath(font, ch, size)}"/>`,
+        );
+      }
+      cursor += font.getAdvanceWidth(ch, size, { kerning: false }) + track;
+    } else {
+      fallbacks.push(
+        `<text x="${(cursor + cell / 2).toFixed(1)}" y="${y}" font-family="Menlo, DejaVu Sans Mono, monospace" font-size="${size}" font-weight="700" fill="${fill}" text-anchor="middle">${escape(ch)}</text>`,
+      );
+      cursor += cell + track;
+    }
+  }
+  return `<g fill="${fill}">${glyphs.join("")}</g>${fallbacks.join("")}`;
+}
 
 /** Attitude-indicator mark: dark face, cyan horizon + aircraft symbol. */
 export const iconSvg = (size: number) =>
@@ -28,30 +101,33 @@ export const iconSvg = (size: number) =>
 </svg>`;
 
 const ogSvg = () => {
+  const f = getFonts();
   const [first, ...rest] = siteConfig.name.toUpperCase().split(" ");
+  const annunciator = availabilityText[siteConfig.availability.status].long;
   const readouts = heroReadouts
     .slice(0, 3)
-    .map(
-      (r, i) => `
-  <g transform="translate(${64 + i * 176} 470)">
-    <rect width="164" height="96" rx="8" fill="#101211"/>
-    <rect x="3" y="3" width="158" height="90" rx="6" fill="none" stroke="#1c201f" stroke-width="4"/>
-    <text x="16" y="30" font-family="${MONO}" font-size="12" font-weight="700" fill="#a2a8a4" letter-spacing="0.5">${escape(r.source.toUpperCase())}</text>
-    <text x="16" y="74" font-family="${MONO}" font-size="30" font-weight="700" fill="#3fcfdf">${escape(r.value)}</text>
-  </g>`,
-    )
+    .map((r, i) => {
+      const x = 64 + i * 196;
+      return `<g>
+    <rect x="${x}" y="456" width="184" height="120" rx="8" fill="#101211"/>
+    <rect x="${x + 3}" y="459" width="178" height="114" rx="6" fill="none" stroke="#1c201f" stroke-width="4"/>
+    ${text(f.monoBold, r.label.toUpperCase(), x + 16, 484, 12, "#f1f1eb", 0.04)}
+    ${text(f.mono, r.source.toUpperCase(), x + 16, 503, 12, "#a2a8a4", 0.04)}
+    ${text(f.monoBold, r.value, x + 16, 552, 28, "#3fcfdf")}
+  </g>`;
+    })
     .join("");
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
   <rect width="1200" height="630" fill="#d5d8d5"/>
   <rect width="1200" height="56" fill="#101211"/>
-  <text x="64" y="36" font-family="${MONO}" font-size="18" font-weight="700" fill="#f1f1eb" letter-spacing="2">${escape(siteConfig.callsign)} / ${escape(siteConfig.base)}</text>
+  ${text(f.monoBold, `${siteConfig.callsign} / ${siteConfig.base}`, 64, 36, 18, "#f1f1eb", 0.1)}
   <rect x="900" y="13" width="236" height="30" rx="4" fill="#0c2a18"/>
-  <text x="1018" y="34" font-family="${MONO}" font-size="14" font-weight="700" fill="#3cc46e" text-anchor="middle">${escape(availabilityText[siteConfig.availability.status].long)}</text>
-  <text x="64" y="118" font-family="${MONO}" font-size="16" fill="#464c49" letter-spacing="1">BACKEND &amp; FULLSTACK ENGINEER · FOUNDER</text>
-  <text x="60" y="222" font-family="${SANS}" font-size="104" font-weight="800" fill="#111312" letter-spacing="-3">${escape(first ?? "")}</text>
-  <text x="60" y="318" font-family="${SANS}" font-size="104" font-weight="800" fill="#111312" letter-spacing="-3">${escape(rest.join(" "))}</text>
-  <text x="64" y="380" font-family="${SANS}" font-size="24" fill="#111312">Backend systems and products, AI agents and automation,</text>
-  <text x="64" y="412" font-family="${SANS}" font-size="24" fill="#111312">services shipped to production.</text>
+  ${text(f.monoBold, annunciator, 916, 34, 14, "#3cc46e", 0.02)}
+  ${text(f.mono, "BACKEND & FULLSTACK ENGINEER · FOUNDER", 64, 116, 16, "#464c49", 0.04)}
+  ${text(f.display, first ?? "", 58, 226, 112, "#111312", -0.02)}
+  ${text(f.display, rest.join(" "), 58, 326, 112, "#111312", -0.02)}
+  ${text(f.body, "Backend systems and products, AI agents and", 64, 380, 25, "#111312")}
+  ${text(f.body, "automation, services shipped to production.", 64, 413, 25, "#111312")}
   ${readouts}
 </svg>`;
 };
@@ -64,24 +140,17 @@ function toBody(buf: Buffer): Uint8Array<ArrayBuffer> {
 }
 
 export async function renderOgImage(): Promise<Uint8Array<ArrayBuffer>> {
-  const poster = fileURLToPath(new URL("../assets/hero/panel-day.png", import.meta.url));
-  let layers: OverlayOptions[] = [];
+  const layers: OverlayOptions[] = [];
   try {
-    const panel = await sharp(poster)
-      .resize({
-        width: 700,
-        height: 400,
-        fit: "contain",
-        background: { r: 0, g: 0, b: 0, alpha: 0 },
-      })
+    const portrait = await sharp(join(root, "src/assets/portraits/cutout-turtleneck.webp"))
+      .resize({ height: 574 })
       .png()
-      .toBuffer();
-    layers = [{ input: panel, left: 560, top: 140 }];
+      .toBuffer({ resolveWithObject: true });
+    layers.push({ input: portrait.data, left: 1200 - portrait.info.width - 8, top: 56 });
   } catch {
-    /* poster missing — text-only card */
+    /* portrait missing — text-only card */
   }
-  const base = sharp(Buffer.from(ogSvg())).png();
-  return toBody(await base.composite(layers).png().toBuffer());
+  return toBody(await sharp(Buffer.from(ogSvg())).composite(layers).png().toBuffer());
 }
 
 export async function renderTouchIcon(size = 180): Promise<Uint8Array<ArrayBuffer>> {

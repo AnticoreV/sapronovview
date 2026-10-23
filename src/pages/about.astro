@@ -2,11 +2,22 @@
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
 import CrewCard from "@components/crew/CrewCard.astro";
+import JsonLd from "@components/seo/JsonLd.astro";
 import { shownAll } from "@lib/content";
+import { personSchema } from "@lib/schema";
 import { enjoys, facts, philosophy, values } from "@data/about";
 import { siteConfig, techStack } from "@config";
 
 const realFacts = shownAll(facts, (f) => f.text);
+const site = Astro.site ?? new URL("http://localhost:4321");
+// ProfilePage whose main entity is the same Person (#person) as on the homepage.
+const profileLd = {
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  url: new URL("/about", site).toString(),
+  name: `About ${siteConfig.name}`,
+  mainEntity: personSchema(site),
+};
 ---
 
 <BaseLayout
@@ -18,9 +29,7 @@ const realFacts = shownAll(facts, (f) => f.text);
     <div class="shell">
       <Breadcrumbs items={[{ label: "About" }]} />
       <p class="label mt-8 text-ink-muted">About · crew</p>
-      <h1 class="display mt-3 max-w-[16ch] text-display-l">
-        Engineer, founder, pilot in training.
-      </h1>
+      <h1 class="display mt-3 max-w-[16ch] text-display-l">Engineer and founder.</h1>
     </div>
   </div>
 
@@ -61,16 +70,16 @@ const realFacts = shownAll(facts, (f) => f.text);
             Ownira
           </a>
           , now in pilot, and validating{" "}
-          <a href="/projects/apex-line-market-research" class="link-inline font-semibold">
+          <a href="/projects/apexline" class="link-inline font-semibold">
             Apexline
           </a>
           .
         </p>
         <p>
-          The rest of my time goes to things with engines and horizons: ultralight aircraft,
-          motorcycles and a growing list of countries. Flying rewards preparation and checklists,
-          riding rewards attention, travel rewards curiosity — the same traits I try to bring to a
-          codebase.
+          The rest of my time goes to things with engines and horizons: I am a pilot in training on
+          ultralight aircraft, I ride motorcycles, and I keep a growing list of countries. Flying
+          rewards preparation and checklists, riding rewards attention, travel rewards curiosity —
+          the same traits I try to bring to a codebase.
         </p>
       </div>
     </div>
@@ -172,4 +181,5 @@ const realFacts = shownAll(facts, (f) => f.text);
       </div>
     </section>
   )}
+  <JsonLd data={profileLd} />
 </BaseLayout>
