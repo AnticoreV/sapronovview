@@ -1,471 +1,112 @@
 ---
 /**
- * Interactive world map.
+ * Flat world map — the fallback for the globe (reduced motion, no WebGL).
  *
- * - Country outlines: inline SVG generated at build time (src/lib/world-map.ts).
- * - Markers: real <button> elements positioned over the SVG, so they get
- *   native focus, keyboard and touch behaviour for free.
- * - A small vanilla script handles selection, country highlighting and
- *   the World / Europe zoom. Nothing else ships to the browser.
+ * The map itself (/images/adventures-map-base.svg, built from world-atlas with
+ * d3-geo at build time) is fetched and inlined only when this fallback is shown,
+ * so the globe page does not carry it. It is a picture, not a control: places are
+ * picked in the country list, and the map mirrors the selection (`adventure:select`).
  */
-import { home, mapViews, type AdventureLocation } from "@data/adventures";
-import { countryNumericIds } from "@data/country-ids";
-import { shown } from "@lib/content";
-import { countryPaths, project, spherePath, viewBoxForBounds, worldViewBox } from "@lib/world-map";
+import { adventures } from "@data/adventures";
 
-interface Props {
-  locations: AdventureLocation[];
-  /** id of the view to start in (see mapViews in adventures.ts) */
-  initialView?: string;
-}
-const { locations, initialView = mapViews[0]?.id ?? "world" } = Astro.props;
-
-const numericToAlpha = new Map(Object.entries(countryNumericIds).map(([a2, num]) => [num, a2]));
-const activeCountries = new Map<
-  string,
-  { name: string; status: "visited" | "wishlist" | "home" }
->();
-activeCountries.set(home.countryCode, { name: home.country, status: "home" });
-for (const l of locations) {
-  const prev = activeCountries.get(l.countryCode);
-  if (!prev || (prev.status === "wishlist" && l.status === "visited"))
-    activeCountries.set(l.countryCode, { name: l.country, status: l.status });
-}
-for (const code of activeCountries.keys()) {
-  if (!countryNumericIds[code]) {
-    console.warn(
-      `[adventures] No numeric id for country code "${code}" — add it to src/data/country-ids.ts to highlight it on the map.`,
-    );
-  }
-}
-
-const views = mapViews.map((v) => ({
-  id: v.id,
-  label: v.label,
-  box: v.bounds ? viewBoxForBounds(v.bounds) : worldViewBox,
-}));
-const startView = views.find((v) => v.id === initialView) ?? views[0]!;
-const vb = startView.box;
-
-const markers = locations.map((l) => {
-  const { x, y } = project(l.coordinates.lat, l.coordinates.lng);
-  return {
-    ...l,
-    x,
-    y,
-    // Percentages for the initial (server-rendered) view; the script recomputes on zoom.
-    left: (((x - vb.x) / vb.w) * 100).toFixed(2),
-    top: (((y - vb.y) / vb.h) * 100).toFixed(2),
-    name: shown(l.city) ?? l.country,
-    label: shown(l.city) ? `${l.city}, ${l.country}` : l.country,
-  };
-});
+const visited = new Set(adventures.filter((a) => a.status === "visited").map((a) => a.country))
+  .size;
 ---
 
-<div
-  class="adv-map"
-  data-adv-map
-  data-view={startView.id}
-  style={`--map-aspect:${worldViewBox.w}/${worldViewBox.h}`}
->
-  {views.length > 1 && (
-    <div class="adv-map__views" role="group" aria-label="Map zoom">
-      {views.map((v) => (
-        <button
-          type="button"
-          class="adv-map__view"
-          data-adv-view-btn={v.id}
-          data-box={`${v.box.x} ${v.box.y} ${v.box.w} ${v.box.h}`}
-          aria-pressed={v.id === startView.id ? "true" : "false"}
-        >
-          {v.label}
-        </button>
-      ))}
-    </div>
-  )}
-
-  <div class="adv-map__stage">
-    <svg
-      class="adv-map__svg"
-      viewBox={`${vb.x} ${vb.y} ${vb.w} ${vb.h}`}
-      role="group"
-      aria-label="World map with visited places and places I want to visit"
-      data-adv-svg
-    >
-      <path class="adv-map__sphere" d={spherePath}></path>
-      <g class="adv-map__countries">
-        {countryPaths.map((c) => {
-          const code = numericToAlpha.get(c.id);
-          const active = code ? activeCountries.get(code) : undefined;
-          return active ? (
-            <path
-              class:list={["adv-map__country adv-map__country--active", `is-${active.status}`]}
-              d={c.d}
-              data-country={code}
-              role="button"
-              tabindex="0"
-              aria-label={`${active.name} — show places`}
-            >
-              <title>{active.name}</title>
-            </path>
-          ) : (
-            <path class="adv-map__country" d={c.d} aria-hidden="true" />
-          );
-        })}
-      </g>
-    </svg>
-
-    <ul class="adv-map__markers" aria-label="Places">
-      {markers.map((m) => (
-        <li
-          class="adv-map__marker-item"
-          style={`left:${m.left}%;top:${m.top}%`}
-          data-x={m.x}
-          data-y={m.y}
-        >
-          <button
-            type="button"
-            class:list={["adv-marker", `adv-marker--${m.status}`]}
-            data-adv-marker={m.id}
-            data-country={m.countryCode}
-            aria-pressed="false"
-            aria-label={`${m.label} — ${m.status === "visited" ? "visited" : "want to visit"}`}
-          >
-            <span class="adv-marker__dot" aria-hidden="true" />
-            <span class="adv-marker__label" aria-hidden="true">
-              {m.name}
-            </span>
-          </button>
-        </li>
-      ))}
-    </ul>
-  </div>
-</div>
+<figure class="adv-map" data-adv-map data-src="/images/adventures-map-base.svg">
+  <div class="adv-map__stage" data-adv-stage></div>
+  <figcaption class="sr-only">
+    World map: {visited} visited countries in ink, home in the Czech Republic highlighted, wishlist
+    countries outlined. Use the country list to pick a place.
+  </figcaption>
+</figure>
 
 <style>
   .adv-map {
-    position: relative;
+    margin: 0;
   }
-  .adv-map__views {
-    position: absolute;
-    top: 0.75rem;
-    left: 0.75rem;
-    z-index: 2;
-    display: inline-flex;
-    padding: 0.2rem;
-    gap: 0.2rem;
-    border-radius: var(--radius-md);
-    background: var(--face);
-  }
-  .adv-map__view {
-    min-height: 36px;
-    padding: 0.3rem 0.8rem;
-    border: 0;
-    border-radius: var(--radius-sm);
-    background: transparent;
-    color: var(--marking);
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition:
-      background-color 0.2s ease,
-      color 0.2s ease;
-  }
-  .adv-map__view:hover {
-    text-decoration: underline;
-  }
-  .adv-map__view[aria-pressed="true"] {
-    background: var(--select);
-    color: var(--on-select);
-  }
-
   .adv-map__stage {
-    position: relative;
+    aspect-ratio: 960 / 500;
     width: 100%;
-    aspect-ratio: var(--map-aspect);
-    overflow: hidden;
-    border-radius: inherit;
-    touch-action: manipulation;
   }
-  .adv-map__svg {
+  .adv-map__stage :global(svg) {
     display: block;
     width: 100%;
     height: 100%;
   }
-  .adv-map__sphere {
-    fill: var(--adventure-water);
-  }
-  .adv-map__country {
-    fill: var(--adventure-land);
-    stroke: var(--adventure-border);
+  .adv-map__stage :global(.c) {
+    fill: var(--panel-raised);
+    stroke: var(--panel-edge-strong);
     stroke-width: 0.6;
     vector-effect: non-scaling-stroke;
-    stroke-linejoin: round;
-    transition: fill 0.25s ease;
   }
-  .adv-map__country--active {
-    fill: var(--adventure-land-active);
-    cursor: pointer;
-    outline: none;
+  .adv-map__stage :global(.c.v) {
+    fill: var(--ink);
   }
-  .adv-map__country--active.is-home {
+  .adv-map__stage :global(.c.h) {
     fill: var(--route);
   }
-  .adv-map__country--active.is-wishlist {
-    fill: var(--adventure-land);
+  .adv-map__stage :global(.c.w) {
     stroke: var(--route);
-    stroke-width: 1.6;
-    stroke-dasharray: 4 3;
+    stroke-width: 1.4;
+    stroke-dasharray: 3 2;
   }
-  .adv-map__country--active:hover {
-    opacity: 0.8;
-  }
-  .adv-map__country--active:focus-visible {
-    stroke: var(--focus);
-    stroke-width: 2.5;
+  .adv-map__stage :global(.c.is-selected) {
+    stroke: var(--select);
+    stroke-width: 2;
     stroke-dasharray: none;
   }
-  .adv-map__country[data-selected="true"] {
+  .adv-map__stage :global(.m) {
+    fill: var(--route);
+    stroke: var(--panel-sheet);
+    stroke-width: 1.5;
+  }
+  .adv-map__stage :global(.m-w) {
+    fill: var(--panel-sheet);
     stroke: var(--route);
+    stroke-width: 2;
+  }
+  .adv-map__stage :global(.m.is-selected) {
+    r: 7px;
+    stroke: var(--ink);
     stroke-width: 2.5;
-    stroke-dasharray: none;
-  }
-
-  .adv-map__markers {
-    position: absolute;
-    inset: 0;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    pointer-events: none;
-  }
-  .adv-map__marker-item {
-    position: absolute;
-    width: 0;
-    height: 0;
-  }
-  .adv-marker {
-    --size: var(--adventure-marker-size);
-    --hit: var(--adventure-marker-hit);
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: var(--hit);
-    height: var(--hit);
-    margin: calc(var(--hit) / -2) 0 0 calc(var(--hit) / -2);
-    padding: 0;
-    border: 0;
-    border-radius: 999px;
-    background: transparent;
-    cursor: pointer;
-    pointer-events: auto;
-    display: grid;
-    place-items: center;
-  }
-  .adv-marker__dot {
-    width: var(--size);
-    height: var(--size);
-    border-radius: 999px;
-    box-sizing: border-box;
-    transition:
-      transform 0.25s var(--ease-out-soft, ease),
-      box-shadow 0.25s ease;
-  }
-  .adv-marker--visited .adv-marker__dot {
-    background: var(--route);
-    box-shadow: 0 0 0 2px var(--panel-sheet);
-  }
-  .adv-marker--wishlist .adv-marker__dot {
-    background: var(--panel-sheet);
-    border: 2px solid var(--route);
-  }
-  .adv-marker:hover .adv-marker__dot,
-  .adv-marker:focus-visible .adv-marker__dot {
-    transform: scale(1.35);
-  }
-  .adv-marker[aria-pressed="true"] .adv-marker__dot {
-    transform: scale(1.5);
-    box-shadow:
-      0 0 0 2px var(--panel-sheet),
-      0 0 0 4px var(--route);
-  }
-  .adv-marker--wishlist[aria-pressed="true"] .adv-marker__dot {
-    background: var(--route);
-    border-color: var(--panel-sheet);
-  }
-  .adv-marker:focus-visible {
-    outline: 2px solid var(--focus);
-    outline-offset: 2px;
-  }
-  /* Selected / hovered markers sit above their neighbours in dense clusters. */
-  .adv-map__marker-item:has(.adv-marker[aria-pressed="true"]),
-  .adv-map__marker-item:has(.adv-marker:hover),
-  .adv-map__marker-item:has(.adv-marker:focus-visible) {
-    z-index: 3;
-  }
-
-  /* Lightweight hover / focus preview */
-  .adv-marker__label {
-    position: absolute;
-    bottom: calc(50% + var(--size) / 2 + 6px);
-    left: 50%;
-    transform: translate(-50%, 4px);
-    padding: 0.2rem 0.5rem;
-    border-radius: var(--radius-sm);
-    background: var(--face);
-    color: var(--marking);
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    font-weight: 600;
-    line-height: 1.2;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition:
-      opacity 0.15s ease,
-      transform 0.15s ease;
-  }
-  @media (hover: hover) {
-    .adv-marker:hover .adv-marker__label,
-    .adv-marker:focus-visible .adv-marker__label {
-      opacity: 1;
-      transform: translate(-50%, 0);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .adv-map__country,
-    .adv-marker__dot,
-    .adv-marker__label,
-    .adv-map__view {
-      transition: none;
-    }
   }
 </style>
 
 <script>
-  /**
-   * SVG map interaction: markers and highlighted countries emit `adventure:pick`
-   * on the section; the details panel answers with `adventure:select`, which the
-   * map mirrors (pressed marker, selected country). Plus the World / Europe zoom.
-   */
-  type ViewBox = { x: number; y: number; w: number; h: number };
-  type SelectDetail = { id?: string | null; country?: string | null };
+  type Selection = { id?: string | null; country?: string | null };
 
-  function setupAdventureMap(root: HTMLElement) {
-    if (root.dataset.bound) return;
-    root.dataset.bound = "true";
-
+  async function loadMap(root: HTMLElement) {
+    if (root.dataset.loaded) return;
+    root.dataset.loaded = "true";
+    const stage = root.querySelector<HTMLElement>("[data-adv-stage]");
+    if (!stage || !root.dataset.src) return;
+    try {
+      const response = await fetch(root.dataset.src);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      // Same-origin SVG generated at build time from our own data.
+      stage.innerHTML = await response.text();
+    } catch {
+      delete root.dataset.loaded;
+      return;
+    }
     const section = root.closest<HTMLElement>("[data-adventures]") ?? document.body;
-    const svg = root.querySelector<SVGSVGElement>("[data-adv-svg]")!;
-    const markerItems = [...root.querySelectorAll<HTMLElement>(".adv-map__marker-item")];
-    const markers = [...root.querySelectorAll<HTMLButtonElement>("[data-adv-marker]")];
-    const countries = [...root.querySelectorAll<SVGPathElement>("[data-country].adv-map__country")];
-    const viewButtons = [...root.querySelectorAll<HTMLButtonElement>("[data-adv-view-btn]")];
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const pick = (detail: SelectDetail) =>
-      section.dispatchEvent(new CustomEvent("adventure:pick", { detail }));
-
-    /* Nearest marker to the pointer resolves overlapping hit boxes in dense clusters. */
-    const nearestMarker = (x: number, y: number) => {
-      let best = markers[0];
-      let bestDistance = Infinity;
-      for (const m of markers) {
-        const r = m.getBoundingClientRect();
-        const d = Math.hypot(r.left + r.width / 2 - x, r.top + r.height / 2 - y);
-        if (d < bestDistance) {
-          bestDistance = d;
-          best = m;
-        }
-      }
-      return best;
-    };
-
-    markers.forEach((m) =>
-      m.addEventListener("click", (e) => {
-        const target = (e.detail === 0 ? m : nearestMarker(e.clientX, e.clientY)) ?? m;
-        if (target !== m) target.focus({ preventScroll: true });
-        pick(
-          target.getAttribute("aria-pressed") === "true" ? {} : { id: target.dataset.advMarker },
-        );
-      }),
-    );
-    countries.forEach((c) => {
-      const activate = () => pick({ country: c.dataset.country });
-      c.addEventListener("click", activate);
-      c.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          activate();
-        }
-      });
-    });
-
     section.addEventListener("adventure:select", (e: Event) => {
-      const { id = null, country = null } = (e as CustomEvent<SelectDetail>).detail ?? {};
-      markers.forEach((m) => m.setAttribute("aria-pressed", String(m.dataset.advMarker === id)));
-      const code = id ? markers.find((m) => m.dataset.advMarker === id)?.dataset.country : country;
-      countries.forEach((c) => {
-        if (code && c.dataset.country === code) c.dataset.selected = "true";
-        else delete c.dataset.selected;
-      });
+      const { id = null, country = null } = (e as CustomEvent<Selection>).detail ?? {};
+      const marker = id ? stage.querySelector<SVGElement>(`.m[data-id="${id}"]`) : null;
+      const code = marker?.dataset.c ?? country;
+      stage.querySelectorAll(".is-selected").forEach((el) => el.classList.remove("is-selected"));
+      marker?.classList.add("is-selected");
+      if (code) stage.querySelector(`.c[data-c="${code}"]`)?.classList.add("is-selected");
     });
-
-    /* zoom */
-    const parseBox = (s: string): ViewBox => {
-      const [x, y, w, h] = s.split(" ").map(Number);
-      return { x: x!, y: y!, w: w!, h: h! };
-    };
-    let current = parseBox(svg.getAttribute("viewBox")!);
-    let frame = 0;
-    const applyBox = (b: ViewBox) => {
-      svg.setAttribute("viewBox", `${b.x} ${b.y} ${b.w} ${b.h}`);
-      for (const item of markerItems) {
-        const x = Number(item.dataset.x);
-        const y = Number(item.dataset.y);
-        item.style.left = `${((x - b.x) / b.w) * 100}%`;
-        item.style.top = `${((y - b.y) / b.h) * 100}%`;
-      }
-    };
-    const animateTo = (target: ViewBox) => {
-      cancelAnimationFrame(frame);
-      if (reduceMotion) {
-        current = target;
-        applyBox(target);
-        return;
-      }
-      const from = { ...current };
-      const start = performance.now();
-      const ease = (t: number) => 1 - Math.pow(1 - t, 3);
-      const step = (now: number) => {
-        const t = Math.min(1, (now - start) / 380);
-        const k = ease(t);
-        current = {
-          x: from.x + (target.x - from.x) * k,
-          y: from.y + (target.y - from.y) * k,
-          w: from.w + (target.w - from.w) * k,
-          h: from.h + (target.h - from.h) * k,
-        };
-        applyBox(current);
-        if (t < 1) frame = requestAnimationFrame(step);
-      };
-      frame = requestAnimationFrame(step);
-    };
-    viewButtons.forEach((b) =>
-      b.addEventListener("click", () => {
-        viewButtons.forEach((o) => o.setAttribute("aria-pressed", String(o === b)));
-        root.dataset.view = b.dataset.advViewBtn;
-        animateTo(parseBox(b.dataset.box!));
-      }),
-    );
   }
 
-  const init = () =>
-    document.querySelectorAll<HTMLElement>("[data-adv-map]").forEach(setupAdventureMap);
-  document.addEventListener("astro:page-load", init);
-  // The map lives in a <template> on /adventures and is mounted on demand.
-  document.addEventListener("adventure:map-mounted", init);
+  /** Load the map once its container is actually displayed. */
+  function syncMaps() {
+    document.querySelectorAll<HTMLElement>("[data-adv-map]").forEach((root) => {
+      if (root.offsetParent !== null) void loadMap(root);
+    });
+  }
+  document.addEventListener("astro:page-load", syncMaps);
+  document.addEventListener("adventure:fallback", syncMaps);
 </script>

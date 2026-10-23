@@ -118,10 +118,9 @@ const widths = [360, 540, 720, 1080, 1440];
     const tip = stage.querySelector<HTMLElement>(".globe-tip");
     const section = stage.closest<HTMLElement>("[data-adventures]");
     if (!canvas) return;
-    // Probe WebGL only now; without it, swap to the SVG map.
+    // Probe WebGL only now; without it, swap to the flat map.
     if (!capture && !hasWebGL()) {
-      const visual = stage.closest<HTMLElement>("[data-adv-visual]");
-      if (visual) visual.dataset.globe = "off";
+      if (section) section.dataset.globe = "off";
       return;
     }
     try {
@@ -155,7 +154,6 @@ const widths = [360, 540, 720, 1080, 1440];
     const stage = document.querySelector<HTMLElement>("[data-globe-stage]");
     if (!stage || stage.dataset.bound) return;
     stage.dataset.bound = "true";
-    const visual = stage.closest<HTMLElement>("[data-adv-visual]");
     const section = stage.closest<HTMLElement>("[data-adventures]");
 
     const params = new URLSearchParams(window.location.search);
@@ -163,10 +161,7 @@ const widths = [360, 540, 720, 1080, 1440];
       void start(stage, { dpr: Number(params.get("globe-capture")) || 2 });
       return;
     }
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      if (visual) visual.dataset.globe = "off";
-      return;
-    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     section?.addEventListener("adventure:select", (e: Event) => {
       const { lat, lng } = (e as CustomEvent<{ lat?: number; lng?: number }>).detail ?? {};
       if (typeof lat === "number" && typeof lng === "number" && !Number.isNaN(lat))

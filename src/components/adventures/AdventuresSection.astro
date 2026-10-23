@@ -1,8 +1,11 @@
 ---
 /**
  * Adventures: the live paper globe (or, under reduced motion / without WebGL,
- * the d3-geo SVG map) with the country list and details beside it.
- * Data: src/data/adventures.ts.
+ * the flat d3-geo map) with the country list beside it. The list is the control
+ * for both. Data: src/data/adventures.ts.
+ *
+ * `data-globe="off"` on the section (set by GlobeStage when WebGL is missing)
+ * and `prefers-reduced-motion` both switch to the flat map and its copy.
  */
 import AdventureDetails from "@components/adventures/AdventureDetails.astro";
 import AdventureMap from "@components/adventures/AdventureMap.astro";
@@ -32,72 +35,80 @@ const countries = new Set(
       {countries} countries on the map
     </h1>
     <p class="mt-5 max-w-[640px] text-body-l">
-      Where I've been, home in Prague, and the places still on the list. Drag the globe to turn it;
-      pick a country or a place in the list to fly there.
+      Where I've been, home in Prague, and the places still on the list.
+      <span class="copy-globe">
+        {" "}
+        Drag the globe to turn it; pick a country or a place in the list to fly there.
+      </span>
+      <span class="copy-map"> Pick a country or a place in the list to see it on the map.</span>
     </p>
 
     <div class="mt-10 grid items-start gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(300px,1fr)]">
-      <div class="adv-visual flex flex-col gap-4 lg:sticky lg:top-24" data-adv-visual>
+      <div class="flex flex-col gap-4 lg:sticky lg:top-24">
         <GlobeStage />
-        {/* Fallback map: parsed only when needed (reduced motion / no WebGL), so the
-            globe page does not carry ~45 KB of hidden SVG. */}
-        <template data-adv-fallback-template>
-          <div class="adv-fallback sheet p-2 sm:p-3">
-            <AdventureMap locations={adventures} />
-          </div>
-        </template>
+        <div class="adv-fallback sheet p-2 sm:p-3">
+          <AdventureMap />
+        </div>
         <MapLegend />
       </div>
-      <aside class="module p-6" aria-label="Countries and places">
-        <AdventureDetails locations={adventures} />
-      </aside>
+      <section class="places module p-6" aria-labelledby="places-heading">
+        <h2 id="places-heading" class="placard text-ink-muted">
+          Countries &amp; places
+        </h2>
+        <div class="mt-5">
+          <AdventureDetails locations={adventures} headingLevel={3} />
+        </div>
+      </section>
     </div>
   </div>
 </section>
 
 <style>
-  .adventures {
-    --adventure-marker-size: 11px;
-    --adventure-marker-hit: 32px;
-    --adventure-water: var(--panel-sheet);
-    --adventure-land: var(--panel-raised);
-    --adventure-land-active: var(--ink);
-    --adventure-border: var(--panel-edge-strong);
-  }
-  @media (pointer: coarse) {
-    .adventures {
-      --adventure-marker-hit: 44px;
-    }
-  }
-  .adv-visual[data-globe="off"] :global(.globe-stage) {
+  .adv-fallback,
+  .copy-map {
     display: none;
   }
+  .adventures[data-globe="off"] :global(.globe-stage),
+  .adventures[data-globe="off"] :global(.legend-route),
+  .adventures[data-globe="off"] .copy-globe {
+    display: none;
+  }
+  .adventures[data-globe="off"] .adv-fallback {
+    display: block;
+  }
+  .adventures[data-globe="off"] .copy-map {
+    display: inline;
+  }
   @media (prefers-reduced-motion: reduce) {
-    .adv-visual :global(.globe-stage) {
+    .adventures :global(.globe-stage),
+    .adventures :global(.legend-route),
+    .copy-globe {
       display: none;
     }
+    .adv-fallback {
+      display: block;
+    }
+    .copy-map {
+      display: inline;
+    }
+  }
+  /* The list sits below the globe on phones: skip its rendering (and the latin-ext
+     font its place names need) until it comes near the viewport. */
+  .places {
+    content-visibility: auto;
+    /* Reserve height only — a two-axis size would claim 1200px of width on phones. */
+    contain-intrinsic-block-size: auto 1200px;
   }
 </style>
 
 <script>
-  /** Instantiate the SVG map when the globe cannot (or should not) run. */
-  function mountFallback() {
-    const visual = document.querySelector<HTMLElement>("[data-adv-visual]");
-    const template = visual?.querySelector<HTMLTemplateElement>("[data-adv-fallback-template]");
-    if (!visual || !template || visual.querySelector(".adv-fallback")) return;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!reduced && visual.dataset.globe !== "off") return;
-    template.after(template.content.cloneNode(true));
-    document.dispatchEvent(new CustomEvent("adventure:map-mounted"));
-  }
+  /** Tell the flat map to load when the globe is switched off (no WebGL). */
   document.addEventListener("astro:page-load", () => {
-    mountFallback();
-    const visual = document.querySelector<HTMLElement>("[data-adv-visual]");
-    if (!visual || visual.dataset.fallbackWatch) return;
-    visual.dataset.fallbackWatch = "true";
-    new MutationObserver(mountFallback).observe(visual, {
-      attributes: true,
-      attributeFilter: ["data-globe"],
-    });
+    const section = document.querySelector<HTMLElement>("[data-adventures]");
+    if (!section || section.dataset.fallbackWatch) return;
+    section.dataset.fallbackWatch = "true";
+    new MutationObserver(() =>
+      document.dispatchEvent(new CustomEvent("adventure:fallback")),
+    ).observe(section, { attributes: true, attributeFilter: ["data-globe"] });
   });
 </script>

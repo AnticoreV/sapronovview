@@ -16,7 +16,7 @@ interface Props {
   locations: AdventureLocation[];
   headingLevel?: 2 | 3;
 }
-const { locations, headingLevel = 2 } = Astro.props;
+const { locations, headingLevel = 3 } = Astro.props;
 const H = `h${headingLevel}` as "h2" | "h3";
 const name = (a: AdventureLocation) => shown(a.city) ?? a.country;
 const visitedCountries = groupByCountry(locations.filter((l) => l.status === "visited"));
@@ -185,9 +185,12 @@ const groups = [
     min-height: 40px;
     font-weight: 700;
   }
+  /* Place names in mono: Wrocław, Gdańsk… use the small JetBrains latin-ext file,
+     not Saira's, and read like waypoint labels. */
   .adv-item--place {
     color: var(--ink-muted);
-    font-size: var(--text-small);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
   }
   .adv-item:hover {
     text-decoration: underline;
