@@ -5,7 +5,7 @@ const routes = [
   "/about",
   "/projects",
   "/projects/ownira",
-  "/projects/apex-line-market-research",
+  "/projects/apexline",
   "/experience",
   "/writing",
   "/hobbies",
@@ -129,11 +129,87 @@ test.describe("reduced motion", () => {
     expect(await threeRequests(page)).toEqual([]);
   });
 
-  test("adventures shows the SVG map instead of the globe", async ({ page }) => {
+  test("adventures shows the flat map instead of the globe", async ({ page }) => {
     await page.goto("/adventures");
-    await expect(page.locator("[data-adv-svg]")).toBeVisible();
+    await expect(page.locator("[data-adv-map] svg")).toBeVisible();
+    await expect(
+      page.getByText("Pick a country or a place in the list to see it on the map."),
+    ).toBeVisible();
     await expect(page.locator("[data-globe-stage]")).toBeHidden();
     await page.waitForTimeout(1000);
     expect(await threeRequests(page)).toEqual([]);
   });
+});
+
+test.describe("while no post is published", () => {
+  test("Writing leaves the nav, CONTACT takes its slot, RSS is hidden", async ({ page }) => {
+    await page.goto("/");
+    const posts = await page.evaluate(
+      () => document.querySelectorAll('a[href^="/writing/"]').length,
+    );
+    test.skip(posts > 0, "a post is published");
+    const header = page.locator("header").first();
+    await expect(header.locator('a[href="/writing"]')).toHaveCount(0);
+    await expect(page.locator("footer a[href='/rss.xml']")).toHaveCount(0);
+    await expect(page.locator("footer a[href='/writing']")).toHaveCount(0);
+    await expect(page.locator('link[type="application/rss+xml"]')).toHaveCount(0);
+    await expect(page.locator("#off-duty")).toBeVisible();
+    await expect(page.locator("#journal")).toHaveCount(0);
+  });
+
+  test("/writing is noindex without canonical and out of the sitemap", async ({
+    page,
+    request,
+  }) => {
+    await page.goto("/writing");
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+    await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
+    const sitemap = await (await request.get("/sitemap-0.xml")).text();
+    expect(sitemap).not.toContain("/writing");
+  });
+});
+
+test("annunciator links to contact with a matching accessible name", async ({ page }) => {
+  await page.goto("/about");
+  const link = page.getByRole("link", { name: /open to projects — contact/i });
+  await expect(link).toHaveAttribute("href", "/contact");
+});
+
+test("hero shows the four sourced readouts", async ({ page }) => {
+  await page.goto("/");
+  const readouts = page.getByRole("list", { name: "Proof readouts" }).locator("li");
+  await expect(readouts).toHaveCount(4);
+  await expect(readouts.nth(1)).toContainText("p95 latency · CCA Group");
+  await expect(readouts.nth(1)).toContainText("≈ halved");
+  for (let i = 0; i < 4; i++) await expect(readouts.nth(i)).toBeVisible();
+});
+
+test("about: heading, ProfilePage structured data", async ({ page }) => {
+  await page.goto("/about");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Engineer and founder.");
+  const ld = await page
+    .locator('script[type="application/ld+json"]')
+    .evaluateAll((els) => els.map((e) => JSON.parse(e.textContent ?? "{}")));
+  const profile = ld.find((d) => d["@type"] === "ProfilePage");
+  expect(profile?.mainEntity?.["@id"]).toMatch(/#person$/);
+  expect(profile?.mainEntity?.image).toMatch(/\/images\/ivan-sapronov\.jpg$/);
+});
+
+test("renamed Apexline page: old URL forwards to /projects/apexline", async ({ page }) => {
+  await page.goto("/projects/apex-line-market-research");
+  await page.waitForURL(/\/projects\/apexline$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Apexline");
+});
+
+test("404 has no canonical", async ({ page }) => {
+  await page.goto("/no-such-page");
+  await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
+});
+
+test("projects lists the GitHub repositories without case-study links", async ({ page }) => {
+  await page.goto("/projects");
+  const code = page.locator("section", { has: page.locator("#code-heading") });
+  await expect(code.locator("article")).toHaveCount(4);
+  await expect(code.locator('a[href^="/projects/"]')).toHaveCount(0);
+  await expect(code.locator('a[href^="https://github.com/"]').first()).toBeVisible();
 });
