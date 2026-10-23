@@ -5,12 +5,16 @@ const routes = [
   "/about",
   "/projects",
   "/projects/ownira",
+  "/projects/self-service-menu-platform",
+  "/projects/dynamic-form-engine",
+  "/projects/creativedock-greenfield-services",
   "/experience",
   "/writing",
   "/hobbies",
   "/adventures",
   "/now",
   "/contact",
+  "/404",
 ];
 
 /** Requests for the three.js / scene chunks made by the page so far. */
@@ -103,6 +107,22 @@ test("contact form: topic from ?topic=, field errors, honest not-connected state
   await expect(page.locator('[data-state="success"]')).toBeHidden();
   // The text stays in the form.
   await expect(page.locator("#cf-message")).toHaveValue(/smoke test/);
+});
+
+test("hero eyebrow never starts a line with a separator", async ({ page }) => {
+  await page.goto("/");
+  const text = await page.locator("#top p").first().textContent();
+  expect(text).toContain("FOUNDER\u00a0·\u00a0PRAGUE");
+  expect(text).not.toMatch(/ ·/);
+});
+
+test("without a stored choice the theme follows OS changes live", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.goto("/about");
+  await expect(page.locator("html")).not.toHaveClass(/\bdark\b/);
+  await page.emulateMedia({ colorScheme: "dark" });
+  await expect(page.locator("html")).toHaveClass(/\bdark\b/);
+  await expect(page.locator("[data-theme-toggle]")).toHaveAttribute("aria-pressed", "true");
 });
 
 test("theme toggle switches to dark and remembers it", async ({ page }) => {
