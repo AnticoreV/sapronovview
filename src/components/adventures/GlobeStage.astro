@@ -5,12 +5,12 @@
  * (see AdventuresSection) and three.js is never downloaded.
  */
 import ThemePicture from "@components/ui/ThemePicture.astro";
-import posterDay from "@/assets/globe/globe-day.png";
-import posterNight from "@/assets/globe/globe-night.png";
+import posterLight from "@/assets/globe/globe-light.png";
+import posterDark from "@/assets/globe/globe-dark.png";
 import { adventures, home } from "@data/adventures";
 
 const visited = new Set(adventures.filter((a) => a.status === "visited").map((a) => a.countryCode));
-const alt = `Globe centred on Europe: ${visited.size} visited countries in ink, home in ${home.country} highlighted, routes from ${home.city} to every visited place, wishlist countries outlined.`;
+const alt = `Globe centred on Europe: ${visited.size} visited countries in ink, home in ${home.country} highlighted in blue, routes from ${home.city} to every visited place, wishlist countries outlined.`;
 const sizes = "(min-width: 1100px) 720px, 92vw";
 const widths = [360, 540, 720, 1080, 1440];
 ---
@@ -18,8 +18,8 @@ const widths = [360, 540, 720, 1080, 1440];
 <div class="globe-stage relative mx-auto aspect-square w-full max-w-[720px]" data-globe-stage>
   <span class="globe-poster">
     <ThemePicture
-      day={posterDay}
-      night={posterNight}
+      light={posterLight}
+      dark={posterDark}
       alt={alt}
       widths={widths}
       sizes={sizes}
@@ -69,11 +69,12 @@ const widths = [360, 540, 720, 1080, 1440];
     left: 0;
     top: 0;
     z-index: 2;
-    padding: 4px 8px;
-    border-radius: var(--radius-sm);
-    background: var(--face);
-    color: var(--marking);
-    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;

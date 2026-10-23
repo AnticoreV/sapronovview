@@ -2,8 +2,9 @@
  * Adventures paper globe — port of claude-design-system/3d/d2.html (three r184),
  * travel mode, driven by src/data/adventures.ts and world-atlas countries-110m.
  *
- * Visited countries in ink, home (Czechia) in magenta, wishlist countries with a
- * dashed magenta outline, magenta arcs from Prague to every visited place.
+ * Re-skinned to design system v2: a clay-white paper plate, visited countries in ink,
+ * home (Czechia) in accent blue, wishlist countries with a dashed accent outline,
+ * accent arcs from Prague to every visited place. Light / dark follow `.dark`.
  * Drag to rotate (with inertia), hover for the country name, click a country
  * with places to open its card. The country list beside the globe is the
  * keyboard / screen-reader equivalent; selecting there turns the globe.
@@ -71,28 +72,29 @@ type Palette = {
   key: number;
 };
 
-const PALETTES: Record<"day" | "night", Palette> = {
-  day: {
-    paper: "#f7f8f6",
-    graticule: "#c6ccc7",
+/** v2 tokens: paper = clay-white, land = surface, lines = line / line-strong, ink, accent. */
+const PALETTES: Record<"light" | "dark", Palette> = {
+  light: {
+    paper: "#f6f7f8",
+    graticule: "#d4dae1",
     land: "#ffffff",
-    border: "#111413",
-    visited: "#111413",
-    home: "#a3136a",
-    route: "#a3136a",
-    dot: "#111413",
+    border: "#4d5662",
+    visited: "#10141a",
+    home: "#2450ff",
+    route: "#2450ff",
+    dot: "#10141a",
     ambient: 2.2,
     key: 1.2,
   },
-  night: {
-    paper: "#1b1f1f",
-    graticule: "#2a2f2e",
-    land: "#262b2b",
-    border: "#a2a8a4",
-    visited: "#eeeee8",
-    home: "#e0569f",
-    route: "#e0569f",
-    dot: "#eeeee8",
+  dark: {
+    paper: "#171b22",
+    graticule: "#2a313b",
+    land: "#212833",
+    border: "#6b7686",
+    visited: "#eef1f4",
+    home: "#7d9bff",
+    route: "#7d9bff",
+    dot: "#eef1f4",
     ambient: 1.6,
     key: 1.0,
   },
@@ -105,7 +107,7 @@ const START = { lng: 18, lat: 38 };
 type CountryProps = { name: string };
 type Countries = Topology<{ countries: GeometryCollection<CountryProps> }>;
 
-const isNight = () => document.documentElement.classList.contains("dark");
+const isDark = () => document.documentElement.classList.contains("dark");
 
 function toVec(lng: number, lat: number, r = 1) {
   const phi = (90 - lat) * DEG;
@@ -279,7 +281,7 @@ export async function mountGlobe(
   const globe = new Group();
   globe.rotation.order = "XYZ";
   scene.add(globe);
-  let C = PALETTES[isNight() ? "night" : "day"];
+  let C = PALETTES[isDark() ? "dark" : "light"];
   const sphereMat = new MeshStandardMaterial({ roughness: 1, metalness: 0 });
   const sphere = new Mesh(new SphereGeometry(1, mobile ? 96 : 128, mobile ? 72 : 96), sphereMat);
   globe.add(sphere);
@@ -321,7 +323,7 @@ export async function mountGlobe(
   sphereMat.map = mapTexture;
 
   const applyTheme = () => {
-    C = PALETTES[isNight() ? "night" : "day"];
+    C = PALETTES[isDark() ? "dark" : "light"];
     const next = paintMap(C);
     sphereMat.map = next;
     sphereMat.needsUpdate = true;
@@ -471,8 +473,8 @@ export async function mountGlobe(
   });
   const onVisibility = () => wake();
   const themeObserver = new MutationObserver(() => {
-    const night = isNight();
-    if ((night && C === PALETTES.day) || (!night && C === PALETTES.night)) {
+    const dark = isDark();
+    if ((dark && C === PALETTES.light) || (!dark && C === PALETTES.dark)) {
       applyTheme();
       renderer.render(scene, camera);
     }

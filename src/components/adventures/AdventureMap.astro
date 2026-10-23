@@ -35,8 +35,8 @@ const visited = new Set(adventures.filter((a) => a.status === "visited").map((a)
     height: 100%;
   }
   .adv-map__stage :global(.c) {
-    fill: var(--panel-raised);
-    stroke: var(--panel-edge-strong);
+    fill: var(--surface);
+    stroke: var(--line-strong);
     stroke-width: 0.6;
     vector-effect: non-scaling-stroke;
   }
@@ -44,26 +44,26 @@ const visited = new Set(adventures.filter((a) => a.status === "visited").map((a)
     fill: var(--ink);
   }
   .adv-map__stage :global(.c.h) {
-    fill: var(--route);
+    fill: var(--accent);
   }
   .adv-map__stage :global(.c.w) {
-    stroke: var(--route);
+    stroke: var(--accent);
     stroke-width: 1.4;
     stroke-dasharray: 3 2;
   }
   .adv-map__stage :global(.c.is-selected) {
-    stroke: var(--select);
+    stroke: var(--accent);
     stroke-width: 2;
     stroke-dasharray: none;
   }
   .adv-map__stage :global(.m) {
-    fill: var(--route);
-    stroke: var(--panel-sheet);
+    fill: var(--accent);
+    stroke: var(--surface);
     stroke-width: 1.5;
   }
   .adv-map__stage :global(.m-w) {
-    fill: var(--panel-sheet);
-    stroke: var(--route);
+    fill: var(--surface);
+    stroke: var(--accent);
     stroke-width: 2;
   }
   .adv-map__stage :global(.m.is-selected) {

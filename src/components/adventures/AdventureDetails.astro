@@ -42,19 +42,19 @@ const groups = [
   <p class="sr-only" aria-live="polite" data-adv-announce></p>
 
   <div data-adv-view="list">
-    <p class="placard flex items-center gap-2 text-ink-muted">
+    <p class="label flex items-center gap-2 text-ink-muted">
       <span class="adv-dot adv-dot--home" aria-hidden="true"></span>
       Home base · {home.city}, {home.country}
     </p>
     {groups.map((group) => (
       <section aria-labelledby={`adv-group-${group.key}`} class="mt-6">
-        <H id={`adv-group-${group.key}`} class="placard flex items-center gap-2 text-ink-muted">
+        <H id={`adv-group-${group.key}`} class="label flex items-center gap-2 text-ink-muted">
           <span class:list={["adv-dot", `adv-dot--${group.key}`]} aria-hidden="true" />
           {group.title}
         </H>
         <ul class="mt-2 flex flex-col">
           {group.items.map((c) => (
-            <li class="border-b border-panel-edge py-1.5">
+            <li class="border-b border-line py-1.5">
               <button
                 type="button"
                 class="adv-item adv-item--country"
@@ -93,7 +93,7 @@ const groups = [
       hidden
     >
       <div class="flex items-center justify-between gap-3">
-        <p class="placard flex items-center gap-2 text-ink-muted">
+        <p class="label flex items-center gap-2 text-ink-muted">
           <span class:list={["adv-dot", `adv-dot--${a.status}`]} aria-hidden="true" />
           {statusLabel(a.status)}
           {a.status === "visited" && shown(a.visitedAt) && <span>· {a.visitedAt}</span>}
@@ -105,7 +105,7 @@ const groups = [
           </svg>
         </button>
       </div>
-      <H id={`adv-title-${a.id}`} class="display mt-3 text-[2rem] leading-none">
+      <H id={`adv-title-${a.id}`} class="display mt-3 text-[32px] leading-none tracking-[-0.03em]">
         {name(a)}
       </H>
       {shown(a.city) && <p class="mt-1 text-ink-muted">{a.country}</p>}
@@ -117,7 +117,7 @@ const groups = [
         </p>
       )}
       {a.href && (
-        <a href={a.href} class="link-ghost mt-4 inline-flex min-h-11 items-center">
+        <a href={a.href} class="link-more mt-4">
           {a.hrefLabel ?? "Read more"}
           <span aria-hidden="true">&nbsp;→</span>
         </a>
@@ -137,19 +137,22 @@ const groups = [
       hidden
     >
       <div class="flex items-center justify-between gap-3">
-        <p class="placard text-ink-muted">Country</p>
+        <p class="label text-ink-muted">Country</p>
         <button type="button" class="adv-close" data-adv-close aria-label="Close details">
           <svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true">
             <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" />
           </svg>
         </button>
       </div>
-      <H id={`adv-country-${c.countryCode}`} class="display mt-3 text-[2rem] leading-none">
+      <H
+        id={`adv-country-${c.countryCode}`}
+        class="display mt-3 text-[32px] leading-none tracking-[-0.03em]"
+      >
         {c.country}
       </H>
       <ul class="mt-4 flex flex-col">
         {c.locations.map((a) => (
-          <li class="border-b border-panel-edge">
+          <li class="border-b border-line">
             <button
               type="button"
               class="adv-item flex w-full items-center gap-2"
@@ -157,7 +160,7 @@ const groups = [
             >
               <span class:list={["adv-dot", `adv-dot--${a.status}`]} aria-hidden="true" />
               <span class="font-semibold">{name(a)}</span>
-              <span class="mono text-xs text-ink-muted uppercase">{statusLabel(a.status)}</span>
+              <span class="mono text-[12px] text-ink-muted uppercase">{statusLabel(a.status)}</span>
             </button>
           </li>
         ))}
@@ -185,8 +188,8 @@ const groups = [
     min-height: 40px;
     font-weight: 700;
   }
-  /* Place names in mono: Wrocław, Gdańsk… use the small JetBrains latin-ext file,
-     not Saira's, and read like waypoint labels. */
+  /* Place names in mono: Wrocław, Gdańsk… use the small IBM Plex Mono latin-ext file
+     instead of the larger Schibsted one. */
   .adv-item--place {
     color: var(--ink-muted);
     font-family: var(--font-mono);
@@ -197,8 +200,8 @@ const groups = [
     text-underline-offset: 4px;
   }
   .adv-item[aria-current="true"] {
-    background: var(--face);
-    color: var(--select);
+    background: var(--accent-soft);
+    color: var(--accent);
   }
   .adv-dot {
     display: inline-block;
@@ -211,10 +214,10 @@ const groups = [
     background: var(--ink);
   }
   .adv-dot--home {
-    background: var(--route);
+    background: var(--accent);
   }
   .adv-dot--wishlist {
-    border: 2px dashed var(--route);
+    border: 2px dashed var(--accent);
   }
   .adv-card {
     outline: none;
@@ -225,14 +228,14 @@ const groups = [
     justify-content: center;
     width: 44px;
     height: 44px;
-    border: 1px solid var(--panel-edge-strong);
-    border-radius: var(--radius-sm);
-    background: var(--panel-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
     color: var(--ink);
     cursor: pointer;
   }
   .adv-close:hover {
-    border-color: var(--ink);
+    border-color: var(--line-strong);
   }
 </style>
 

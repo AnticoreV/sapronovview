@@ -7,23 +7,26 @@ const { class: className } = Astro.props;
 ---
 
 <ul
-  class:list={["mono flex flex-wrap gap-x-5 gap-y-2 text-xs text-ink-muted uppercase", className]}
+  class:list={[
+    "mono flex flex-wrap gap-x-5 gap-y-2 text-[12px] font-medium text-ink-muted uppercase",
+    className,
+  ]}
   aria-label="Map legend"
 >
   <li class="inline-flex items-center gap-2">
-    <span class="inline-block size-3 rounded-[2px] bg-route" aria-hidden="true"></span>Home
+    <span class="inline-block size-3 rounded-[2px] bg-accent" aria-hidden="true"></span>Home
   </li>
   <li class="inline-flex items-center gap-2">
     <span class="inline-block size-3 rounded-[2px] bg-ink" aria-hidden="true"></span>Visited
   </li>
   <li class="inline-flex items-center gap-2">
     <span
-      class="inline-block size-3 rounded-[2px] border-2 border-dashed border-route"
+      class="inline-block size-3 rounded-[2px] border-2 border-dashed border-accent"
       aria-hidden="true"
     ></span>
     Want to visit
   </li>
   <li class="legend-route inline-flex items-center gap-2">
-    <span class="inline-block h-0.5 w-4 bg-route" aria-hidden="true"></span>Route from Prague
+    <span class="inline-block h-0.5 w-4 bg-accent" aria-hidden="true"></span>Route from Prague
   </li>
 </ul>

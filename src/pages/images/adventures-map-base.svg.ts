@@ -21,14 +21,14 @@ export const GET: APIRoute = () => {
   }
   status.set(home.countryCode, "h");
 
-  const fills = { v: "#111312", h: "#a3136a", w: "#e5e7e4" } as const;
+  const fills = { v: "#10141a", h: "#2450ff", w: "#ffffff" } as const;
   const countries = countryPaths
     .map((c) => {
       const code = alphaByNumeric.get(c.id);
       const s = code ? status.get(code) : undefined;
       return s
         ? `<path class="c ${s}" data-c="${code}" d="${c.d}" fill="${fills[s]}"/>`
-        : `<path class="c" d="${c.d}" fill="#e5e7e4"/>`;
+        : `<path class="c" d="${c.d}" fill="#ffffff"/>`;
     })
     .join("");
 
@@ -42,8 +42,8 @@ export const GET: APIRoute = () => {
 
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${MAP_WIDTH} ${MAP_HEIGHT}" class="adv-svg" focusable="false" aria-hidden="true">` +
-    `<g stroke="#a9aeaa" stroke-width="0.6" stroke-linejoin="round">${countries}</g>` +
-    `<g fill="#a3136a">${markers}</g></svg>`;
+    `<g stroke="#7d879a" stroke-width="0.6" stroke-linejoin="round">${countries}</g>` +
+    `<g fill="#2450ff">${markers}</g></svg>`;
 
   return new Response(svg, {
     headers: { "Content-Type": "image/svg+xml; charset=utf-8" },
