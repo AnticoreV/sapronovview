@@ -120,7 +120,10 @@ test("theme toggle switches to dark and remembers it", async ({ page }) => {
 test.describe("dark theme", () => {
   test.use({ colorScheme: "dark" });
 
-  test("follows the OS preference: dark tokens, pressed toggle, dark poster", async ({ page }) => {
+  test("follows the OS preference: dark tokens, pressed toggle, dark poster", async ({
+    page,
+    isMobile,
+  }) => {
     await page.goto("/");
     await expect(page.locator("html")).toHaveClass(/\bdark\b/);
     await expect(page.locator("[data-theme-toggle]")).toHaveAttribute("aria-pressed", "true");
@@ -129,7 +132,7 @@ test.describe("dark theme", () => {
     const poster = page.locator("[data-hero-stage] img");
     await expect(poster).toHaveJSProperty("complete", true);
     expect(await poster.evaluate((img: HTMLImageElement) => img.currentSrc)).toMatch(
-      /blueprint-dark/,
+      isMobile ? /blueprint-small-dark/ : /blueprint-dark/,
     );
   });
 
@@ -244,7 +247,9 @@ test("hero: V6 blueprint poster, legend and the four sourced proof numbers", asy
   const legend = page.locator(".hero-media figcaption");
   await expect(legend).toContainText("DRAWN");
   await expect(legend).toContainText("REVIEW · AGENT LOOP");
-  await expect(legend).toContainText("SKETCH → BUILD → SHIP → LEARN");
+  // → is an inline SVG glyph; screen readers read "to".
+  await expect(legend).toContainText("SKETCH to BUILD to SHIP to LEARN");
+  await expect(legend.locator("svg.glyph-arrow")).toHaveCount(3);
   await expect(page.locator("[data-hero-stage]")).toHaveAttribute(
     "aria-label",
     /isometric technical drawing builds itself/,
@@ -252,7 +257,10 @@ test("hero: V6 blueprint poster, legend and the four sourced proof numbers", asy
   const numbers = page.getByRole("list", { name: "Proof numbers" }).locator("li");
   await expect(numbers).toHaveCount(4);
   await expect(numbers.nth(1)).toContainText("p95 latency, roughly halved · CCA Group");
-  await expect(numbers.nth(1)).toContainText("≈ ½");
+  // "≈ ½": ≈ is an inline SVG glyph; screen readers get "approximately half".
+  await expect(numbers.nth(1)).toContainText("½");
+  await expect(numbers.nth(1).locator("svg.glyph-approx")).toHaveCount(1);
+  await expect(numbers.nth(1)).toContainText("approximately half");
   for (let i = 0; i < 4; i++) await expect(numbers.nth(i)).toBeVisible();
   await expect(page.getByText(/^WORKED WITH NCR VOYIX/)).toBeVisible();
 });
@@ -313,4 +321,67 @@ test("projects lists the GitHub repositories without case-study links", async ({
   await expect(code.locator("article")).toHaveCount(4);
   await expect(code.locator('a[href^="/projects/"]')).toHaveCount(0);
   await expect(code.locator('a[href^="https://github.com/"]').first()).toBeVisible();
+});
+
+test.describe("security headers (applied from _headers, as on Cloudflare Pages)", () => {
+  test("CSP + HSTS: no violations across ClientRouter navigation, 3D and the form", async ({
+    page,
+    isMobile,
+  }) => {
+    test.setTimeout(90_000);
+    await page.addInitScript(() => {
+      const w = window as unknown as { __csp?: string[] };
+      w.__csp = [];
+      document.addEventListener("securitypolicyviolation", (e) =>
+        w.__csp!.push(`${e.violatedDirective} ${e.blockedURI}`),
+      );
+    });
+    const consoleCsp: string[] = [];
+    page.on("console", (m) => {
+      if (/Content.Security.Policy|Refused to/i.test(m.text())) consoleCsp.push(m.text());
+    });
+
+    const res = await page.goto("/");
+    expect(res?.headers()["content-security-policy"]).toContain("default-src 'self'");
+    expect(res?.headers()["strict-transport-security"]).toBe("max-age=31536000");
+    expect(res?.headers()["permissions-policy"]).not.toContain("interest-cohort");
+    // The hero scene starts by itself on desktop (on phones it waits for a scroll).
+    if (!isMobile) await page.waitForSelector("[data-hero-stage][data-live]", { timeout: 30_000 });
+
+    // ClientRouter swaps (a full reload would drop this marker).
+    await page.evaluate(() => ((window as unknown as { __noReload?: boolean }).__noReload = true));
+    const go = async (selector: string, url: RegExp, heading: string | RegExp) => {
+      await page.locator(selector).first().click();
+      await page.waitForURL(url);
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading);
+    };
+    await go('#work a[href="/projects"]', /\/projects$/, "Projects");
+    await go('footer a[href="/about"]', /\/about$/, "Engineer and founder.");
+    // Styles of the swapped page apply (inline <style> under the policy).
+    expect(await page.evaluate(() => getComputedStyle(document.body).fontFamily)).toMatch(
+      /Schibsted/,
+    );
+    await go('footer a[href="/hobbies"]', /\/hobbies$/, /.+/);
+    await go('main a[href="/adventures"]', /\/adventures$/, /countries on the map/);
+    if (!isMobile) await page.waitForSelector("[data-globe-stage][data-live]", { timeout: 30_000 });
+    await go(
+      '#contact a[href="/contact?topic=hiring"]',
+      /\/contact\?topic=hiring$/,
+      /Ready to ship/,
+    );
+    expect(
+      await page.evaluate(() => (window as unknown as { __noReload?: boolean }).__noReload),
+    ).toBe(true);
+
+    // The form still works (topic preselect, honest not-connected state).
+    await expect(page.locator("#cf-topic")).toHaveValue("hiring");
+    await page.fill("#cf-name", "Test Person");
+    await page.fill("#cf-email", "test@example.com");
+    await page.fill("#cf-message", "Hello — CSP smoke test.");
+    await page.locator("[data-contact-form] button[type=submit]").click();
+    await expect(page.locator('[data-state="offline"]')).toBeVisible();
+
+    expect(await page.evaluate(() => (window as unknown as { __csp: string[] }).__csp)).toEqual([]);
+    expect(consoleCsp).toEqual([]);
+  });
 });
