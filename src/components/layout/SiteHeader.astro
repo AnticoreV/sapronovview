@@ -2,7 +2,7 @@
 /**
  * SiteHeader — sticky header from the approved artboard: cube mark + name, nav
  * (Products · Capabilities · Cases · Experience · About), availability pill, theme
- * toggle, EN | CS switch and the Contact pill. Below 1024px the nav and Contact collapse into a 44px menu
+ * toggle, EN | CS switch and the Contact button. Below 1024px the nav and Contact collapse into a 44px menu
  * button that opens a full-height sheet with every route (native <dialog>: focus
  * trapping, Escape and an inert page for free). A 1px line appears once scrolled.
  */
@@ -109,7 +109,7 @@ const isCurrent = (href: string) =>
     </div>
     <nav aria-label={t("menu.pages")} class="band flex-1 overflow-y-auto py-6">
       <ol class="flex flex-col">
-        {sheetNav.map((item, i) => {
+        {sheetNav.map((item) => {
           const current = isCurrent(item.href);
           return (
             <li>
@@ -122,9 +122,6 @@ const isCurrent = (href: string) =>
                 ]}
               >
                 <span>{t(item.key)}</span>
-                <span class="meta text-ink-muted" aria-hidden="true">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
               </a>
             </li>
           );
@@ -134,7 +131,7 @@ const isCurrent = (href: string) =>
       <ul class="mt-3 flex flex-wrap gap-2">
         {contactRoutes(locale).map((r) => (
           <li>
-            <a href={l(`/contact?topic=${r.id}`)} class="chip uppercase">
+            <a href={l(`/contact?topic=${r.id}`)} class="chip">
               {r.label}
             </a>
           </li>

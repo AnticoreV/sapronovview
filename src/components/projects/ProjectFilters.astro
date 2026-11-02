@@ -45,15 +45,13 @@ const categories = (Object.keys(labels) as Array<keyof typeof labels>).filter((c
     gap: 8px;
     min-height: 44px;
     padding-inline: 16px;
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-sm);
     border: 1px solid var(--line);
     background: var(--surface);
     color: var(--ink);
     font-family: var(--font-mono);
     font-size: 12px;
     font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
     cursor: pointer;
   }
   .filter:hover {

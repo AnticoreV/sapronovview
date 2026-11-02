@@ -23,7 +23,9 @@ const { locale, t } = i18n(Astro);
 const { Content } = await renderEntry(position);
 const lang = bodyLang(position, locale);
 const isCurrent = !data.endDate;
-const dash = locale === "cs" ? " – " : " — ";
+// Date range with an en dash: unspaced in English ("Apr 2026–Jun 2026"), spaced in
+// Czech, where the range ends are multi-word ("dub 2026 – čen 2026").
+const dash = locale === "cs" ? " – " : "–";
 const range = `${formatMonthYear(data.startDate, locale)}${dash}${isCurrent ? t("experience.present") : formatMonthYear(data.endDate, locale)}`;
 const duration = formatDuration(data.startDate, data.endDate, locale);
 const achievements = shownAll(data.achievements);
@@ -39,7 +41,7 @@ const meta = [
 <article id={position.id} class="grid scroll-mt-24 gap-4 md:grid-cols-[200px_1fr] md:gap-10">
   <div class="mono text-[14px]">
     <p class="font-medium text-accent">{range}</p>
-    <p class="mt-1 text-[12px] text-ink-muted uppercase">{duration}</p>
+    <p class="mt-1 text-[12px] text-ink-muted">{duration}</p>
   </div>
   <div class="min-w-0">
     <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
@@ -66,14 +68,9 @@ const meta = [
       <Content />
     </div>
     {achievements.length > 0 && (
-      <ul class="mt-4 flex max-w-[68ch] flex-col gap-2">
+      <ul class="mt-4 max-w-[68ch] list-disc space-y-2 pl-5 marker:text-line-strong">
         {achievements.map((a) => (
-          <li class="flex gap-3">
-            <span class="mono mt-[0.15em] shrink-0 text-[12px] text-ok-ink" aria-hidden="true">
-              ✓
-            </span>
-            <span>{a}</span>
-          </li>
+          <li>{a}</li>
         ))}
       </ul>
     )}
@@ -81,7 +78,7 @@ const meta = [
       <ul class="mt-5 flex flex-wrap gap-1.5" aria-label={t("experience.technologies")}>
         {data.technologies.map((tech) => (
           <li>
-            <TechBadge label={tech} />
+            <TechBadge label={tech} class="bg-surface" />
           </li>
         ))}
       </ul>

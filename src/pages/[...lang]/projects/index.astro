@@ -29,8 +29,7 @@ const rest = projects.filter((p) => !p.data.featured && !p.data.tagline);
   <div class="band pt-8 md:pt-10">
     <div class="shell">
       <Breadcrumbs items={[{ label: t("projects.title") }]} />
-      <p class="label mt-8 text-ink-muted">{t("projects.eyebrow")}</p>
-      <h1 class="display mt-3 text-display-l">{t("projects.title")}</h1>
+      <h1 class="display mt-8 text-display-l">{t("projects.title")}</h1>
       <p class="mt-5 max-w-[640px] text-body-l">{t("projects.intro")}</p>
       <div class="mt-8">
         <ProjectFilters projects={[...projects, ...code]} />
@@ -76,7 +75,7 @@ const rest = projects.filter((p) => !p.data.featured && !p.data.tagline);
   {code.length > 0 && (
     <section class="band section-gap pt-12" aria-labelledby="code-heading" data-project-group>
       <div class="shell flex flex-col gap-6">
-        <SectionHeader id="code-heading" title={t("projects.code")} tag={t("projects.codeTag")} />
+        <SectionHeader id="code-heading" title={t("projects.code")} />
         <ul class="border-t border-line">
           {code.map((p) => (
             <li data-category={p.data.category}>

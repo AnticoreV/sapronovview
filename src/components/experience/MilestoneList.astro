@@ -1,5 +1,5 @@
 ---
-/** Education, certifications, talks, awards or community work — one group. */
+/** Education, certifications, talks, awards or community work: one group. */
 import { milestoneLabels, shown, type Milestone } from "@lib/content";
 import { formatMonthYear } from "@lib/utils";
 import { i18n } from "@/i18n";
@@ -10,6 +10,8 @@ interface Props {
 }
 const { type, items } = Astro.props;
 const { locale } = i18n(Astro);
+// En dash: unspaced in English, spaced in Czech (as in ExperienceItem).
+const dash = locale === "cs" ? " – " : "–";
 ---
 
 {items.length > 0 && (
@@ -31,8 +33,7 @@ const { locale } = i18n(Astro);
               )}
             </p>
             <p class="meta text-ink-muted">
-              {formatMonthYear(data.date, locale)}
-              {data.endDate && ` – ${formatMonthYear(data.endDate, locale)}`}
+              {`${formatMonthYear(data.date, locale)}${data.endDate ? `${dash}${formatMonthYear(data.endDate, locale)}` : ""}`}
             </p>
           </div>
           {(shown(data.organization) || shown(data.location)) && (

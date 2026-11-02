@@ -1,11 +1,9 @@
 ---
 /**
- * "Track record" (04) — every position as a RecordRow (years · company · role ·
- * shipped), "CV on request" (or "Download CV" once the file exists) and
- * "Full experience →".
+ * "Track record": every position as a RecordRow (years · company · role · shipped),
+ * "CV on request" (or "Download CV" once the file exists) and a "Full experience" link.
  */
 import RecordRow from "@components/experience/RecordRow.astro";
-import Arrow from "@components/ui/Arrow.astro";
 import SectionHeader from "@components/ui/SectionHeader.astro";
 import type { Position } from "@lib/content";
 import { cvPath } from "@lib/cv";
@@ -18,9 +16,9 @@ const { positions } = Astro.props;
 const { t, l } = i18n(Astro);
 ---
 
-<section id="experience" class="band section-gap" aria-labelledby="experience-heading" data-reveal>
+<section id="experience" class="band section-gap" aria-labelledby="experience-heading">
   <div class="shell flex flex-col gap-7">
-    <SectionHeader id="experience-heading" index="04" title={t("record.title")}>
+    <SectionHeader id="experience-heading" title={t("record.title")}>
       {cvPath ? (
         <a slot="action" href={cvPath} class="btn btn-secondary min-h-12 px-[22px]" download>
           {t("record.cvDownload")}
@@ -55,7 +53,6 @@ const { t, l } = i18n(Astro);
       <p class="mt-7">
         <a href={l("/experience")} class="link-more">
           {t("record.full")}
-          <Arrow class="ml-[0.4em]" />
         </a>
       </p>
     </div>

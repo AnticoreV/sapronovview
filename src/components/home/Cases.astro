@@ -1,7 +1,7 @@
 ---
 /**
- * "Proof in production" (03) — the homepage case rows: title, summary, metric chips
- * from src/data/readouts.ts and mono meta. "All projects →".
+ * "Proof in production": the homepage case rows (title, summary, metric chips from
+ * src/data/readouts.ts, mono meta) and an "All projects" link.
  */
 import Glyphs from "@components/ui/Glyphs.astro";
 import SectionHeader from "@components/ui/SectionHeader.astro";
@@ -21,11 +21,10 @@ const readout = (id: ReadoutId): Readout => readouts[id];
 ---
 
 {cases.length > 0 && (
-  <section id="work" class="band section-gap" aria-labelledby="work-heading" data-reveal>
+  <section id="work" class="band section-gap" aria-labelledby="work-heading">
     <div class="shell flex flex-col gap-7">
       <SectionHeader
         id="work-heading"
-        index="03"
         title={t("work.title")}
         href={l("/projects")}
         linkLabel={t("work.all")}
@@ -42,7 +41,7 @@ const readout = (id: ReadoutId): Readout => readouts[id];
               <span class="flex flex-col gap-2.5">
                 <span class="flex flex-wrap gap-1.5">
                   {c.chips.map((id) => (
-                    <span class="chip bg-bg uppercase">
+                    <span class="chip bg-bg">
                       <Glyphs
                         text={readout(id).chip ?? readout(id).value}
                         spoken={readout(id).chipSpoken}
@@ -51,7 +50,7 @@ const readout = (id: ReadoutId): Readout => readouts[id];
                     </span>
                   ))}
                 </span>
-                <span class="mono text-[12px] text-ink-muted uppercase">{c.meta.join(" · ")}</span>
+                <span class="mono text-[12px] text-ink-muted">{c.meta.join(" · ")}</span>
               </span>
             </a>
           </li>

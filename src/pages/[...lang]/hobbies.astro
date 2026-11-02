@@ -16,8 +16,7 @@ const hobbies = await getHobbies(locale);
   <div class="band pt-8 md:pt-10">
     <div class="shell">
       <Breadcrumbs items={[{ label: t("hobbies.title") }]} />
-      <p class="label mt-8 text-ink-muted">{t("hobbies.eyebrow")}</p>
-      <h1 class="display mt-3 text-display-l">{t("hobbies.h1")}</h1>
+      <h1 class="display mt-8 text-display-l">{t("hobbies.h1")}</h1>
       <p class="mt-5 max-w-[640px] text-body-l">{t("hobbies.intro")}</p>
       <nav aria-label={t("hobbies.jump")} class="mt-8 flex flex-wrap gap-2">
         {hobbies.map((h) => (

@@ -66,12 +66,12 @@ const Heading = heading === 3 ? "h3" : "h2";
     <dl class="grid grid-cols-[repeat(auto-fit,minmax(min(150px,100%),1fr))] content-start gap-x-6 gap-y-3.5">
       {fields.map((f) => (
         <div>
-          <dt class="mono text-[12px] text-ink-muted uppercase">{f.k}</dt>
+          <dt class="mono text-[12px] text-ink-muted">{f.k}</dt>
           <dd class="mt-0.5 font-semibold">{f.v}</dd>
         </div>
       ))}
       <div>
-        <dt class="mono text-[12px] text-ink-muted uppercase">{t("who.status")}</dt>
+        <dt class="mono text-[12px] text-ink-muted">{t("who.status")}</dt>
         <dd class="mt-0.5 font-semibold text-ok-ink">
           <span aria-hidden="true">● </span>
           {t("status.openLabel")}
@@ -81,7 +81,7 @@ const Heading = heading === 3 ? "h3" : "h2";
     {switcher && (
       <fieldset class="m-0 border-0 p-0">
         <legend class="label text-ink-muted">{t("who.portrait")}</legend>
-        <div class="mt-2.5 inline-flex flex-wrap gap-1 rounded-[26px] bg-surface-sunken p-1">
+        <div class="mt-2.5 inline-flex flex-wrap gap-1 rounded-md bg-surface-sunken p-1">
           {list.map((p, i) => (
             <label class="segment">
               <input
@@ -147,7 +147,7 @@ const Heading = heading === 3 ? "h3" : "h2";
     align-items: center;
     min-height: 44px;
     padding: 0 16px;
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-sm);
     color: var(--ink-muted);
     font-size: 15px;
     font-weight: 600;

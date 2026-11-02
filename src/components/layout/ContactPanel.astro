@@ -1,10 +1,11 @@
 ---
 /**
  * The accent contact panel that closes every page (approved artboard): "Ready to
- * ship your project.", three route cards (Hiring / Investing / Partnering), the
- * email as a pill, Copy, LinkedIn and GitHub. Inside a page the routes open /contact
- * with the topic preselected; on /contact itself (`level={1}`) they are emails with
- * the subject filled in.
+ * ship your project.", three route columns (Hiring / Investing / Partnering) set
+ * directly on the accent fill between thin on-accent rules, the email as a button,
+ * Copy, LinkedIn and GitHub. Inside a page the routes open /contact with the topic
+ * preselected; on /contact itself (`level={1}`) they are emails with the subject
+ * filled in.
  */
 import ContactRoute from "@components/contact/ContactRoute.astro";
 import CopyEmail from "@components/ui/CopyEmail.astro";
@@ -15,16 +16,13 @@ import { i18n } from "@/i18n";
 interface Props {
   /** Heading level: 2 inside a page, 1 when the panel is the page head (/contact). */
   level?: 1 | 2;
-  /** Section index before the label, e.g. "05" on the homepage. */
-  index?: string;
 }
-const { level = 2, index } = Astro.props;
+const { level = 2 } = Astro.props;
 const Heading = level === 1 ? "h1" : "h2";
 const { locale, t, l } = i18n(Astro);
 const routes = contactRoutes(locale);
 const routeHref = (route: Route) =>
   level === 1 ? mailtoFor(siteConfig.email, route.subject) : l(`/contact?topic=${route.id}`);
-const eyebrow = t("contact.eyebrow");
 ---
 
 <section
@@ -34,7 +32,7 @@ const eyebrow = t("contact.eyebrow");
 >
   <div class="contact-panel shell flex flex-col gap-10 rounded-lg bg-accent p-[clamp(20px,5vw,72px)] text-on-accent">
     <div class="flex flex-col gap-3.5">
-      <span class="label">{index ? `${index} · ${eyebrow}` : eyebrow}</span>
+      <span class="label">{t("contact.eyebrow")}</span>
       <Heading
         id="contact-heading"
         class="display text-[clamp(44px,6.4vw,96px)] leading-[0.95] tracking-[-0.045em]"
@@ -44,7 +42,7 @@ const eyebrow = t("contact.eyebrow");
         {t("contact.title2")}
       </Heading>
     </div>
-    <ul class="grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-3">
+    <ul class="routes grid lg:grid-cols-3">
       {routes.map((route) => (
         <li class="flex">
           <ContactRoute route={route} href={routeHref(route)} level={level === 1 ? 2 : 3} />
@@ -54,7 +52,7 @@ const eyebrow = t("contact.eyebrow");
     <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
       <a
         href={`mailto:${siteConfig.email}`}
-        class="email-pill inline-flex min-h-[54px] max-w-full items-center rounded-full bg-surface px-5 text-[clamp(15px,1.2vw,17px)] font-bold text-accent no-underline"
+        class="email-btn inline-flex min-h-[54px] max-w-full items-center rounded-sm bg-surface px-5 text-[clamp(15px,1.2vw,17px)] font-bold text-accent no-underline"
       >
         <span class="truncate">{siteConfig.email}</span>
       </a>
@@ -85,11 +83,26 @@ const eyebrow = t("contact.eyebrow");
   /* Focus rings switch to the on-accent colour on the accent fill. */
   .contact-panel {
     --focus: var(--on-accent);
+    --rule-on-accent: color-mix(in srgb, var(--on-accent) 30%, transparent);
   }
-  .contact-panel a:not(.route):hover {
+  .contact-panel a:hover {
     color: var(--on-accent);
   }
-  .email-pill:hover {
+  .email-btn:hover {
     color: var(--accent-hover) !important;
+  }
+  /* Route columns: rules above, between and below; stacked rows on narrow screens,
+     three columns with vertical rules from 1024px. */
+  .routes {
+    border-block: 1px solid var(--rule-on-accent);
+  }
+  .routes > li + li {
+    border-top: 1px solid var(--rule-on-accent);
+  }
+  @media (min-width: 64rem) {
+    .routes > li + li {
+      border-top: 0;
+      border-left: 1px solid var(--rule-on-accent);
+    }
   }
 </style>

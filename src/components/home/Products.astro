@@ -1,5 +1,5 @@
 ---
-/** "What I'm building" (01) — own products as wide ProductModules (for partners and investors). */
+/** "What I'm building": own products as wide ProductModules (for partners and investors). */
 import ProductModule from "@components/projects/ProductModule.astro";
 import SectionHeader from "@components/ui/SectionHeader.astro";
 import type { Project } from "@lib/content";
@@ -13,14 +13,9 @@ const { t } = i18n(Astro);
 ---
 
 {products.length > 0 && (
-  <section id="build" class="band section-gap" aria-labelledby="build-heading" data-reveal>
+  <section id="build" class="band section-gap" aria-labelledby="build-heading">
     <div class="shell flex flex-col gap-9">
-      <SectionHeader
-        id="build-heading"
-        index="01"
-        title={t("build.title")}
-        tag={t(products.length > 1 ? "build.tagMany" : "build.tag")}
-      />
+      <SectionHeader id="build-heading" title={t("build.title")} />
       <ul class="flex flex-col gap-4">
         {products.map((p) => (
           <li class="flex">

@@ -1,13 +1,12 @@
 ---
 /**
- * ProductModule — the wide product card from the approved artboard (Ownira), also
+ * ProductModule: the wide product card from the approved artboard (Ownira), also
  * used for featured client work on /projects (components.md: "featured client work
  * (no facts)"). Own product: domain · role, status pill, name, tagline, description,
- * "Read the case →" and a facts list (STATUS, FOR, MY ROLE, WEB — only real values).
- * Client work: organisation, status pill, name, description, "Read the case →".
+ * "Read the case" and a facts list (Status, For, My role, Web; only real values).
+ * Client work: organisation, status pill, name, description, "Read the case".
  * The whole card is one link; hover lifts it.
  */
-import Arrow from "@components/ui/Arrow.astro";
 import StatusBadge from "@components/ui/StatusBadge.astro";
 import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
 import { shortCompany, shown, shownAll, statusLabel, type Project } from "@lib/content";
@@ -50,7 +49,7 @@ const facts = isProduct
 >
   <div class="flex flex-[1_1_420px] flex-col gap-4">
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <span class="mono text-[12px] font-medium text-ink-muted uppercase">{source}</span>
+      <span class="mono text-[12px] font-medium text-ink-muted">{source}</span>
       <StatusBadge label={status.label} tone={status.tone} />
     </div>
     <Name
@@ -67,17 +66,14 @@ const facts = isProduct
       </p>
     )}
     <p class="max-w-[560px] text-ink-muted">{text}</p>
-    <span class="read-more mt-auto pt-2 font-semibold text-accent">
-      {t("project.readCase")}
-      <Arrow weight="bold" class="ml-[0.35em]" />
-    </span>
+    <span class="read-more mt-auto pt-2 font-semibold text-accent">{t("project.readCase")}</span>
     {data.placeholder && <PlaceholderBadge />}
   </div>
   {facts.length > 0 && (
     <dl class="m-0 grid flex-[1_1_320px] grid-cols-[auto_1fr] content-start gap-x-6 gap-y-3.5 border-t border-line pt-3.5">
       {facts.map((f) => (
         <>
-          <dt class="mono pt-0.5 text-[12px] font-medium text-ink-muted uppercase">{f.label}</dt>
+          <dt class="mono pt-0.5 text-[12px] font-medium text-ink-muted">{f.label}</dt>
           <dd class="m-0">{f.value}</dd>
         </>
       ))}

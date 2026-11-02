@@ -22,9 +22,7 @@ const submitLabel = t(connected ? "form.send" : "form.asEmail");
     <h2 class="text-heading">{t("form.title")}</h2>
     {!connected && (
       <p class="text-small text-ink-muted" role="note">
-        <strong class="text-ink">{t("form.notConnected")}</strong>
-        {locale === "cs" ? " – " : " — "}
-        {t("form.notConnectedText")}{" "}
+        <strong class="text-ink">{t("form.notConnected")}</strong>: {t("form.notConnectedText")}{" "}
         <a href={`mailto:${siteConfig.email}`} class="link-inline text-ink break-all">
           {siteConfig.email}
         </a>
@@ -184,8 +182,6 @@ const submitLabel = t(connected ? "form.send" : "form.asEmail");
     font-family: var(--font-mono);
     font-size: 12px;
     font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
   }
   .field input,
   .field select,
@@ -193,7 +189,7 @@ const submitLabel = t(connected ? "form.send" : "form.asEmail");
     width: 100%;
     min-height: 48px;
     padding: 0 14px;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     border: 1px solid var(--line-strong);
     background: var(--surface);
     color: var(--ink);
@@ -317,7 +313,7 @@ const submitLabel = t(connected ? "form.send" : "form.asEmail");
 
       if (!connected) {
         const subject = subjects[topic.value] ?? form.dataset.defaultSubject ?? "Hello";
-        const body = `${field("message").value.trim()}\n\n— ${field("name").value.trim()} (${field("email").value.trim()})`;
+        const body = `${field("message").value.trim()}\n\n${field("name").value.trim()} (${field("email").value.trim()})`;
         const params = new URLSearchParams({ subject, body }).toString().replace(/\+/g, "%20");
         const mailto = root.querySelector<HTMLAnchorElement>("[data-mailto]");
         if (mailto) mailto.href = `mailto:${email}?${params}`;

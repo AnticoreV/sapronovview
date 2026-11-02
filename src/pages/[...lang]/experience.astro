@@ -26,10 +26,7 @@ const byType = (t: (typeof types)[number]) => milestones.filter((m) => m.data.ty
     <div class="shell">
       <Breadcrumbs items={[{ label: t("experience.title") }]} />
       <div class="mt-8 flex flex-wrap items-end justify-between gap-6">
-        <div>
-          <p class="label text-ink-muted">{t("experience.eyebrow")}</p>
-          <h1 class="display mt-3 text-display-l">{t("record.title")}</h1>
-        </div>
+        <h1 class="display text-display-l">{t("record.title")}</h1>
         {cvPath ? (
           <a href={cvPath} class="btn btn-primary" download>
             {t("record.cvDownload")}
@@ -65,17 +62,12 @@ const byType = (t: (typeof types)[number]) => milestones.filter((m) => m.data.ty
     </div>
   </section>
 
-  <section class="band section-gap pt-14" aria-labelledby="positions-heading">
-    <div class="shell sheet px-[clamp(16px,5vw,64px)] py-10 md:py-14">
-      <h2
-        id="positions-heading"
-        class="display text-[clamp(28px,3vw,40px)] leading-[1.05] tracking-[-0.03em]"
-      >
-        {t("experience.positions")}
-      </h2>
-      <ol class="mt-8 flex flex-col divide-y divide-line">
+  <section class="band section-gap pt-20" aria-labelledby="positions-heading">
+    <div class="shell flex flex-col gap-2">
+      <SectionHeader id="positions-heading" title={t("experience.positions")} />
+      <ol class="flex flex-col divide-y divide-line">
         {positions.map((position) => (
-          <li class="py-10 first:pt-0 last:pb-0">
+          <li class="py-10 last:pb-0">
             <ExperienceItem position={position} />
           </li>
         ))}

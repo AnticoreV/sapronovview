@@ -6,7 +6,7 @@ import { siteConfig } from "@config";
 export async function GET(context: APIContext) {
   const posts = await getPosts();
   return rss({
-    title: `${siteConfig.name} — Writing`,
+    title: `${siteConfig.name} · Writing`,
     description: siteConfig.description,
     site: context.site ?? "http://localhost:4321",
     trailingSlash: false,

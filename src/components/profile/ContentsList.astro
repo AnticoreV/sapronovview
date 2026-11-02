@@ -1,7 +1,7 @@
 ---
 /**
- * ContentsList — "Before you hire, invest or partner": the homepage contents as
- * numbered rows (01 Products I build … 05 Get in touch), each → its section.
+ * ContentsList: "Before you hire, invest or partner", the homepage contents as rows
+ * (Products I build … Get in touch), each with an arrow and linking to its section.
  */
 import Arrow from "@components/ui/Arrow.astro";
 import { contents as contentsFor } from "@data/home";
@@ -30,12 +30,7 @@ const contents = contentsFor(locale);
               last && "text-accent",
             ]}
           >
-            <span>
-              <span class="mono mr-3 text-[12px] font-normal text-ink-muted" aria-hidden="true">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              {item.label}
-            </span>
+            <span>{item.label}</span>
             <Arrow weight="bold" />
           </a>
         </li>

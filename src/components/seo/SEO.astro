@@ -36,7 +36,7 @@ const {
   title,
   description = copy.description,
   image = locale === "cs" ? siteConfig.ogImageCs : siteConfig.ogImage,
-  imageAlt = `${siteConfig.name} — ${copy.title}`,
+  imageAlt = `${siteConfig.name} · ${copy.title}`,
   type = "website",
   noindex = false,
   publishedTime,
@@ -129,7 +129,7 @@ const websiteLd = {
   <link
     rel="alternate"
     type="application/rss+xml"
-    title={`${siteConfig.name} — Writing`}
+    title={`${siteConfig.name} · Writing`}
     href={new URL("/rss.xml", site).toString()}
   />
 )}

@@ -22,10 +22,7 @@ const tags = await getAllTags(posts);
     <div class="shell">
       <Breadcrumbs items={[{ label: t("writing.title") }]} />
       <div class="mt-8 flex flex-wrap items-end justify-between gap-6">
-        <div>
-          <p class="label text-ink-muted">{t("writing.eyebrow")}</p>
-          <h1 class="display mt-3 text-display-l">{t("writing.title")}</h1>
-        </div>
+        <h1 class="display text-display-l">{t("writing.title")}</h1>
         {posts.length > 0 && (
           <a href="/rss.xml" class="link-more">
             {t("writing.rss")}

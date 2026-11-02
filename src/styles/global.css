@@ -120,7 +120,6 @@
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
   --duration-fast: 160ms;
   --duration-base: 240ms;
-  --duration-reveal: 600ms;
 
   /* Type scale (tokens.json): display-xl 116/0.92 w800 · display-l 64/1 w800 ·
      display-m 80/1 w800 · numeral 64/1 w800 · heading 26/1.2 w700 · title 21/1.3 w700 ·
@@ -276,13 +275,17 @@
     font-family: var(--font-display);
     font-weight: 800;
   }
-  /* Mono label: eyebrows, section tags, table heads, legends, chips. */
+  /* Mono label: small headings, table heads, breadcrumbs. Sentence case, no tracking:
+     the mono face alone carries the "drawing annotation" voice. */
   .label {
     font-family: var(--font-mono);
     font-size: var(--text-label);
     line-height: var(--text-label--line-height);
     font-weight: 500;
-    letter-spacing: 0.06em;
+  }
+  /* The one all-caps exception: the hero drawing's key, which mirrors the uppercase
+     callouts drawn inside the 3D scene. */
+  .drawing-key {
     text-transform: uppercase;
   }
   /* Mono meta: dates, stacks, small facts. */
@@ -302,14 +305,15 @@
     border: 1px solid var(--line);
     border-radius: var(--radius-md);
   }
-  /* Hover lift for linked cards and rows: translateY(-2px) + shadow-pop, never at rest. */
-  .lift {
+  /* Hover lift for cards that are links: translateY(-2px) + shadow-pop, never at rest.
+     Scoped to <a> so a static card can never inflate on hover. */
+  a.lift {
     transition:
       transform var(--duration-fast) var(--ease-out),
       box-shadow var(--duration-fast) var(--ease-out),
       border-color var(--duration-fast) var(--ease-out);
   }
-  .lift:hover {
+  a.lift:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-pop);
     color: inherit;
@@ -321,7 +325,7 @@
     border-radius: var(--radius-md);
   }
 
-  /* Section title row: 1px ink rule, mono index, display-l heading, tag / link right. */
+  /* Section title row: 1px ink rule, display-l heading, an action (link / button) right. */
   .section-head {
     display: flex;
     flex-wrap: wrap;
@@ -332,7 +336,8 @@
     border-top: 1px solid var(--ink);
   }
 
-  /* Buttons — pills. Primary: accent fill. Secondary: surface with a 1px line border. */
+  /* Buttons: radius-sm. Primary: accent fill. Secondary: surface with a 1px line border.
+     Pills are reserved for status pills and the round icon button. */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -340,7 +345,7 @@
     gap: 10px;
     min-height: 52px;
     padding-inline: 28px;
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-sm);
     font-family: var(--font-sans);
     font-size: 17px;
     font-weight: 600;
@@ -375,7 +380,7 @@
     border-color: var(--line-strong);
     color: var(--ink);
   }
-  /* Ink pill (header Contact). */
+  /* Ink button (header Contact). */
   .btn-ink {
     background: var(--ink);
     color: var(--bg);
@@ -417,7 +422,7 @@
     color: var(--ink);
   }
 
-  /* Mono link with an arrow: "ALL PROJECTS →". */
+  /* Mono text link ("All projects"); external links add ↗. */
   .link-more {
     display: inline-flex;
     align-items: center;
@@ -425,8 +430,6 @@
     font-family: var(--font-mono);
     font-size: var(--text-meta);
     font-weight: 500;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 6px;
@@ -444,24 +447,25 @@
     text-decoration-thickness: 2px;
   }
 
-  /* Mono chip: metric chips, stack chips, tags. */
+  /* Mono chip: metric chips, stack chips, tags. Nearly square (4px): a data tag, not a
+     button. Chips that are links are 44px controls and take the button radius. */
   .chip {
     display: inline-flex;
     align-items: center;
     min-height: 26px;
     padding: 4px 10px;
-    border-radius: var(--radius-pill);
+    border-radius: 4px;
     background: var(--surface-sunken);
     color: var(--ink);
     font-family: var(--font-mono);
     font-size: 12px;
     font-weight: 600;
     line-height: 1.3;
-    letter-spacing: 0.02em;
   }
   a.chip {
     min-height: 44px;
     padding-inline: 14px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--line);
     background: var(--surface);
     text-decoration: none;
@@ -487,8 +491,6 @@
     font-size: 12px;
     font-weight: 600;
     line-height: 1.3;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
     white-space: nowrap;
   }
   .status-pill::before {
@@ -658,22 +660,9 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* Motion: sections reveal once (opacity + 12px rise, 600ms ease-out).  */
-/* Only when JS runs and motion is allowed (html.motion, set in the     */
-/* head); otherwise everything is simply there.                          */
+/* Motion: content is static. The hero 3D scene is the one animated     */
+/* moment; hover and focus states use short colour / lift transitions.  */
 /* ------------------------------------------------------------------ */
-@media (prefers-reduced-motion: no-preference) {
-  .motion [data-reveal]:not([data-revealed]) {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  .motion [data-reveal] {
-    transition:
-      opacity var(--duration-reveal) var(--ease-out),
-      transform var(--duration-reveal) var(--ease-out);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -683,7 +672,7 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .lift:hover {
+  a.lift:hover {
     transform: none;
   }
   ::view-transition-group(*),

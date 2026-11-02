@@ -1,9 +1,8 @@
 ---
 /**
- * ProofNumber — a big numeral (Schibsted 800, tabular) over a mono caption naming
- * the source ("USERS SERVED · NCR VOYIX"). Only real, sourced numbers from
- * src/data/readouts.ts. Values with `count` count up once when first seen (static
- * under reduced motion).
+ * ProofNumber: a big numeral (Schibsted 800, tabular), then a mono caption saying what
+ * is measured and, on its own line, where it comes from. Only real, sourced numbers
+ * from src/data/readouts.ts, rendered as they are (no count-up).
  */
 import Glyphs from "@components/ui/Glyphs.astro";
 import type { Readout } from "@data/readouts";
@@ -15,7 +14,6 @@ interface Props {
   class?: string;
 }
 const { readout, size = "lg", class: className } = Astro.props;
-const count = readout.count;
 ---
 
 <div class:list={["flex flex-col gap-2", className]}>
@@ -24,16 +22,14 @@ const count = readout.count;
       "display tabular leading-none tracking-[-0.04em]",
       size === "lg" ? "text-numeral" : "text-[clamp(36px,4vw,48px)]",
     ]}
-    data-count-to={count?.to}
-    data-count-prefix={count?.prefix}
-    data-count-suffix={count?.suffix}
     aria-hidden={readout.spoken ? "true" : undefined}
   >
     <Glyphs text={readout.value} weight="heavy" silent={Boolean(readout.spoken)} />
   </span>
   {readout.spoken && <span class="sr-only">{readout.spoken}</span>}
-  <span class="mono text-[12px] font-medium tracking-[0.04em] text-ink-muted uppercase">
-    {readout.label} · {readout.source}
+  <span class="mono flex flex-col text-[12px] font-medium">
+    <span>{readout.label}</span>
+    <span class="text-ink-muted">{readout.source}</span>
   </span>
-  <span class="sr-only">— {readout.detail}</span>
+  <span class="sr-only">{readout.detail}</span>
 </div>

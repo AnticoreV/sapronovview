@@ -23,7 +23,7 @@ const { locale, t, l } = i18n(Astro);
     <span class="text-heading">{data.title}</span>
     <span class="text-ink-muted">{data.description}</span>
   </span>
-  <span class="mono text-[12px] leading-relaxed text-ink-muted uppercase md:text-right">
+  <span class="mono text-[12px] leading-relaxed text-ink-muted md:text-right">
     <FormattedDate date={data.pubDate} /> · {t("writing.min", { n: String(minutes) })}
     <br />
     {data.tags.join(" · ")}

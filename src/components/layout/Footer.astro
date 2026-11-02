@@ -1,8 +1,8 @@
 ---
 /**
- * Footer (approved artboard): © line, Projects · About · Experience · Hobbies · RSS ·
- * Sitemap (RSS only once a post is published), and the "all services healthy" status.
- * Below it, one quiet operator line (§435 OZ: name, IČO, registered seat).
+ * Footer (approved artboard): © line and Projects · About · Experience · Hobbies · RSS ·
+ * Sitemap (RSS only once a post is published). Below it, one quiet operator line
+ * (§435 OZ: name, IČO, registered seat).
  */
 import { footerNav, siteConfig, withWriting } from "@config";
 import { hasWriting } from "@lib/content";
@@ -20,7 +20,7 @@ const operatorLine = t("footer.operator").replace(/170 00 (Praha|Prague) 7/, (m)
 <footer class="band pb-safe pt-6">
   <div class="shell meta flex flex-wrap items-center justify-between gap-x-8 gap-y-3 text-[12px] text-ink-muted">
     <span>
-      © {year} {siteConfig.name.toUpperCase()} · {t("footer.city")}
+      © {year} {siteConfig.name} · {t("footer.city")}
     </span>
     <nav aria-label={t("footer.label")}>
       <ul class="flex flex-wrap gap-x-5 gap-y-1">
@@ -37,10 +37,6 @@ const operatorLine = t("footer.operator").replace(/170 00 (Praha|Prague) 7/, (m)
         ))}
       </ul>
     </nav>
-    <span class="inline-flex items-center gap-2 text-ok-ink">
-      <i class="inline-block size-2 rounded-full bg-clay-mint" aria-hidden="true"></i>
-      {t("footer.healthy")}
-    </span>
   </div>
   <p class="operator shell meta mt-2 text-[12px] text-ink-muted" data-operator>
     {operatorLine}

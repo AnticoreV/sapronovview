@@ -1,6 +1,6 @@
 ---
 /**
- * Proof — the four sourced numbers under the hero (src/data/readouts.ts) on a 1px
+ * Proof: the four sourced numbers under the hero (src/data/readouts.ts) on a 1px
  * ink rule, then the "worked with" byline.
  */
 import ProofNumber from "@components/ui/ProofNumber.astro";
@@ -11,7 +11,7 @@ const { locale, t } = i18n(Astro);
 const heroReadouts = readoutsFor(locale);
 ---
 
-<section class="band pt-10 pb-16" aria-label={t("proof.label")} data-reveal>
+<section class="band pt-10 pb-16" aria-label={t("proof.label")}>
   <div class="shell flex flex-col gap-[18px]">
     <ul
       class="grid grid-cols-[repeat(auto-fit,minmax(min(250px,100%),1fr))] border-t border-ink"
@@ -23,6 +23,6 @@ const heroReadouts = readoutsFor(locale);
         </li>
       ))}
     </ul>
-    <p class="label text-ink-muted">{t("proof.workedWith").replace(/ · /g, "\u00a0· ")}</p>
+    <p class="label text-ink-muted">{t("proof.workedWith")}</p>
   </div>
 </section>

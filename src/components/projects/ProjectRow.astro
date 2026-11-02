@@ -13,7 +13,7 @@ const { locale, l } = i18n(Astro);
 const org = shown(data.organization);
 const meta = [
   org ? shortCompany(org) : categoryLabels[locale][data.category],
-  shown(data.timeframe),
+  shown(data.timeframe)?.replace(/\s+—\s+/g, "–"),
   statusLabel(data.status, locale).label,
   ...data.technologies.slice(0, 4),
 ]
@@ -27,7 +27,7 @@ const meta = [
 >
   <span class="text-[26px] leading-[1.15] font-bold tracking-[-0.02em]">{data.title}</span>
   <span class="text-ink-muted">{data.description}</span>
-  <span class="mono text-[12px] leading-relaxed text-ink-muted uppercase">
+  <span class="mono text-[12px] leading-relaxed text-ink-muted">
     {meta}
     {data.placeholder && <PlaceholderBadge />}
   </span>

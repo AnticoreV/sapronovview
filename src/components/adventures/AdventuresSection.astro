@@ -33,8 +33,7 @@ const countries = new Set(
 >
   <div class="shell">
     <slot name="before" />
-    <p class="label mt-8 text-ink-muted">{t("adventures.eyebrow")}</p>
-    <h1 id="adventures-heading" class="display mt-3 text-display-l">
+    <h1 id="adventures-heading" class="display mt-8 text-display-l">
       {t("hobbies.mapLine", { countries: t("countries", { n: countries }) })}
     </h1>
     <p class="mt-5 max-w-[640px] text-body-l">

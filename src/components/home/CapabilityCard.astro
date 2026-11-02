@@ -8,12 +8,11 @@ import type { CapabilityId } from "@data/home";
 
 interface Props {
   id: CapabilityId;
-  code: string;
   title: string;
   text: string;
   spotlight?: boolean;
 }
-const { id, code, title, text, spotlight = false } = Astro.props;
+const { id, title, text, spotlight = false } = Astro.props;
 ---
 
 <li
@@ -80,14 +79,6 @@ const { id, code, title, text, spotlight = false } = Astro.props;
       />
     </svg>
   )}
-  <span
-    class:list={[
-      "mono text-[12px] font-semibold tracking-[0.06em]",
-      spotlight ? "text-accent" : "text-ink-muted",
-    ]}
-  >
-    {code}
-  </span>
   <h3 class="text-[24px] leading-[1.15] font-bold tracking-[-0.02em]">{title}</h3>
   <p class="text-[16px] text-ink-muted">{text}</p>
 </li>
