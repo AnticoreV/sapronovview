@@ -62,9 +62,9 @@ const LATIN_EXT = [
 /** @param {string} subset */
 const schibsted = (subset) =>
   `./node_modules/@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-${subset}-wght-normal.woff2`;
-/** Newsreader "standard" files carry both axes: wght 200–800 and opsz 6–72. @param {string} subset */
+/** Newsreader weight-only files (wght 200–800); the opsz files are twice the size. @param {string} subset */
 const newsreader = (subset) =>
-  `./node_modules/@fontsource-variable/newsreader/files/newsreader-${subset}-standard-normal.woff2`;
+  `./node_modules/@fontsource-variable/newsreader/files/newsreader-${subset}-wght-normal.woff2`;
 /** @param {string} subset @param {number} weight */
 const plexMono = (subset, weight) =>
   `./node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-${subset}-${weight}-normal.woff2`;
@@ -124,7 +124,7 @@ export default defineConfig({
     responsiveStyles: true,
   },
   // Fonts are self-hosted from the Fontsource npm packages (latin + latin-ext) so builds
-  // never depend on a third-party request: Newsreader (variable, wght 200–800, opsz 6–72)
+  // never depend on a third-party request: Newsreader (variable, wght 200–800)
   // for headlines and proof numbers, Schibsted Grotesk (variable, wght 400–900) for text,
   // IBM Plex Mono (static 400 / 500 / 600) for labels, meta and code.
   //

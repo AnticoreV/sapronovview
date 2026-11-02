@@ -152,10 +152,10 @@ config, annunciator, checklist ticking and every aviation label are gone.
   inline script in `BaseLayout` applies it before paint (no flash).
 - **Type direction (`type/serif-display`):** headlines, proof numbers, card and row titles
   and the header name are set in Newsreader at w430 to w500; running text stays in
-  Schibsted Grotesk and labels in IBM Plex Mono. Newsreader's optical-size axis follows the
-  font size, so the 100px hero name gets the display cut and 24px card titles the text cut.
-  Sizes are in the `@theme` type tokens.
-- **Fonts:** Newsreader (variable, wght 200–800, opsz 6–72), Schibsted Grotesk (variable,
+  Schibsted Grotesk and labels in IBM Plex Mono. The site loads Newsreader's weight-only
+  files (58 KB latin); the optical-size files look finer at 100px but are 132 KB and cost
+  about 6 Lighthouse points on mobile. Sizes are in the `@theme` type tokens.
+- **Fonts:** Newsreader (variable, wght 200–800), Schibsted Grotesk (variable,
   wght 400–900) and IBM Plex Mono (400 / 500 / 600), self-hosted from
   `@fontsource-variable/newsreader`, `@fontsource-variable/schibsted-grotesk` and
   `@fontsource/ibm-plex-mono` through Astro's `fonts` config. Each is split into a **latin**
