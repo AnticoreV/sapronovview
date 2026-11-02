@@ -150,8 +150,13 @@ config, annunciator, checklist ticking and every aviation label are gone.
 - **Theme:** light by default; the header toggle (sun / moon, `aria-pressed`) stores the
   choice in `localStorage` (try/catch); without a stored choice the OS preference wins. The
   inline script in `BaseLayout` applies it before paint (no flash).
-- **Fonts:** Schibsted Grotesk (variable, wght 400–900) and IBM Plex Mono (400 / 500 / 600),
-  self-hosted from `@fontsource-variable/schibsted-grotesk` and `@fontsource/ibm-plex-mono`
+- **Type direction (`type/plex-datasheet`):** one superfamily. IBM Plex Sans at w600 for
+  headlines (hero name 80px, section titles 38px, about two thirds of the artboard sizes)
+  and w400 for running text; IBM Plex Mono for labels, meta and the proof numbers, which
+  read as instrument readouts. Sizes are in the `@theme` type tokens. The social card and
+  touch icon (`src/lib/brand-images.ts`) still use Schibsted Grotesk.
+- **Fonts:** IBM Plex Sans (variable, wght 100–700) and IBM Plex Mono (400 / 500 / 600),
+  self-hosted from `@fontsource-variable/ibm-plex-sans` and `@fontsource/ibm-plex-mono`
   through Astro's `fonts` config. Each is split into a **latin** family (preloaded — for the
   mono only the 500 labels) and a **latin-ext** family (Czech diacritics, loaded on demand,
   carries the metric-matched fallback); `--font-sans` / `--font-mono` chain them.
@@ -541,4 +546,4 @@ preview deploy (console) before merging.
 - three.js 0.184.0 (lazy; `Line2` fat lines for the hero), world-atlas + topojson-client
   (globe), d3-geo (build-time SVG map)
 - TypeScript (strict), ESLint, Prettier, Playwright smoke tests; opentype.js (build-time OG text)
-- Fonts: Schibsted Grotesk and IBM Plex Mono (latin + latin-ext, self-hosted, SIL OFL)
+- Fonts: IBM Plex Sans and IBM Plex Mono (latin + latin-ext, self-hosted, SIL OFL)

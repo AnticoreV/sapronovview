@@ -1,6 +1,6 @@
 ---
 /**
- * ProofNumber: a big numeral (Schibsted 800, tabular), then a mono caption saying what
+ * ProofNumber: a big numeral (IBM Plex Mono, tabular), then a mono caption saying what
  * is measured and, on its own line, where it comes from. Only real, sourced numbers
  * from src/data/readouts.ts, rendered as they are (no count-up).
  */
@@ -18,7 +18,7 @@ const { readout, size = "lg", class: className } = Astro.props;
 
 <div class:list={["flex flex-col gap-2", className]}>
   <span
-    class:list={["display tabular", size === "lg" ? "text-numeral" : "text-numeral-md"]}
+    class:list={["display numeral tabular", size === "lg" ? "text-numeral" : "text-numeral-md"]}
     aria-hidden={readout.spoken ? "true" : undefined}
   >
     <Glyphs text={readout.value} weight="heavy" silent={Boolean(readout.spoken)} />

@@ -402,7 +402,7 @@ test.describe("security headers (applied from _headers, as on Cloudflare Pages)"
     await go('footer a[href="/about"]', /\/about$/, "Engineer and founder.");
     // Styles of the swapped page apply (inline <style> under the policy).
     expect(await page.evaluate(() => getComputedStyle(document.body).fontFamily)).toMatch(
-      /Schibsted/,
+      /IBM Plex Sans/,
     );
     await go('footer a[href="/hobbies"]', /\/hobbies$/, /.+/);
     await go('main a[href="/adventures"]', /\/adventures$/, /countries on the map/);

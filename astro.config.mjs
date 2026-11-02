@@ -60,8 +60,8 @@ const LATIN_EXT = [
 ];
 
 /** @param {string} subset */
-const schibsted = (subset) =>
-  `./node_modules/@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-${subset}-wght-normal.woff2`;
+const plexSans = (subset) =>
+  `./node_modules/@fontsource-variable/ibm-plex-sans/files/ibm-plex-sans-${subset}-wght-normal.woff2`;
 /** @param {string} subset @param {number} weight */
 const plexMono = (subset, weight) =>
   `./node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-${subset}-${weight}-normal.woff2`;
@@ -121,23 +121,23 @@ export default defineConfig({
     responsiveStyles: true,
   },
   // Fonts are self-hosted from the Fontsource npm packages (latin + latin-ext) so builds
-  // never depend on a third-party request: Schibsted Grotesk (variable, wght 400–900) for
+  // never depend on a third-party request: IBM Plex Sans (variable, wght 100–700) for
   // display and text, IBM Plex Mono (static 400 / 500 / 600) for labels, numbers and code.
   //
   // Each typeface is split into two families: latin (preloaded, no fallback of its
   // own) and latin-ext (Czech diacritics, loaded on demand, carries the metric-matched
-  // fallback). global.css chains them: var(--font-schibsted), var(--font-schibsted-ext).
+  // fallback). global.css chains them: var(--font-plex-sans), var(--font-plex-sans-ext).
   fonts: [
     {
       provider: fontProviders.local(),
-      name: "Schibsted Grotesk Variable",
-      cssVariable: "--font-schibsted",
+      name: "IBM Plex Sans Variable",
+      cssVariable: "--font-plex-sans",
       fallbacks: [],
       options: {
         variants: [
           {
-            src: [schibsted("latin")],
-            weight: "400 900",
+            src: [plexSans("latin")],
+            weight: "100 700",
             style: "normal",
             unicodeRange: /** @type {[string, ...string[]]} */ (LATIN),
           },
@@ -146,14 +146,14 @@ export default defineConfig({
     },
     {
       provider: fontProviders.local(),
-      name: "Schibsted Grotesk Variable",
-      cssVariable: "--font-schibsted-ext",
+      name: "IBM Plex Sans Variable",
+      cssVariable: "--font-plex-sans-ext",
       fallbacks: ["system-ui", "sans-serif"],
       options: {
         variants: [
           {
-            src: [schibsted("latin-ext")],
-            weight: "400 900",
+            src: [plexSans("latin-ext")],
+            weight: "100 700",
             style: "normal",
             unicodeRange: /** @type {[string, ...string[]]} */ (LATIN_EXT),
           },
