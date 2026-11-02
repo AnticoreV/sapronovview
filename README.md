@@ -138,7 +138,11 @@ config, annunciator, checklist ticking and every aviation label are gone.
   `:root` = light, `.dark` = dark, `@theme inline` maps them to utilities (`bg-surface`,
   `text-ink-muted`, `border-line`, `bg-accent`, `text-on-accent`, `shadow-pop`, …) and the
   type scale (`text-display-xl`, `text-display-l`, `text-display-m`, `text-numeral`,
-  `text-heading`, `text-title`, `text-body-l`, …).
+  `text-heading`, `text-title`, `text-body-l`, …) plus the headline roles added on top
+  (`text-display-panel`, `text-display-page`, `text-display-s`, `text-numeral-md`,
+  `text-card-title`, `text-route-title`, `text-wordmark`, `text-tagline`). Each token
+  carries size, line height, tracking and weight, and components use no inline headline
+  sizes, so a type change is an edit to `global.css` (plus the font config for a new face).
 - **Colour means something:** `accent` (deploy blue) = what you can act on (primary buttons,
   links, focus, the contact panel); `ok-ink` / `ok-soft` = healthy, open, in pilot;
   `caution` = a butter status fill; `error-ink` = errors only. `clay-*` colours live only in
@@ -152,13 +156,11 @@ config, annunciator, checklist ticking and every aviation label are gone.
   mono only the 500 labels) and a **latin-ext** family (Czech diacritics, loaded on demand,
   carries the metric-matched fallback); `--font-sans` / `--font-mono` chain them.
 - **Surfaces:** `.card` (surface + 1px line, radius 12), `.lift` (hover: −2px + shadow-pop),
-  `.sheet` + `.prose-sheet` (long reading, 68ch), `.section-head` (1px ink rule, mono index,
-  display-l title, tag), `.btn-primary` / `.btn-secondary` / `.btn-ink`, `.icon-btn`,
-  `.link-more` ("ALL PROJECTS →"), `.chip`, `.status-pill`, `.label`, `.meta`.
-- **Motion:** CSS + small vanilla scripts. Sections marked `data-reveal` rise 12px and fade
-  in once (600ms, IntersectionObserver), proof numbers count up once, cards lift on hover.
-  Reveals only run when the head script sets `html.motion` (JS on, no reduced motion), so
-  without JS or under `prefers-reduced-motion` everything is simply there.
+  `.sheet` + `.prose-sheet` (long reading, 68ch), `.section-head` (1px ink rule, display-l
+  title, an optional link or action), `.btn-primary` / `.btn-secondary` / `.btn-ink`,
+  `.icon-btn`, `.link-more` ("All projects"), `.chip`, `.status-pill`, `.label`, `.meta`.
+- **Motion:** content is static (no scroll reveals, no count-ups). The hero 3D scene is the
+  one animated element; link cards lift on hover.
 - **Glyphs:** neither font ships → ← ↗ ≈ in its Latin subsets, so `Arrow` / `Approx`
   (`src/components/ui/`) draw them as em-sized `currentColor` SVGs with a stroke per text
   weight, and `Glyphs` renders data strings ("h → min", "≈ ½", chips, the hero legend) with
