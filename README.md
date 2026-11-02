@@ -465,12 +465,13 @@ Every page has `hreflang` alternates (en, cs, x-default = English) and a canonic
 its own language; see [Languages](#languages-english--czech).
 
 The 1200×630 share image (`/images/og-default.png`, Czech: `/images/og-default-cs.png`) is
-generated at build time
-(`src/lib/brand-images.ts`) in the v2 look: cube mark + "OPEN TO PROJECTS" pill, the
-eyebrow, the name in Schibsted Grotesk 800, the lede, three proof numbers with their mono
-captions and the cut-out portrait. Text is converted to vector paths with opentype.js from
-`@fontsource/schibsted-grotesk` and `@fontsource/ibm-plex-mono` (so the card is the same on
-any build machine). The favicon and touch icon are the isometric cube mark.
+generated at build time (`src/lib/brand-images.ts`) in the v2 look: cube mark + "Open to
+projects" pill, the eyebrow, the name in Newsreader, the lede in Schibsted Grotesk, three
+proof numbers in Newsreader with their mono caption and source, and the cut-out portrait.
+Text is converted to vector paths with opentype.js from `@fontsource/newsreader`,
+`@fontsource/schibsted-grotesk` and `@fontsource/ibm-plex-mono`, so the card is the same on
+any build machine. Captions wrap at 27 characters so long Czech ones stay in their column.
+The favicon and touch icon are the isometric cube mark.
 
 ## Accessibility and performance
 

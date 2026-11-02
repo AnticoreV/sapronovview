@@ -3,12 +3,12 @@
  * system v2 look (R2-C Runtime): cool light ground, ink type, deploy-blue accent,
  * the isometric cube mark.
  *
- * Text is set in the site's own typefaces — Schibsted Grotesk for the name, lede and
- * numbers, IBM Plex Mono for labels — converted to vector paths with opentype.js, so
- * the card looks the same on every build machine. Czech diacritics come from the
- * latin-ext files; glyphs outside both subsets (≈, →) fall back to a system font in
- * their cell. The cut-out portrait is composited on the right. One card per language
- * (/images/og-default.png, /images/og-default-cs.png).
+ * Text is set in the site's own typefaces — Newsreader for the name and numbers,
+ * Schibsted Grotesk for the lede, IBM Plex Mono for labels — converted to vector paths
+ * with opentype.js, so the card looks the same on every build machine. Czech diacritics
+ * come from the latin-ext files; glyphs outside both subsets (≈, →) fall back to a
+ * system font in their cell. The cut-out portrait is composited on the right. One card
+ * per language (/images/og-default.png, /images/og-default-cs.png).
  *
  * To use your own artwork instead, delete the matching endpoint in src/pages/
  * and drop a static file into public/ with the same path.
@@ -38,7 +38,7 @@ const face = (pkg: string, name: string, weight: number): Face =>
 let fonts: { display: Face; body: Face; mono: Face; monoBold: Face } | undefined;
 const getFonts = () =>
   (fonts ??= {
-    display: face("@fontsource/schibsted-grotesk", "schibsted-grotesk", 800),
+    display: face("@fontsource/newsreader", "newsreader", 400),
     body: face("@fontsource/schibsted-grotesk", "schibsted-grotesk", 500),
     mono: face("@fontsource/ibm-plex-mono", "ibm-plex-mono", 500),
     monoBold: face("@fontsource/ibm-plex-mono", "ibm-plex-mono", 600),
@@ -67,7 +67,8 @@ function glyphPath(font: Font, ch: string, size: number): string {
 /**
  * Text as SVG paths in `font`, tracked by `letterSpacing` (em), placed glyph by glyph
  * (opentype.js's own letterSpacing / kerning options also emit NaN with these fonts).
- * Glyphs missing from the latin subset are drawn as system-font <text>.
+ * Glyphs missing from the latin subset are drawn as system-font <text> at
+ * `fallbackWeight` (400 next to the w400 serif numbers, 700 next to bold faces).
  */
 function text(
   fontFace: Face,
@@ -77,6 +78,7 @@ function text(
   size: number,
   fill: string,
   letterSpacing = 0,
+  fallbackWeight = 700,
 ): string {
   const glyphs: string[] = [];
   const fallbacks: string[] = [];
@@ -95,7 +97,7 @@ function text(
       cursor += font.getAdvanceWidth(ch, size, { kerning: false }) + track;
     } else {
       fallbacks.push(
-        `<text x="${(cursor + cell / 2).toFixed(1)}" y="${y}" font-family="Menlo, DejaVu Sans Mono, monospace" font-size="${size}" font-weight="700" fill="${fill}" text-anchor="middle">${escape(ch)}</text>`,
+        `<text x="${(cursor + cell / 2).toFixed(1)}" y="${y}" font-family="Menlo, DejaVu Sans Mono, monospace" font-size="${size}" font-weight="${fallbackWeight}" fill="${fill}" text-anchor="middle">${escape(ch)}</text>`,
       );
       cursor += cell + track;
     }
@@ -138,12 +140,11 @@ const ogSvg = (locale: Locale) => {
     .slice(0, 3)
     .map((r, i) => {
       const x = 64 + i * 236;
-      const label = `${r.label} · ${r.source}`.toUpperCase();
-      const [l1, l2] = label.length > 28 ? splitLabel(label) : [label, ""];
+      // Caption, then the source on its own line, in sentence case like the site.
+      const lines = [...wrapWords(r.label, LABEL_CHARS), r.source];
       return `<g>
-    ${text(f.display, r.value, x, 532, 50, "#10141A", -0.04)}
-    ${text(f.mono, l1, x, 560, 12, "#4D5662", 0.04)}
-    ${l2 ? text(f.mono, l2, x, 577, 12, "#4D5662", 0.04) : ""}
+    ${text(f.display, r.value, x, 532, 54, "#10141A", -0.02, 400)}
+    ${lines.map((line, j) => text(f.mono, line, x, 560 + j * 17, 12, j === lines.length - 1 ? "#4D5662" : "#10141A", 0.02)).join("")}
   </g>`;
     })
     .join("");
@@ -154,8 +155,8 @@ const ogSvg = (locale: Locale) => {
   <circle cx="142" cy="62" r="4" fill="#59C990"/>
   ${text(f.mono, status, 156, 67, 13, "#1C7A4A", 0.02)}
   ${text(f.mono, siteCopy[locale].eyebrow, 64, 132, 15, "#4D5662", 0.06)}
-  ${text(f.display, first ?? "", 58, 238, 112, "#10141A", -0.045)}
-  ${text(f.display, rest.join(" "), 58, 336, 112, "#10141A", -0.045)}
+  ${text(f.display, first ?? "", 58, 238, 112, "#10141A", -0.032)}
+  ${text(f.display, rest.join(" "), 58, 336, 112, "#10141A", -0.032)}
   ${text(f.body, lede1, 64, 390, 25, "#10141A")}
   ${text(f.body, lede2, 64, 423, 25, "#10141A")}
   <rect x="64" y="466" width="690" height="1" fill="#10141A"/>
@@ -163,10 +164,22 @@ const ogSvg = (locale: Locale) => {
 </svg>`;
 };
 
-/** Break a long mono label after the "·" nearest the middle. */
-function splitLabel(label: string): [string, string] {
-  const i = label.lastIndexOf(" · ");
-  return i > 0 ? [label.slice(0, i), label.slice(i + 3).trim()] : [label, ""];
+/** Mono characters that fit a 236px proof column at 12px (the rest wraps). */
+const LABEL_CHARS = 27;
+
+/** Wrap a caption at spaces into lines of at most `max` characters. */
+function wrapWords(label: string, max: number): string[] {
+  const lines: string[] = [];
+  let line = "";
+  for (const word of label.split(" ")) {
+    if (line && line.length + 1 + word.length > max) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = line ? `${line} ${word}` : word;
+    }
+  }
+  return line ? [...lines, line] : lines;
 }
 
 /** Copy a Node Buffer into a standalone ArrayBuffer-backed Uint8Array (a valid Response body). */
