@@ -1,8 +1,15 @@
 /**
  * Typed queries over the content collections. Pages import from here so
  * sorting / filtering rules live in one place.
+ *
+ * Every getter takes a locale. Czech entries live in `src/content/<collection>/cs/` with the
+ * same file name and only the translatable fields; they are merged over the English entry
+ * (anything missing falls back to English). Render bodies with `renderEntry()`, which picks
+ * the Czech Markdown body when there is one — `bodyLang()` tells which language it is in.
  */
-import { getCollection, type CollectionEntry } from "astro:content";
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import type { Locale } from "@/i18n/locales";
+import { typoDeep } from "@/i18n/typo";
 
 export type Project = CollectionEntry<"projects">;
 export type Post = CollectionEntry<"writing">;
@@ -40,10 +47,66 @@ export function shownAll<T>(items: readonly T[], text: (item: T) => string = Str
 const visible = (data: { placeholder?: boolean; draft?: boolean }) =>
   !(isProd && (data.draft || (hidePlaceholders && data.placeholder)));
 
+/* Czech versions ------------------------------------------------------------ */
+
+type Translatable = "projects" | "experience" | "hobbies" | "now";
+type CsOf = {
+  projects: "projectsCs";
+  experience: "experienceCs";
+  hobbies: "hobbiesCs";
+  now: "nowCs";
+};
+const csCollection: CsOf = {
+  projects: "projectsCs",
+  experience: "experienceCs",
+  hobbies: "hobbiesCs",
+  now: "nowCs",
+};
+
+/** Merged entry → the entry whose Markdown body should be rendered (the Czech one). */
+const bodySource = new WeakMap<object, CollectionEntry<CsOf[Translatable]>>();
+
+/** English entries with their Czech fields (and body) merged in for `locale === "cs"`. */
+async function localized<C extends Translatable>(
+  collection: C,
+  entries: CollectionEntry<C>[],
+  locale: Locale,
+): Promise<CollectionEntry<C>[]> {
+  if (locale === "en") return entries;
+  const czech = new Map(
+    (await getCollection(csCollection[collection])).map((e) => [e.id, e] as const),
+  );
+  return entries.map((entry) => {
+    const cs = czech.get(entry.id);
+    if (!cs) return entry;
+    const data: Record<string, unknown> = { ...entry.data };
+    for (const [key, value] of Object.entries(typoDeep(cs.data)))
+      if (value !== undefined) data[key] = value;
+    const merged = { ...entry, data } as CollectionEntry<C>;
+    if (cs.body?.trim()) bodySource.set(merged, cs);
+    return merged;
+  });
+}
+
+/** Render an entry's body — the Czech body when the entry was localized and has one. */
+export function renderEntry(entry: CollectionEntry<Translatable | "writing">) {
+  const source = bodySource.get(entry);
+  return source ? render(source) : render(entry);
+}
+
+/** Language the rendered body is written in ("en" when a Czech page falls back). */
+export function bodyLang(entry: object, locale: Locale): Locale {
+  return locale === "cs" && bodySource.has(entry) ? "cs" : "en";
+}
+
 /* Projects ---------------------------------------------------------------- */
 
-export async function getProjects(): Promise<Project[]> {
-  const all = await getCollection("projects", ({ data }) => visible(data));
+export async function getProjects(locale: Locale = "en"): Promise<Project[]> {
+  const all = await localized(
+    "projects",
+    await getCollection("projects", ({ data }) => visible(data)),
+    locale,
+  );
   return all.sort((a, b) => {
     if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
     if (a.data.order !== b.data.order) return a.data.order - b.data.order;
@@ -56,16 +119,20 @@ export async function getProjects(): Promise<Project[]> {
  * repository. /projects lists them as compact rows built only from their real
  * fields (title, description, stack, repository links) — never as case studies.
  */
-export async function getCodeProjects(): Promise<Project[]> {
-  const all = await getCollection(
+export async function getCodeProjects(locale: Locale = "en"): Promise<Project[]> {
+  const all = await localized(
     "projects",
-    ({ data }) => data.placeholder && !data.draft && Boolean(data.github),
+    await getCollection(
+      "projects",
+      ({ data }) => data.placeholder && !data.draft && Boolean(data.github),
+    ),
+    locale,
   );
   return all.sort((a, b) => a.data.order - b.data.order);
 }
 
-export async function getFeaturedProjects(limit = 4): Promise<Project[]> {
-  const all = await getProjects();
+export async function getFeaturedProjects(locale: Locale = "en", limit = 4): Promise<Project[]> {
+  const all = await getProjects(locale);
   return all.filter((p) => p.data.featured).slice(0, limit);
 }
 
@@ -116,8 +183,12 @@ export function getAdjacentPosts(post: Post, all: Post[]): { prev?: Post; next?:
 
 /* Experience -------------------------------------------------------------- */
 
-export async function getPositions(): Promise<Position[]> {
-  const all = await getCollection("experience", ({ data }) => visible(data));
+export async function getPositions(locale: Locale = "en"): Promise<Position[]> {
+  const all = await localized(
+    "experience",
+    await getCollection("experience", ({ data }) => visible(data)),
+    locale,
+  );
   return all.sort((a, b) => {
     const aEnd = a.data.endDate?.valueOf() ?? Infinity;
     const bEnd = b.data.endDate?.valueOf() ?? Infinity;
@@ -133,68 +204,153 @@ export async function getMilestones(): Promise<Milestone[]> {
 
 /* Hobbies ----------------------------------------------------------------- */
 
-export async function getHobbies(): Promise<Hobby[]> {
-  const all = await getCollection("hobbies");
+export async function getHobbies(locale: Locale = "en"): Promise<Hobby[]> {
+  const all = await localized("hobbies", await getCollection("hobbies"), locale);
   return all.sort(
     (a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title),
   );
 }
 
+/* Now --------------------------------------------------------------------- */
+
+export type NowEntry = CollectionEntry<"now">;
+
+export async function getNow(locale: Locale = "en"): Promise<NowEntry> {
+  const [entry] = await localized("now", await getCollection("now"), locale);
+  if (!entry) throw new Error("Add a file to src/content/now/ to populate the Now page.");
+  return entry;
+}
+
 /* Labels ------------------------------------------------------------------ */
 
-export const categoryLabels: Record<Project["data"]["category"], string> = {
-  professional: "Professional",
-  "open-source": "Open source",
-  personal: "Personal",
-  experiment: "Experiment",
-  hobby: "Hobby project",
+export const categoryLabels: Record<Locale, Record<Project["data"]["category"], string>> = {
+  en: {
+    professional: "Professional",
+    "open-source": "Open source",
+    personal: "Personal",
+    experiment: "Experiment",
+    hobby: "Hobby project",
+  },
+  cs: {
+    professional: "Profesní",
+    "open-source": "Open source",
+    personal: "Osobní",
+    experiment: "Experiment",
+    hobby: "Projekt z koníčku",
+  },
 };
 
 export type StatusTone = "ok" | "caution" | "off";
 
-/** Project status as a pill: word + tone (ok = mint, caution = butter, off = neutral). */
-export const statusLabels: Record<Project["data"]["status"], { label: string; tone: StatusTone }> =
-  {
-    active: { label: "Live", tone: "ok" },
-    pilot: { label: "Pilot", tone: "ok" },
-    "in-progress": { label: "In progress", tone: "caution" },
-    validating: { label: "Validating", tone: "caution" },
-    research: { label: "Research", tone: "caution" },
-    completed: { label: "Completed", tone: "off" },
-    paused: { label: "Paused", tone: "off" },
-    archived: { label: "Archived", tone: "off" },
-  };
-
-export const employmentLabels: Record<Position["data"]["employmentType"], string> = {
-  "full-time": "Full-time",
-  "part-time": "Part-time",
-  contract: "Contract",
-  freelance: "Freelance",
-  internship: "Internship",
-  founder: "Founder",
+const statusTones: Record<Project["data"]["status"], StatusTone> = {
+  active: "ok",
+  pilot: "ok",
+  "in-progress": "caution",
+  validating: "caution",
+  research: "caution",
+  completed: "off",
+  paused: "off",
+  archived: "off",
 };
 
-export const milestoneLabels: Record<Milestone["data"]["type"], { title: string; plural: string }> =
-  {
+const statusWords: Record<Locale, Record<Project["data"]["status"], string>> = {
+  en: {
+    active: "Live",
+    pilot: "Pilot",
+    "in-progress": "In progress",
+    validating: "Validating",
+    research: "Research",
+    completed: "Completed",
+    paused: "Paused",
+    archived: "Archived",
+  },
+  cs: {
+    active: "V provozu",
+    pilot: "Pilot",
+    "in-progress": "Rozpracováno",
+    validating: "Validace",
+    research: "Výzkum",
+    completed: "Dokončeno",
+    paused: "Pozastaveno",
+    archived: "Archivováno",
+  },
+};
+
+/** Project status as a pill: word + tone (ok = mint, caution = butter, off = neutral). */
+export const statusLabel = (status: Project["data"]["status"], locale: Locale) => ({
+  label: statusWords[locale][status],
+  tone: statusTones[status],
+});
+
+export const employmentLabels: Record<
+  Locale,
+  Record<Position["data"]["employmentType"], string>
+> = {
+  en: {
+    "full-time": "Full-time",
+    "part-time": "Part-time",
+    contract: "Contract",
+    freelance: "Freelance",
+    internship: "Internship",
+    founder: "Founder",
+  },
+  cs: {
+    "full-time": "Plný úvazek",
+    "part-time": "Částečný úvazek",
+    contract: "Kontrakt",
+    freelance: "Na volné noze",
+    internship: "Stáž",
+    founder: "Zakladatel",
+  },
+};
+
+export const milestoneLabels: Record<
+  Locale,
+  Record<Milestone["data"]["type"], { title: string; plural: string }>
+> = {
+  en: {
     education: { title: "Education", plural: "Education" },
     certification: { title: "Certification", plural: "Certifications" },
     speaking: { title: "Talk", plural: "Speaking" },
     award: { title: "Award", plural: "Awards" },
     community: { title: "Community", plural: "Community involvement" },
-  };
+  },
+  cs: {
+    education: { title: "Vzdělání", plural: "Vzdělání" },
+    certification: { title: "Certifikace", plural: "Certifikace" },
+    speaking: { title: "Přednáška", plural: "Přednášky" },
+    award: { title: "Ocenění", plural: "Ocenění" },
+    community: { title: "Komunita", plural: "Zapojení v komunitě" },
+  },
+};
 
-export const hobbyCategoryLabels: Record<Hobby["data"]["category"], string> = {
-  sport: "Sport",
-  aviation: "Aviation",
-  motorcycles: "Motorcycles",
-  travel: "Travel",
-  photography: "Photography",
-  gaming: "Gaming",
-  books: "Books",
-  music: "Music",
-  hardware: "Hardware",
-  art: "Art",
-  experiments: "Side experiments",
+export const hobbyCategoryLabels: Record<Locale, Record<Hobby["data"]["category"], string>> = {
+  en: {
+    sport: "Sport",
+    aviation: "Aviation",
+    motorcycles: "Motorcycles",
+    travel: "Travel",
+    photography: "Photography",
+    gaming: "Gaming",
+    books: "Books",
+    music: "Music",
+    hardware: "Hardware",
+    art: "Art",
+    experiments: "Side experiments",
+  },
+  cs: {
+    sport: "Sport",
+    aviation: "Létání",
+    motorcycles: "Motorky",
+    travel: "Cestování",
+    photography: "Fotografie",
+    gaming: "Hry",
+    books: "Knihy",
+    music: "Hudba",
+    hardware: "Hardware",
+    art: "Umění",
+    experiments: "Vedlejší experimenty",
+  },
 };
 
 /* Track record helpers ------------------------------------------------------ */

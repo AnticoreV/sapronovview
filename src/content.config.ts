@@ -47,7 +47,8 @@ export const projectStatuses = [
 ] as const;
 
 const projects = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: "./src/content/projects" }),
+  // Top-level files only: Czech versions live in ./cs/ (collection "projectsCs").
+  loader: glob({ pattern: "[^_]*.{md,mdx}", base: "./src/content/projects" }),
   schema: ({ image }) =>
     z.object({
       title: z.string(),
@@ -122,7 +123,8 @@ export const employmentTypes = [
 ] as const;
 
 const experience = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: "./src/content/experience" }),
+  // Top-level files only: Czech versions live in ./cs/ (collection "experienceCs").
+  loader: glob({ pattern: "[^_]*.{md,mdx}", base: "./src/content/experience" }),
   schema: z.object({
     company: z.string(),
     role: z.string(),
@@ -189,7 +191,8 @@ export const hobbyCategories = [
 ] as const;
 
 const hobbies = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: "./src/content/hobbies" }),
+  // Top-level files only: Czech versions live in ./cs/ (collection "hobbiesCs").
+  loader: glob({ pattern: "[^_]*.{md,mdx}", base: "./src/content/hobbies" }),
   schema: ({ image }) =>
     z.object({
       title: z.string(),
@@ -213,7 +216,8 @@ const hobbies = defineCollection({
 /** Now --------------------------------------------------------------------- */
 
 const now = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: "./src/content/now" }),
+  // Top-level files only: Czech versions live in ./cs/ (collection "nowCs").
+  loader: glob({ pattern: "[^_]*.{md,mdx}", base: "./src/content/now" }),
   schema: z.object({
     updated: z.coerce.date(),
     working: z.array(z.string()).default([]),
@@ -229,4 +233,76 @@ const now = defineCollection({
   }),
 });
 
-export const collections = { projects, writing, experience, milestones, hobbies, now };
+/** Czech versions ------------------------------------------------------------
+ *
+ * `src/content/<collection>/cs/<same-file-name>.md` holds the Czech version of an English
+ * entry: only the translatable fields (everything else — dates, status, stack, links,
+ * `placeholder` — comes from the English entry) plus the Czech Markdown body. A missing
+ * Czech file or field falls back to English (see `src/lib/content.ts`).
+ */
+const csDir = (c: string) => `./src/content/${c}/cs`;
+
+const projectsCs = defineCollection({
+  loader: glob({ pattern: "[^_]*.{md,mdx}", base: csDir("projects") }),
+  schema: z.object({
+    title: z.string().optional(),
+    description: z.string().max(260).optional(),
+    tagline: z.string().optional(),
+    summary: z.string().optional(),
+    facts: z.array(z.object({ label: z.string(), value: z.string() })).optional(),
+    role: z.string().optional(),
+    organization: z.string().optional(),
+    timeframe: z.string().optional(),
+    links: z.array(linkSchema).optional(),
+  }),
+});
+
+const experienceCs = defineCollection({
+  loader: glob({ pattern: "[^_]*.{md,mdx}", base: csDir("experience") }),
+  schema: z.object({
+    role: z.string().optional(),
+    location: z.string().optional(),
+    workplace: z.string().optional(),
+    achievements: z.array(z.string()).optional(),
+    shipped: z.string().optional(),
+  }),
+});
+
+const hobbiesCs = defineCollection({
+  loader: glob({ pattern: "[^_]*.{md,mdx}", base: csDir("hobbies") }),
+  schema: z.object({
+    title: z.string().optional(),
+    tagline: z.string().optional(),
+    favorites: z.array(z.string()).optional(),
+    stats: z.array(z.object({ label: z.string(), value: z.string() })).optional(),
+    links: z.array(linkSchema).optional(),
+  }),
+});
+
+const nowCs = defineCollection({
+  loader: glob({ pattern: "[^_]*.{md,mdx}", base: csDir("now") }),
+  schema: z.object({
+    working: z.array(z.string()).optional(),
+    learning: z.array(z.string()).optional(),
+    reading: z
+      .array(
+        z.object({ title: z.string(), author: z.string().optional(), note: z.string().optional() }),
+      )
+      .optional(),
+    interests: z.array(z.string()).optional(),
+    location: z.string().optional(),
+  }),
+});
+
+export const collections = {
+  projects,
+  writing,
+  experience,
+  milestones,
+  hobbies,
+  now,
+  projectsCs,
+  experienceCs,
+  hobbiesCs,
+  nowCs,
+};
