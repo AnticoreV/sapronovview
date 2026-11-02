@@ -60,6 +60,40 @@ export type HeroOptions = {
    * time, no animation, and the frame is kept in the drawing buffer for toDataURL().
    */
   capture?: { dpr: number };
+  /** Callout texts in the page language (HeroStage passes them from src/i18n/ui.ts). */
+  labels?: Partial<HeroLabels>;
+};
+
+/** Every text drawn into the scene. English defaults; Czech comes from the dictionary. */
+export type HeroLabels = Record<
+  | "idea"
+  | "validate"
+  | "frontend"
+  | "backend"
+  | "services"
+  | "arch"
+  | "tests"
+  | "review"
+  | "cicd"
+  | "deploy"
+  | "observe"
+  | "agent",
+  string
+>;
+
+const DEFAULT_LABELS: HeroLabels = {
+  idea: "IDEA",
+  validate: "VALIDATE",
+  frontend: "FRONTEND",
+  backend: "BACKEND",
+  services: "SERVICES",
+  arch: "ARCHITECTURE",
+  tests: "TESTS",
+  review: "REVIEW · 1 CHANGE",
+  cicd: "CI/CD",
+  deploy: "DEPLOY",
+  observe: "OBSERVE",
+  agent: "AGENT LOOP",
 };
 
 type Palette = {
@@ -143,7 +177,9 @@ async function fontsReady(font: string) {
   try {
     await Promise.race([
       Promise.all([
+        // Latin + latin-ext (Czech labels: NÁPAD, NASAZENÍ, AGENTNÍ SMYČKA…).
         document.fonts.load(`600 64px ${font}`, "IDEAVLTRCHUFNBKSOPYG/·1"),
+        document.fonts.load(`600 64px ${font}`, "ÁÍÝÉĚŠČŘŽŮÚ"),
         document.fonts.ready,
       ]),
       new Promise((r) => setTimeout(r, 2500)),
@@ -219,6 +255,7 @@ async function buildScene(
   dark: boolean,
   font: string,
   size: { w: number; h: number },
+  TX: HeroLabels = DEFAULT_LABELS,
 ): Promise<Built> {
   const C = PALETTES[dark ? "dark" : "light"];
   const scene = new Scene();
@@ -956,7 +993,7 @@ async function buildScene(
     const px = 64;
     g.font = `600 ${px}px ${font}`;
     g.letterSpacing = "8px";
-    c.width = Math.ceil(g.measureText("AGENT LOOP").width) + 96;
+    c.width = Math.ceil(g.measureText(TX.agent).width) + 96;
     c.height = 120;
     g.fillStyle = C.paper;
     g.strokeStyle = C.tagLine;
@@ -973,7 +1010,7 @@ async function buildScene(
     g.letterSpacing = "8px";
     g.fillStyle = C.label;
     g.textBaseline = "middle";
-    g.fillText("AGENT LOOP", 72, 64);
+    g.fillText(TX.agent, 72, 64);
     const t = canvasTex(c);
     const s = new Sprite(
       new SpriteMaterial({ map: t, transparent: true, depthTest: false, toneMapped: false }),
@@ -1002,14 +1039,14 @@ async function buildScene(
   const depCorner = V(DEP.x + DEP.w / 2, 0.02, DEP.z + DEP.d / 2);
   const obsCorner = V(OBS.x0, OBS.y1, OBS.z);
   const Lb = {
-    idea: callout("IDEA", ideaAnchor, up(ideaAnchor, 1.55)),
-    validate: callout("VALIDATE", gateTop, up(gateTop, 0.85)),
-    frontend: callout("FRONTEND", feAnchor, up(feAnchor, 1.25)),
-    backend: callout("BACKEND", beAnchor, up(beAnchor, 0.75)),
-    services: callout("SERVICES", svAnchor, up(svAnchor, 0.85)),
-    arch: callout("ARCHITECTURE", archMid, archMid, { align: "center", color: C.faint }),
+    idea: callout(TX.idea, ideaAnchor, up(ideaAnchor, 1.55)),
+    validate: callout(TX.validate, gateTop, up(gateTop, 0.85)),
+    frontend: callout(TX.frontend, feAnchor, up(feAnchor, 1.25)),
+    backend: callout(TX.backend, beAnchor, up(beAnchor, 0.75)),
+    services: callout(TX.services, svAnchor, up(svAnchor, 0.85)),
+    arch: callout(TX.arch, archMid, archMid, { align: "center", color: C.faint }),
     tests: callout(
-      "TESTS",
+      TX.tests,
       testsAnchor,
       testsAnchor
         .clone()
@@ -1017,13 +1054,13 @@ async function buildScene(
         .add(V(0, -0.75, 0)),
       { lead: C.mint, color: C.label, align: "right" },
     ),
-    review: callout("REVIEW · 1 CHANGE", V(QU.x - 0.2, 1.05, -0.62), V(QU.x - 0.2, 2.15, -0.62), {
+    review: callout(TX.review, V(QU.x - 0.2, 1.05, -0.62), V(QU.x - 0.2, 2.15, -0.62), {
       color: C.rose,
       lead: C.rose,
     }),
-    cicd: callout("CI/CD", ciMid, ciMid.clone().add(V(0.85, 0, 0.85)), { align: "right" }),
-    deploy: callout("DEPLOY", depCorner, depCorner.clone().add(V(0.55, 0, 0.55))),
-    observe: callout("OBSERVE", obsCorner, up(obsCorner, 0.55)),
+    cicd: callout(TX.cicd, ciMid, ciMid.clone().add(V(0.85, 0, 0.85)), { align: "right" }),
+    deploy: callout(TX.deploy, depCorner, depCorner.clone().add(V(0.55, 0, 0.55))),
+    observe: callout(TX.observe, obsCorner, up(obsCorner, 0.55)),
   };
 
   /** Callouts kept on narrow stages; everything is shown otherwise. */
@@ -1329,6 +1366,7 @@ export async function mountHero(
   options: HeroOptions = {},
 ): Promise<HeroHandle> {
   const capture = options.capture;
+  const labels: HeroLabels = { ...DEFAULT_LABELS, ...options.labels };
   const font = monoStack();
   await fontsReady(font);
 
@@ -1374,7 +1412,7 @@ export async function mountHero(
 
   let dark = isDark();
   renderer.setClearColor(PALETTES[dark ? "dark" : "light"].bg, 1);
-  let built = await buildScene(renderer, camera, dark, font, { ...size });
+  let built = await buildScene(renderer, camera, dark, font, { ...size }, labels);
 
   /* ------------------------------------------------------------ state */
   let time = POSTER_T;
@@ -1443,7 +1481,7 @@ export async function mountHero(
     sleep();
     const old = built;
     renderer.setClearColor(PALETTES[dark ? "dark" : "light"].bg, 1);
-    built = await buildScene(renderer, camera, dark, font, { ...size });
+    built = await buildScene(renderer, camera, dark, font, { ...size }, labels);
     old.dispose();
     rebuilding = false;
     if (disposed) {

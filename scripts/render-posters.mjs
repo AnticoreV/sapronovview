@@ -6,11 +6,14 @@
  *                                                      the finished drawing), 1440 viewport, 2×
  *   src/assets/hero/blueprint-small-{light,dark}.png  ← the same at a 375 px stage (phone labels:
  *                                                      larger, main callouts only), 3×
- *   src/assets/globe/globe-{light,dark}.png  ← src/scripts/globe3d.ts on /adventures
+ *   src/assets/hero/blueprint{,-small}-{light,dark}-cs.png ← the same on /cs (Czech callouts)
+ *   src/assets/globe/globe-{light,dark}.png  ← src/scripts/globe3d.ts on /adventures (no text,
+ *                                             shared by both languages)
  *
  * Usage (needs a running preview of the current build):
  *   npm run build && npm run preview -- --host 127.0.0.1 --port 4321 &
  *   node scripts/render-posters.mjs            # BASE_URL=http://127.0.0.1:4321
+ *   ONLY=cs node scripts/render-posters.mjs    # only jobs whose name contains "cs"
  *   npm run build                              # rebuild with the new posters
  *
  * Uses the Chromium that ships with @playwright/test (SwiftShader WebGL, so it
@@ -45,6 +48,24 @@ const jobs = [
     out: "src/assets/hero/blueprint-small",
   },
   {
+    name: "hero cs",
+    path: `/cs?hero-capture=${DPR}`,
+    viewport: DESKTOP,
+    flag: "__heroReady",
+    canvas: ".hero-canvas",
+    out: "src/assets/hero/blueprint",
+    suffix: "-cs",
+  },
+  {
+    name: "hero cs (phone)",
+    path: `/cs?hero-capture=3`,
+    viewport: PHONE,
+    flag: "__heroReady",
+    canvas: ".hero-canvas",
+    out: "src/assets/hero/blueprint-small",
+    suffix: "-cs",
+  },
+  {
     name: "globe",
     path: `/adventures?globe-capture=${DPR}`,
     viewport: DESKTOP,
@@ -60,8 +81,9 @@ const browser = await chromium.launch({
 });
 
 try {
+  const only = process.env.ONLY;
   for (const theme of ["light", "dark"]) {
-    for (const job of jobs) {
+    for (const job of jobs.filter((j) => !only || j.name.includes(only))) {
       const context = await browser.newContext({
         viewport: job.viewport,
         deviceScaleFactor: 1,
@@ -83,9 +105,9 @@ try {
         const c = document.querySelector(sel);
         return { dataUrl: c.toDataURL("image/png"), width: c.width, height: c.height };
       }, job.canvas);
-      const file = `${root}${job.out}-${theme}.png`;
-      await writeFile(file, Buffer.from(dataUrl.split(",")[1], "base64"));
-      console.log(`${job.name} ${theme}: ${width}×${height} → ${job.out}-${theme}.png`);
+      const name = `${job.out}-${theme}${job.suffix ?? ""}.png`;
+      await writeFile(`${root}${name}`, Buffer.from(dataUrl.split(",")[1], "base64"));
+      console.log(`${job.name} ${theme}: ${width}×${height} → ${name}`);
       await context.close();
     }
   }

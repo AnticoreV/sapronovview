@@ -13,10 +13,37 @@ import posterLight from "@/assets/hero/blueprint-light.png";
 import posterDark from "@/assets/hero/blueprint-dark.png";
 import posterSmallLight from "@/assets/hero/blueprint-small-light.png";
 import posterSmallDark from "@/assets/hero/blueprint-small-dark.png";
+import posterLightCs from "@/assets/hero/blueprint-light-cs.png";
+import posterDarkCs from "@/assets/hero/blueprint-dark-cs.png";
+import posterSmallLightCs from "@/assets/hero/blueprint-small-light-cs.png";
+import posterSmallDarkCs from "@/assets/hero/blueprint-small-dark-cs.png";
+import { i18n } from "@/i18n";
+import type { HeroLabels } from "@/scripts/hero3d";
 
+const { locale, t } = i18n(Astro);
+// Posters carry the callout labels, so each language has its own (scripts/render-posters.mjs).
+const posters =
+  locale === "cs"
+    ? { light: posterLightCs, dark: posterDarkCs, sl: posterSmallLightCs, sd: posterSmallDarkCs }
+    : { light: posterLight, dark: posterDark, sl: posterSmallLight, sd: posterSmallDark };
+// Callout texts for the live scene (hero3d.ts), in the page language.
+const labelKeys = [
+  "idea",
+  "validate",
+  "frontend",
+  "backend",
+  "services",
+  "arch",
+  "tests",
+  "review",
+  "cicd",
+  "deploy",
+  "observe",
+  "agent",
+] as const satisfies ReadonlyArray<keyof HeroLabels>;
+const labels = Object.fromEntries(labelKeys.map((k) => [k, t(`hero3d.${k}`)])) as HeroLabels;
 // The artboard's description of the drawing (screens/HeroV6.dc.html).
-const description =
-  "An isometric technical drawing builds itself: three idea sketches, two struck out at a validation gate; the architecture (frontend, backend, services) is drawn stroke by stroke and filled with colour; tests stamp checks; a rose review mark erases one link and redraws it through a queue; dashed CI/CD arrows carry a package to a deploy target where service blocks extrude; a sparkline draws on an observe card; a rose pen-orb flies back along the agent loop and sketches the next idea while the sheet clears.";
+const description = t("hero.description");
 // Measured: beside the name (≥ 1270px viewport) the stage is ≤ 800px wide (797 at 1440);
 // below that it takes the full width. Below 600px phones get their own render (larger,
 // fewer callout labels — see hero3d.ts), 375 / 750 / 1125 wide.
@@ -24,10 +51,10 @@ const sizes = "(min-width: 1270px) 800px, 100vw";
 const widths = [480, 640, 800, 1200, 1594];
 // HeroLegend, exactly as the V6 artboard: an ink line for DRAWN, clay dots for the rest.
 const legend = [
-  { label: "IDEA", dot: "bg-clay-butter" },
-  { label: "BUILT · SHIPPED", dot: "bg-clay-blue" },
-  { label: "TESTED · RUNNING", dot: "bg-clay-mint" },
-  { label: "REVIEW · AGENT LOOP", dot: "bg-clay-rose" },
+  { label: t("hero.legend.idea"), dot: "bg-clay-butter" },
+  { label: t("hero.legend.built"), dot: "bg-clay-blue" },
+  { label: t("hero.legend.tested"), dot: "bg-clay-mint" },
+  { label: t("hero.legend.review"), dot: "bg-clay-rose" },
 ];
 ---
 
@@ -35,15 +62,16 @@ const legend = [
   <div
     class="hero-stage relative aspect-[16/10] w-full overflow-hidden rounded-md bg-bg"
     data-hero-stage
+    data-labels={JSON.stringify(labels)}
     role="img"
     aria-label={description}
   >
     <span class="hero-poster">
       <ThemePicture
-        light={posterLight}
-        dark={posterDark}
-        lightSmall={posterSmallLight}
-        darkSmall={posterSmallDark}
+        light={posters.light}
+        dark={posters.dark}
+        lightSmall={posters.sl}
+        darkSmall={posters.sd}
         smallMedia="(max-width: 599px)"
         smallWidths={[375, 750, 1125]}
         alt=""
@@ -57,7 +85,8 @@ const legend = [
   </div>
   <figcaption class="mono flex flex-wrap justify-center gap-x-5 gap-y-2 px-4 text-[12px] font-medium text-ink-muted">
     <span class="inline-flex items-center gap-[7px]">
-      <i class="inline-block h-0 w-3.5 border-t-2 border-ink" aria-hidden="true"></i>DRAWN
+      <i class="inline-block h-0 w-3.5 border-t-2 border-ink" aria-hidden="true"></i>
+      {t("hero.legend.drawn")}
     </span>
     {legend.map((l) => (
       <span class="inline-flex items-center gap-[7px]">
@@ -66,7 +95,7 @@ const legend = [
       </span>
     ))}
     <span>
-      <Glyphs text="SKETCH → BUILD → SHIP → LEARN" />
+      <Glyphs text={t("hero.legend.line")} spoken={t("hero.legend.spoken") || undefined} />
     </span>
   </figcaption>
 </figure>
@@ -122,7 +151,7 @@ const legend = [
 </style>
 
 <script>
-  import type { HeroHandle } from "@/scripts/hero3d";
+  import type { HeroHandle, HeroLabels } from "@/scripts/hero3d";
 
   let handle: HeroHandle | undefined;
 
@@ -167,8 +196,15 @@ const legend = [
     try {
       const { mountHero } = await import("@/scripts/hero3d");
       if (!stage.isConnected) return;
+      let labels: Partial<HeroLabels> | undefined;
+      try {
+        labels = JSON.parse(stage.dataset.labels ?? "{}") as Partial<HeroLabels>;
+      } catch {
+        labels = undefined;
+      }
       handle = await mountHero(canvas, {
         capture,
+        labels,
         onFirstFrame: () => {
           stage.dataset.live = "";
           window.setTimeout(() => (stage.dataset.liveSettled = ""), 500);
