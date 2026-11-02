@@ -62,6 +62,9 @@ const LATIN_EXT = [
 /** @param {string} subset */
 const schibsted = (subset) =>
   `./node_modules/@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-${subset}-wght-normal.woff2`;
+/** Newsreader "standard" files carry both axes: wght 200–800 and opsz 6–72. @param {string} subset */
+const newsreader = (subset) =>
+  `./node_modules/@fontsource-variable/newsreader/files/newsreader-${subset}-standard-normal.woff2`;
 /** @param {string} subset @param {number} weight */
 const plexMono = (subset, weight) =>
   `./node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-${subset}-${weight}-normal.woff2`;
@@ -121,8 +124,9 @@ export default defineConfig({
     responsiveStyles: true,
   },
   // Fonts are self-hosted from the Fontsource npm packages (latin + latin-ext) so builds
-  // never depend on a third-party request: Schibsted Grotesk (variable, wght 400–900) for
-  // display and text, IBM Plex Mono (static 400 / 500 / 600) for labels, numbers and code.
+  // never depend on a third-party request: Newsreader (variable, wght 200–800, opsz 6–72)
+  // for headlines and proof numbers, Schibsted Grotesk (variable, wght 400–900) for text,
+  // IBM Plex Mono (static 400 / 500 / 600) for labels, meta and code.
   //
   // Each typeface is split into two families: latin (preloaded, no fallback of its
   // own) and latin-ext (Czech diacritics, loaded on demand, carries the metric-matched
@@ -154,6 +158,38 @@ export default defineConfig({
           {
             src: [schibsted("latin-ext")],
             weight: "400 900",
+            style: "normal",
+            unicodeRange: /** @type {[string, ...string[]]} */ (LATIN_EXT),
+          },
+        ],
+      },
+    },
+    {
+      provider: fontProviders.local(),
+      name: "Newsreader Variable",
+      cssVariable: "--font-newsreader",
+      fallbacks: [],
+      options: {
+        variants: [
+          {
+            src: [newsreader("latin")],
+            weight: "200 800",
+            style: "normal",
+            unicodeRange: /** @type {[string, ...string[]]} */ (LATIN),
+          },
+        ],
+      },
+    },
+    {
+      provider: fontProviders.local(),
+      name: "Newsreader Variable",
+      cssVariable: "--font-newsreader-ext",
+      fallbacks: ["Georgia", "serif"],
+      options: {
+        variants: [
+          {
+            src: [newsreader("latin-ext")],
+            weight: "200 800",
             style: "normal",
             unicodeRange: /** @type {[string, ...string[]]} */ (LATIN_EXT),
           },

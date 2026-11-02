@@ -150,11 +150,18 @@ config, annunciator, checklist ticking and every aviation label are gone.
 - **Theme:** light by default; the header toggle (sun / moon, `aria-pressed`) stores the
   choice in `localStorage` (try/catch); without a stored choice the OS preference wins. The
   inline script in `BaseLayout` applies it before paint (no flash).
-- **Fonts:** Schibsted Grotesk (variable, wght 400–900) and IBM Plex Mono (400 / 500 / 600),
-  self-hosted from `@fontsource-variable/schibsted-grotesk` and `@fontsource/ibm-plex-mono`
-  through Astro's `fonts` config. Each is split into a **latin** family (preloaded — for the
-  mono only the 500 labels) and a **latin-ext** family (Czech diacritics, loaded on demand,
-  carries the metric-matched fallback); `--font-sans` / `--font-mono` chain them.
+- **Type direction (`type/serif-display`):** headlines, proof numbers, card and row titles
+  and the header name are set in Newsreader at w430 to w500; running text stays in
+  Schibsted Grotesk and labels in IBM Plex Mono. Newsreader's optical-size axis follows the
+  font size, so the 100px hero name gets the display cut and 24px card titles the text cut.
+  Sizes are in the `@theme` type tokens.
+- **Fonts:** Newsreader (variable, wght 200–800, opsz 6–72), Schibsted Grotesk (variable,
+  wght 400–900) and IBM Plex Mono (400 / 500 / 600), self-hosted from
+  `@fontsource-variable/newsreader`, `@fontsource-variable/schibsted-grotesk` and
+  `@fontsource/ibm-plex-mono` through Astro's `fonts` config. Each is split into a **latin**
+  family (preloaded — for the mono only the 500 labels) and a **latin-ext** family (Czech
+  diacritics, loaded on demand, carries the metric-matched fallback); `--font-display` /
+  `--font-sans` / `--font-mono` chain them.
 - **Surfaces:** `.card` (surface + 1px line, radius 12), `.lift` (hover: −2px + shadow-pop),
   `.sheet` + `.prose-sheet` (long reading, 68ch), `.section-head` (1px ink rule, display-l
   title, an optional link or action), `.btn-primary` / `.btn-secondary` / `.btn-ink`,
@@ -541,4 +548,4 @@ preview deploy (console) before merging.
 - three.js 0.184.0 (lazy; `Line2` fat lines for the hero), world-atlas + topojson-client
   (globe), d3-geo (build-time SVG map)
 - TypeScript (strict), ESLint, Prettier, Playwright smoke tests; opentype.js (build-time OG text)
-- Fonts: Schibsted Grotesk and IBM Plex Mono (latin + latin-ext, self-hosted, SIL OFL)
+- Fonts: Newsreader, Schibsted Grotesk and IBM Plex Mono (latin + latin-ext, self-hosted, SIL OFL)

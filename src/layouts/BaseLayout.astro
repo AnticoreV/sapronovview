@@ -118,6 +118,8 @@ const { locale, t } = i18n(Astro);
     {/* Latin subsets are preloaded (mono: the 500 labels only); latin-ext (Czech
         diacritics) is preloaded on Czech pages and loads on demand on English ones; the
         other mono weights load on demand. */}
+    <Font cssVariable="--font-newsreader" preload />
+    <Font cssVariable="--font-newsreader-ext" preload={locale === "cs"} />
     <Font cssVariable="--font-schibsted" preload />
     <Font cssVariable="--font-schibsted-ext" preload={locale === "cs"} />
     <Font cssVariable="--font-plex-mono" preload={[{ weight: 500 }]} />
