@@ -43,10 +43,7 @@ const hobbies = await getHobbies(locale);
     >
       <span class="flex flex-col gap-2">
         <span class="label text-ink-muted">{t("hobbies.teaser")}</span>
-        <span
-          id="map-teaser"
-          class="display text-[clamp(28px,3vw,40px)] leading-none tracking-[-0.03em]"
-        >
+        <span id="map-teaser" class="display text-display-s">
           {t("hobbies.mapLine", { countries: t("countries", { n: countries }) })}
         </span>
         <span class="text-ink-muted">{t("hobbies.teaserText")}</span>

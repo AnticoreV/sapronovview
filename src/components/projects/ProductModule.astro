@@ -52,19 +52,10 @@ const facts = isProduct
       <span class="mono text-[12px] font-medium text-ink-muted">{source}</span>
       <StatusBadge label={status.label} tone={status.tone} />
     </div>
-    <Name
-      class:list={[
-        "display tracking-[-0.04em]",
-        size === "lg" ? "text-display-m" : "text-[clamp(30px,3vw,40px)] leading-[1.05]",
-      ]}
-    >
+    <Name class:list={["display", size === "lg" ? "text-display-m" : "text-display-s"]}>
       {data.title}
     </Name>
-    {data.tagline && (
-      <p class="text-[clamp(21px,2vw,26px)] leading-[1.3] font-semibold text-accent">
-        {data.tagline}
-      </p>
-    )}
+    {data.tagline && <p class="text-tagline text-accent">{data.tagline}</p>}
     <p class="max-w-[560px] text-ink-muted">{text}</p>
     <span class="read-more mt-auto pt-2 font-semibold text-accent">{t("project.readCase")}</span>
     {data.placeholder && <PlaceholderBadge />}

@@ -16,7 +16,7 @@ const Title = level === 2 ? "h2" : "h3";
 
 <a href={href} class="route flex w-full flex-col gap-2 py-6 text-on-accent no-underline">
   <span class="mono text-[13px] font-medium">{route.label}</span>
-  <Title class="route__title text-[21px] leading-[1.25] font-bold">{route.title}</Title>
+  <Title class="route__title display text-route-title">{route.title}</Title>
   <span class="text-small text-on-accent/90">{route.text}</span>
 </a>
 

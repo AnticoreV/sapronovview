@@ -84,9 +84,7 @@ const profileLd = {
   <section class="band section-gap" aria-label={t("about.valuesLabel")}>
     <div class="shell grid gap-12 lg:grid-cols-2">
       <div>
-        <h2 class="display text-[clamp(28px,3vw,40px)] leading-[1.05] tracking-[-0.03em]">
-          {t("about.value")}
-        </h2>
+        <h2 class="display text-display-s">{t("about.value")}</h2>
         <dl class="mt-6 divide-y divide-line border-y border-line">
           {values.map((v) => (
             <div class="grid gap-1 py-4 sm:grid-cols-[170px_1fr] sm:gap-6">
@@ -108,9 +106,7 @@ const profileLd = {
         </ul>
       </div>
       <div>
-        <h2 class="display text-[clamp(28px,3vw,40px)] leading-[1.05] tracking-[-0.03em]">
-          {t("about.enjoy")}
-        </h2>
+        <h2 class="display text-display-s">{t("about.enjoy")}</h2>
         <ul class="mt-6 flex flex-col">
           {enjoys.map((e) => (
             <li class="border-b border-line py-3">{e}</li>
@@ -123,10 +119,7 @@ const profileLd = {
   <section class="band section-gap" aria-labelledby="stack-heading">
     <div class="shell card p-7 sm:p-10">
       <div class="flex flex-wrap items-end justify-between gap-4">
-        <h2
-          id="stack-heading"
-          class="display text-[clamp(28px,3vw,40px)] leading-[1.05] tracking-[-0.03em]"
-        >
+        <h2 id="stack-heading" class="display text-display-s">
           {t("about.stack")}
         </h2>
       </div>
@@ -144,10 +137,7 @@ const profileLd = {
   {realFacts.length > 0 && (
     <section class="band section-gap" aria-labelledby="facts-heading">
       <div class="shell">
-        <h2
-          id="facts-heading"
-          class="display text-[clamp(28px,3vw,40px)] leading-[1.05] tracking-[-0.03em]"
-        >
+        <h2 id="facts-heading" class="display text-display-s">
           {t("about.facts")}
         </h2>
         <ul class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

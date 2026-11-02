@@ -49,9 +49,7 @@ const groups = [
           </>
         )}
       </p>
-      <h1 class="display mt-4 text-[clamp(36px,5vw,56px)] leading-[1] tracking-[-0.04em]">
-        {t("now.h1")}
-      </h1>
+      <h1 class="display mt-4 text-display-page">{t("now.h1")}</h1>
       <div class="prose-sheet mt-6 text-body-l" lang={lang === locale ? undefined : lang}>
         <Content />
       </div>

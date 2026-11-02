@@ -85,14 +85,8 @@ const jsonLd = {
         <StatusBadge label={status.label} tone={status.tone} />
         {data.placeholder && <PlaceholderBadge />}
       </p>
-      <h1 class="display mt-4 text-[clamp(36px,5vw,56px)] leading-[1] tracking-[-0.04em]">
-        {data.title}
-      </h1>
-      {data.tagline && (
-        <p class="mt-4 text-[clamp(21px,2vw,26px)] leading-[1.3] font-semibold text-accent">
-          {data.tagline}
-        </p>
-      )}
+      <h1 class="display mt-4 text-display-page">{data.title}</h1>
+      {data.tagline && <p class="mt-4 text-tagline text-accent">{data.tagline}</p>}
       <p class="mt-4 text-body-l">{data.description}</p>
       {role && (
         <p class="mono mt-5 text-[12px] font-medium text-ink-muted">

@@ -20,7 +20,7 @@ const { locale, t, l } = i18n(Astro);
   class="post card lift grid gap-x-8 gap-y-2 p-7 no-underline md:grid-cols-[1fr_220px]"
 >
   <span class="flex flex-col gap-2" lang={locale === "en" ? undefined : "en"}>
-    <span class="text-heading">{data.title}</span>
+    <span class="display text-heading">{data.title}</span>
     <span class="text-ink-muted">{data.description}</span>
   </span>
   <span class="mono text-[12px] leading-relaxed text-ink-muted md:text-right">

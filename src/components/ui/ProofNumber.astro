@@ -18,10 +18,7 @@ const { readout, size = "lg", class: className } = Astro.props;
 
 <div class:list={["flex flex-col gap-2", className]}>
   <span
-    class:list={[
-      "display tabular leading-none tracking-[-0.04em]",
-      size === "lg" ? "text-numeral" : "text-[clamp(36px,4vw,48px)]",
-    ]}
+    class:list={["display tabular", size === "lg" ? "text-numeral" : "text-numeral-md"]}
     aria-hidden={readout.spoken ? "true" : undefined}
   >
     <Glyphs text={readout.value} weight="heavy" silent={Boolean(readout.spoken)} />

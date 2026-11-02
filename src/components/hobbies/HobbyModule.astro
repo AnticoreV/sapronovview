@@ -47,10 +47,7 @@ const links = shownAll(data.links, (l) => `${l.label} ${l.href}`).filter(
     </span>
     {data.placeholder && <PlaceholderBadge label="Has placeholders" />}
   </p>
-  <h2
-    id={`${hobby.id}-title`}
-    class="display text-[clamp(30px,3.4vw,44px)] leading-none tracking-[-0.03em]"
-  >
+  <h2 id={`${hobby.id}-title`} class="display text-display-s">
     {data.title}
   </h2>
   <p class="text-body-l font-semibold">{data.tagline}</p>

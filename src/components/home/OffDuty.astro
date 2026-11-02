@@ -34,9 +34,7 @@ const offDuty = t("offduty.line", { countries: t("countries", { n: countries }) 
               lang={locale === "cs" ? "en" : undefined}
               class="post card lift grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] items-start gap-x-8 gap-y-3 p-7 no-underline"
             >
-              <h3 class="text-[26px] leading-[1.15] font-bold tracking-[-0.02em]">
-                {post.data.title}
-              </h3>
+              <h3 class="display text-heading">{post.data.title}</h3>
               <p class="text-ink-muted">{post.data.description}</p>
               {post.data.tags.length > 0 && (
                 <span class="mono text-[12px] text-ink-muted">{post.data.tags.join(" · ")}</span>
