@@ -1,4 +1,4 @@
 ---
 title: "Motorky"
-tagline: "Dvě kola, plná nádrž a silnice, po které jsem ještě nejel."
+tagline: "Mototuristika, nejraději po silnicích, kde jsem ještě nejel."
 ---

@@ -1,6 +1,6 @@
 ---
 title: "Motorcycles"
-tagline: "Two wheels, a full tank and a road I haven't ridden yet."
+tagline: "Motorcycle touring, preferably on roads I haven't ridden yet."
 category: motorcycles
 icon: "Bike"
 images:
@@ -8,7 +8,7 @@ images:
     caption: "[Add your photo: /public/images/hobbies/moto-1.jpg]"
   - alt: "Riding through a forest road"
     caption: "[Add your photo]"
-  - alt: "Garage — maintenance day"
+  - alt: "Garage, maintenance day"
     caption: "[Add your photo]"
 favorites:
   - "[Current bike — make & model]"

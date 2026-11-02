@@ -1,6 +1,6 @@
 ---
 title: "Adventures & country visiting"
-tagline: "Collecting countries one border crossing at a time."
+tagline: "The countries I've visited and the ones still on my list."
 category: travel
 icon: "Compass"
 images:

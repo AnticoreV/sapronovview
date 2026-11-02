@@ -1,6 +1,6 @@
 ---
 title: "Ultralight aviation"
-tagline: "Low, slow and with the best view in the world."
+tagline: "Training for an ultralight pilot licence."
 category: aviation
 icon: "Plane"
 images:

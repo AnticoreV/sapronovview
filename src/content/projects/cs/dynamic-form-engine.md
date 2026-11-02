@@ -9,7 +9,7 @@ Konfigurovatelný formulářový engine pro administraci a zákaznickou aplikaci
 
 ## Problém
 
-Každý nový typ formuláře byl vývojový úkol: nové komponenty, nová validační pravidla, nové zpracování na backendu. Vytvoření jednoho trvalo dny a drobné rozdíly mezi formuláři znamenaly nekonzistentní chování pro uživatele a duplicitní kód pro tým.
+Každý nový typ formuláře byl vývojový úkol, který potřeboval vlastní komponenty, validační pravidla i zpracování na backendu. Vytvoření jednoho trvalo dny a drobné rozdíly mezi formuláři znamenaly nekonzistentní chování pro uživatele a duplicitní kód pro tým.
 
 ## Moje role
 
@@ -23,26 +23,26 @@ Měl jsem na starosti obě strany stacku: engine a knihovnu komponent v Angularu
 
 ## Technické řešení
 
-- **Engine v Angularu.** Formuláře jsou popsané přizpůsobitelnými šablonami; engine vykresluje pole, uplatňuje podmíněnou validaci a v reálném čase aktualizuje závislá pole, zatímco uživatel píše.
-- **Znovupoužitelná knihovna komponent.** Sada silně typovaných Angular komponent a sdílených služeb, které používá administrace i zákaznická aplikace, takže nové formuláře automaticky přebírají konzistentní chování.
-- **Backendové služby v Javě/Springu.** Škálovatelné služby obstarávají složitou logiku zpracování a odesílání formulářů a jsou dostupné přes dobře strukturovaná REST API.
-- **Nejdřív kontrakty.** Verzované REST kontrakty zdokumentované v OpenAPI/Swaggeru a k tomu bezpečná autentizace mezi frontendem v Angularu a backendem ve Springu.
+- Engine v Angularu vykresluje pole podle přizpůsobitelných šablon, uplatňuje podmíněnou validaci a v reálném čase aktualizuje závislá pole, zatímco uživatel píše.
+- Knihovnu silně typovaných Angular komponent a sdílených služeb používá administrace i zákaznická aplikace, takže se nový formulář v obou chová stejně.
+- Služby v Javě/Springu obstarávají zpracování a odesílání formulářů přes REST API.
+- Verzované REST kontrakty jsou zdokumentované v OpenAPI/Swaggeru a volání mezi frontendem v Angularu a backendem ve Springu jsou autentizovaná.
 
 ## Výzvy
 
-Výkonově kritické cesty na backendu volaly několik nezávislých downstream služeb za sebou. Tyto služby jsem refaktoroval z Javy do Kotlinu a pomocí coroutines (korutin) jsem nezávislá volání spustil souběžně.
+Cesty na backendu citlivé na latenci volaly několik nezávislých downstream služeb za sebou. Tyto služby jsem refaktoroval z Javy do Kotlinu a pomocí coroutines (korutin) jsem nezávislá volání spustil souběžně.
 
 ## Rozhodnutí a kompromisy
 
-- **Šablony místo kódu.** Popsat chování formuláře šablonou stojí trochu flexibility u opravdu neobvyklých formulářů, ale v běžných případech se z vývojového úkolu stala konfigurace.
-- **Kotlin jen pro kritické cesty.** Místo přepisu všeho přešly na Kotlin jen služby citlivé na latenci, takže riziko migrace zůstalo pod kontrolou.
+- Šablony stojí trochu flexibility u neobvyklých formulářů, ale v běžných případech udělaly z vývojového úkolu konfiguraci.
+- Na Kotlin jsem převedl jen služby citlivé na latenci místo přepisu všeho, takže riziko migrace zůstalo malé.
 
 ## Výsledky
 
 - Vytvoření nového typu formuláře se zkrátilo **ze dnů na hodiny**.
 - Souběžná downstream volání s coroutines **zkrátila p95 latenci zhruba na polovinu** při špičkové zátěži.
-- Zlepšila se konzistence a znovupoužitelnost kódu napříč administrací a zákaznickou aplikací.
+- Administrace a zákaznická aplikace sdílejí jednu knihovnu komponent.
 
 ## Co jsem se naučil
 
-Největší hodnotu přinesly ty nudné části: dobrá knihovna komponent a čistý, verzovaný kontrakt mezi frontendem a backendem. Samotný engine byl menší polovinou práce.
+Největší hodnotu přinesly ty nudné části: solidní knihovna komponent a verzovaný kontrakt mezi frontendem a backendem. Samotný engine byl menší polovinou práce.

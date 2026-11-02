@@ -29,7 +29,7 @@ I worked on the Android client, implementing the **kanban board** feature: colum
 ## Technical approach
 
 - Built the board UI natively in **Kotlin** on top of the existing client architecture.
-- [Describe how board state was modelled — e.g. as Matrix room state events — and how conflicts were handled.]
+- [Describe how board state was modelled, e.g. as Matrix room state events, and how conflicts were handled.]
 - [Describe testing and release process.]
 
 ## Challenges
@@ -39,7 +39,7 @@ I worked on the Android client, implementing the **kanban board** feature: colum
 
 ## Decisions & trade-offs
 
-[What you chose and why — e.g. persisting board state in room events vs. a separate backend.]
+[What you chose and why, e.g. persisting board state in room events vs. a separate backend.]
 
 ## Results
 

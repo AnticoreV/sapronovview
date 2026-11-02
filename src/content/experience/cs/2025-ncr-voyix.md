@@ -5,7 +5,7 @@ achievements:
   - "Postavil jsem platformu v Angularu pro dynamickou úpravu menu, díky které si klienti z amerického trhu aktualizují menu sami (self-service) místo dřívějšího ručního procesu"
   - "Postavil a provozoval jsem služby na GCP s plnou produkční observabilitou (metriky, logování, alerting) pro enterprise systém s ~2 miliony uživatelů"
   - "Nasadil jsem LLM a agentní AI nástroje (včetně MCP integrací) k automatizaci scaffoldingu testů a interního dohledávání dat"
-  - "Udával jsem technický směr prostřednictvím code review a podnětů k architektuře a pomáhal tak udržet kvalitu a konzistenci v celém týmu"
+  - "Ovlivňoval jsem technický směr prostřednictvím code review a podnětů k architektuře"
 shipped: "BFF nad až 8 službami · ~2 mil. uživatelů"
 ---
 

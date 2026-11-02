@@ -2,7 +2,7 @@
 location: "Praha"
 achievements:
   - "Navrhl jsem a implementoval CRM systém s integrovanou administrací a vyvinul klíčovou backendovou logiku v Javě/Springu"
-  - "Postavil jsem backendové služby pro datovou analytiku a reporting, které umožnily dashboardy a vizualizace v reálném čase na frontendu v Reactu"
+  - "Postavil jsem analytické a reportingové služby pro dashboardy v reálném čase na frontendu v Reactu"
 shipped: "CRM + analytika"
 ---
 

@@ -27,7 +27,7 @@ A configurable form engine for an admin panel and a customer-facing application 
 
 ## Problem
 
-Every new form type was a development task: new components, new validation rules, new backend handling. Creating one took days, and small variations between forms meant inconsistent behaviour for users and duplicated code for the team.
+Every new form type was a development task that needed its own components, validation rules and backend handling. Creating one took days, and small variations between forms meant inconsistent behaviour for users and duplicated code for the team.
 
 ## My role
 
@@ -41,26 +41,26 @@ I owned both sides of the stack: the Angular engine and component library on the
 
 ## Technical approach
 
-- **Engine in Angular.** Forms are described by customisable templates; the engine renders fields, applies conditional validation and updates dependent fields in real time as users type.
-- **Reusable component library.** A set of strongly-typed Angular components and shared services used across both the admin panel and the customer app, so new forms inherit consistent behaviour by default.
-- **Backend services in Java/Spring.** Scalable services handle the complex form-processing and submission logic, exposed through well-structured REST APIs.
-- **Contracts first.** Versioned REST contracts documented with OpenAPI/Swagger, plus secure authentication between the Angular frontend and the Spring backend.
+- An Angular engine that renders fields from customisable templates, applies conditional validation and updates dependent fields in real time as users type.
+- A library of strongly-typed Angular components and shared services used by both the admin panel and the customer app, so a new form behaves the same in both by default.
+- Java/Spring services that handle form processing and submission behind REST APIs.
+- Versioned REST contracts documented with OpenAPI/Swagger, and authenticated calls between the Angular frontend and the Spring backend.
 
 ## Challenges
 
-The performance-critical backend paths made several independent downstream calls in sequence. I refactored those services from Java to Kotlin and used coroutines to run the independent calls concurrently.
+The latency-sensitive backend paths made several independent downstream calls in sequence. I refactored those services from Java to Kotlin and used coroutines to run the independent calls concurrently.
 
 ## Decisions & trade-offs
 
-- **Templates over code.** Encoding form behaviour in templates costs some flexibility for truly unusual forms, but it turned a development task into a configuration task for the common case.
-- **Kotlin for the hot paths only.** Rather than rewriting everything, only the latency-sensitive services moved to Kotlin, keeping the migration risk contained.
+- Templates cost some flexibility for unusual forms, but they turned a development task into a configuration task for the common case.
+- I moved only the latency-sensitive services to Kotlin instead of rewriting everything, which kept the migration risk small.
 
 ## Results
 
 - New form types went from **days to hours** to create.
 - Concurrent downstream calls with coroutines **roughly halved p95 latency** under peak load.
-- Consistency and code reuse improved across the admin panel and the customer-facing app.
+- The admin panel and the customer-facing app share one component library.
 
 ## Lessons learned
 
-Most of the value came from the boring parts: a good component library and a clean, versioned contract between frontend and backend. The engine itself was the smaller half of the work.
+Most of the value came from the boring parts: a solid component library and a versioned contract between frontend and backend. The engine itself was the smaller half of the work.

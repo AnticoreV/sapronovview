@@ -1,4 +1,4 @@
 ---
 title: "Sport"
-tagline: "Silné tělo, čistá hlava, lepší kód."
+tagline: "Kondice k práci, při které většinu dne sedím."
 ---

@@ -1,6 +1,6 @@
 ---
 title: "Samoobslužná platforma pro správu menu"
-description: "Platforma v Angularu, ve které si restaurační klienti z amerického trhu sami upravují menu. Stojí na službách v Javě/Springu – backend-for-frontend a agregátoru – v systému s ~2 miliony uživatelů."
+description: "Platforma v Angularu, ve které si restaurační klienti z amerického trhu sami upravují menu. Stojí na službách v Javě/Springu (backend-for-frontend a agregátor) v systému s ~2 miliony uživatelů."
 timeframe: "2025–2026"
 ---
 
@@ -10,7 +10,7 @@ Součást velké distribuované retailové platformy v NCR Voyix, která obsluhu
 
 ## Problém
 
-Úpravy menu probíhaly ručně: klienti požádali o změnu a někdo ji provedl. Pro klienty to bylo pomalé a provozně nákladné. Na backendu potřebovaly klientské aplikace data z mnoha downstream služeb, a protože si je každý konzument skládal dohromady sám, vznikala duplicitní logika a nekonzistentní odpovědi.
+Úpravy menu probíhaly ručně: klienti požádali o změnu a někdo ji provedl, což bylo pro klienty pomalé a provozně nákladné. Na backendu potřebovaly klientské aplikace data z mnoha downstream služeb, a protože si je každý konzument skládal dohromady sám, vznikala duplicitní logika a nekonzistentní odpovědi.
 
 ## Moje role
 
@@ -24,11 +24,11 @@ Senior fullstack engineer: návrh a údržba mikroslužeb na backendu, self-serv
 
 ## Technické řešení
 
-- **Backend-for-Frontend.** BFF v Javě/Springu přizpůsobený tomu, co klientské aplikace skutečně potřebují, takže frontend zůstává jednoduchý a topologie downstream služeb se může měnit, aniž by ho rozbila.
-- **Agregační služba.** Spojuje data až z **8 downstream služeb** do jedné ucelené odpovědi.
-- **Self-service platforma v Angularu.** Dynamická úprava menu s pracovními postupy, které klienti z amerického trhu potřebují, aby mohli sami publikovat své změny.
-- **GCP s produkční observabilitou.** Metriky, logování a alerting pro každou službu, aby se incidenty zachytily dřív, než si jich klienti všimnou.
-- **AI nástroje na rutinní práci.** LLM a agentní nástroje včetně MCP integrací pro automatizaci scaffoldingu testů a interního dohledávání dat.
+- Backend-for-frontend v Javě/Springu postavený podle toho, co klientské aplikace potřebují, takže frontend zůstává jednoduchý a topologie downstream služeb se může měnit, aniž by ho rozbila.
+- Agregační služba, která spojuje data až z **8 downstream služeb** do jedné odpovědi.
+- Self-service platforma v Angularu s dynamickou úpravou menu a pracovními postupy, díky kterým klienti z amerického trhu sami publikují své změny.
+- Metriky, logování a alerting pro každou službu na GCP, abychom incidenty zachytili dřív, než si jich klienti všimnou.
+- LLM a agentní nástroje včetně MCP integrací, které automatizují scaffolding testů a interní dohledávání dat.
 
 ## Výzvy
 
@@ -36,8 +36,8 @@ Spojit osm downstream služeb znamená osm způsobů, jak být pomalý nebo nedo
 
 ## Rozhodnutí a kompromisy
 
-- **BFF přidá jeden skok navíc, ale odstraní těsnou provázanost.** Služba navíc se vyplatí, když se díky ní může frontend vyvíjet nezávisle na velkém distribuovaném backendu.
-- **Self-service přesouvá odpovědnost na klienty.** Mantinely a validace v platformě jsou důležitější než samotná flexibilita.
+- BFF přidá jeden síťový skok navíc, ale odstraní těsnou provázanost; služba navíc se vyplatí, když se frontend musí vyvíjet nezávisle na velkém distribuovaném backendu.
+- Self-service přesouvá odpovědnost na klienty, takže mantinely a validace v platformě jsou důležitější než samotná flexibilita.
 
 ## Výsledky
 
@@ -47,4 +47,4 @@ Spojit osm downstream služeb znamená osm způsobů, jak být pomalý nebo nedo
 
 ## Co jsem se naučil
 
-V systému takové velikosti je observabilita feature, ne dodatek na poslední chvíli. A nejrychlejší způsob, jak tým zrychlit, je automatizovat mu scaffolding a dohledávání – a právě tam se LLM nástroje vyplatily.
+V systému takové velikosti beru observabilitu jako součást každé funkce od prvního commitu. LLM nástroje se nejvíc vyplatily u scaffoldingu a dohledávání dat, tedy u rutiny, která tým zdržuje.

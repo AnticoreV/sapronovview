@@ -29,7 +29,7 @@ I delivered the initial application: project structure, core screens for balance
 ## Technical approach
 
 - Angular with strict TypeScript and reactive forms.
-- [State handling approach — services + RxJS, signals, NgRx…]
+- [State handling approach, services + RxJS, signals, NgRx…]
 - [How multi-currency display and formatting were handled.]
 
 ## Challenges

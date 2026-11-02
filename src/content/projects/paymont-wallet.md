@@ -40,7 +40,7 @@ I built both sides of the stack: the API and persistence layer on the backend, a
 
 ## Architecture
 
-[Describe the services and how money movement is represented — e.g. double-entry ledger, idempotent transfers.]
+[Describe the services and how money movement is represented, e.g. double-entry ledger, idempotent transfers.]
 
 ## Challenges
 

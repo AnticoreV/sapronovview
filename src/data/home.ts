@@ -11,18 +11,16 @@ export type CapabilityId = "build" | "direct" | "automate" | "ship";
 
 type Capability = {
   id: CapabilityId;
-  code: string;
   title: string;
   text: string;
   spotlight: boolean;
 };
 
-/** "What I can do" — four capability cards (icons live in CapabilityCard.astro). */
+/** "What I can do": four capability cards (icons live in CapabilityCard.astro). */
 const capabilityText: Record<Locale, Capability[]> = {
   en: [
     {
       id: "build",
-      code: "01 · BUILD",
       title: "Backend & fullstack products",
       text: "Java, Kotlin, Spring, Angular, React, OpenAPI, PostgreSQL, Kafka, Redis.",
       spotlight: false,
@@ -30,21 +28,18 @@ const capabilityText: Record<Locale, Capability[]> = {
     {
       // Ivan, 2026-10-22: technical direction only — no team-size or people-management claims.
       id: "direct",
-      code: "02 · TECHNICAL DIRECTION",
       title: "Architecture & technical direction",
       text: "Service boundaries, API contracts, code review, engagements led end to end.",
       spotlight: false,
     },
     {
       id: "automate",
-      code: "03 · AUTOMATE",
       title: "AI agents & automation",
       text: "LLM and MCP tooling at NCR Voyix; my own multi-agent pipeline from research to a deployed site.",
       spotlight: true,
     },
     {
       id: "ship",
-      code: "04 · SHIP & RUN",
       title: "Deploy and operate services",
       text: "Kubernetes, Argo CD, Terraform, Helm, GCP, AWS, CI/CD, Grafana, Prometheus.",
       spotlight: false,
@@ -53,28 +48,24 @@ const capabilityText: Record<Locale, Capability[]> = {
   cs: typoDeep([
     {
       id: "build",
-      code: "01 · STAVBA",
       title: "Backendové a fullstack produkty",
       text: "Java, Kotlin, Spring, Angular, React, OpenAPI, PostgreSQL, Kafka, Redis.",
       spotlight: false,
     },
     {
       id: "direct",
-      code: "02 · TECHNICKÉ SMĚŘOVÁNÍ",
       title: "Architektura a technické směřování",
       text: "Hranice služeb, API kontrakty, code review, zakázky vedené od začátku do konce.",
       spotlight: false,
     },
     {
       id: "automate",
-      code: "03 · AUTOMATIZACE",
       title: "AI agenti a automatizace",
       text: "Nástroje s LLM a MCP v NCR Voyix; vlastní multiagentní pipeline od průzkumu po nasazený web.",
       spotlight: true,
     },
     {
       id: "ship",
-      code: "04 · NASAZENÍ A PROVOZ",
       title: "Nasazení a provoz služeb",
       text: "Kubernetes, Argo CD, Terraform, Helm, GCP, AWS, CI/CD, Grafana, Prometheus.",
       spotlight: false,
@@ -83,7 +74,7 @@ const capabilityText: Record<Locale, Capability[]> = {
 };
 export const capabilities = (locale: Locale) => capabilityText[locale];
 
-/** "Before you hire, invest or partner" — the homepage contents list. */
+/** "Before you hire, invest or partner": the homepage contents list. */
 const contentsText: Record<Locale, Array<{ label: string; href: string }>> = {
   en: [
     { label: "Products I build", href: "#build" },

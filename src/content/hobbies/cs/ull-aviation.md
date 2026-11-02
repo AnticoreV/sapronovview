@@ -1,4 +1,4 @@
 ---
 title: "Ultralehké létání"
-tagline: "Nízko, pomalu a s nejlepším výhledem na světě."
+tagline: "Výcvik na pilota ultralehkých letadel."
 ---

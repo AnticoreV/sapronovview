@@ -11,7 +11,7 @@ achievements:
   - "Built an Angular platform for dynamic menu customisation that let US-market clients update menus through self-service, replacing a manual update process"
   - "Built and operated GCP services with full production observability (metrics, logging, alerting) for an enterprise system serving ~2 million users"
   - "Applied LLM and agentic-AI tooling (including MCP integrations) to automate test scaffolding and internal data lookups"
-  - "Drove technical direction through code review and architecture input, helping maintain quality and consistency across the team"
+  - "Shaped technical direction through code review and architecture input"
 shipped: "BFF over up to 8 services · ~2M users"
 technologies:
   - Java

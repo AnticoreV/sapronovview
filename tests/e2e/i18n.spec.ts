@@ -164,7 +164,7 @@ test("404 in Czech: Czech page under /cs, back link to the Czech home", async ({
   expect(response?.status()).toBe(404);
   await expect(page.locator("html")).toHaveAttribute("lang", "cs");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "404 – tahle cesta není nasazená.",
+    "404: tahle cesta není nasazená.",
   );
   await expect(page.getByRole("link", { name: "Zpět na úvod" })).toHaveAttribute("href", "/cs");
   await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
@@ -177,14 +177,14 @@ test("Czech contact form: topic from ?topic=, Czech errors and mailto subject", 
   await expect(page.getByLabel("Téma")).toHaveValue("investing");
   await expect(page.getByLabel("Téma").locator("option:checked")).toHaveText("Investice");
   await page.getByRole("button", { name: "Napsat jako e-mail" }).click();
-  await expect(page.getByText("Napište, kdo jste – stačí jméno.")).toBeVisible();
+  await expect(page.getByText("Napište, kdo jste. Stačí jméno.")).toBeVisible();
   await page.getByLabel("Jméno").fill("Jana");
   await page.getByLabel("E-mail", { exact: true }).fill("jana@firma.cz");
   await page.getByLabel("Zpráva").fill("Dobrý den, rádi bychom se potkali.");
   await page.getByRole("button", { name: "Napsat jako e-mail" }).click();
   const offline = page.locator('[data-state="offline"]');
   await expect(offline).toBeVisible();
-  await expect(offline).toContainText("FORMULÁŘ ZATÍM NENÍ PŘIPOJENÝ");
+  await expect(offline).toContainText(/formulář zatím není připojený/i);
   await expect(page.locator("[data-mailto]")).toHaveAttribute("href", /subject=Investice/);
   // Route cards on /cs/contact are emails with Czech subjects.
   await expect(page.getByRole("link", { name: /Nábor/ }).first()).toHaveAttribute(

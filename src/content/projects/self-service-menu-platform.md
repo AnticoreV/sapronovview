@@ -16,7 +16,7 @@ technologies:
   - MCP
 role: "Senior Fullstack Engineer"
 organization: "NCR Voyix a.s."
-timeframe: "2025 — 2026"
+timeframe: "2025–2026"
 order: 4
 ---
 
@@ -26,7 +26,7 @@ Part of a large distributed retail platform at NCR Voyix serving around two mill
 
 ## Problem
 
-Menu updates went through a manual process: clients requested changes and someone applied them. That was slow for clients and expensive to operate. On the backend, client applications needed data from many downstream services, and each consumer stitching that together on its own led to duplicated logic and inconsistent responses.
+Menu updates went through a manual process: clients requested changes and someone applied them, which was slow for clients and expensive to operate. On the backend, client applications needed data from many downstream services, and each consumer stitching that together on its own led to duplicated logic and inconsistent responses.
 
 ## My role
 
@@ -40,11 +40,11 @@ Senior fullstack engineer: microservice design and maintenance on the backend, t
 
 ## Technical approach
 
-- **Backend-for-Frontend.** A Java/Spring BFF tailored to what the client applications actually need, so the frontend stays simple and the downstream topology can change without breaking it.
-- **Aggregator service.** Consolidates data from up to **8 downstream services** into a single coherent response.
-- **Angular self-service platform.** Dynamic menu customisation with the workflows US-market clients need to publish their own changes.
-- **GCP with production observability.** Metrics, logging and alerting for every service, so incidents are caught before clients notice.
-- **AI tooling for the routine work.** LLM and agentic tooling, including MCP integrations, to automate test scaffolding and internal data lookups.
+- A Java/Spring backend-for-frontend shaped around what the client applications need, so the frontend stays simple and the downstream topology can change without breaking it.
+- An aggregator service that combines data from up to **8 downstream services** into one response.
+- An Angular self-service platform with dynamic menu customisation and the workflows US-market clients need to publish their own changes.
+- Metrics, logging and alerting for every service on GCP, so we catch incidents before clients notice.
+- LLM and agentic tooling, including MCP integrations, to automate test scaffolding and internal data lookups.
 
 ## Challenges
 
@@ -52,8 +52,8 @@ Consolidating eight downstream services means eight ways to be slow or unavailab
 
 ## Decisions & trade-offs
 
-- **A BFF adds a hop but removes coupling.** The extra service is worth it when it lets the frontend evolve independently of a large distributed backend.
-- **Self-service shifts responsibility to clients.** Guardrails and validation in the platform matter more than raw flexibility.
+- A BFF adds a network hop but removes coupling, and the extra service pays off when the frontend has to evolve independently of a large distributed backend.
+- Self-service moves responsibility to the clients, so guardrails and validation in the platform matter more than raw flexibility.
 
 ## Results
 
@@ -63,4 +63,4 @@ Consolidating eight downstream services means eight ways to be slow or unavailab
 
 ## Lessons learned
 
-In a system this size, observability is a feature, not an afterthought. And the fastest way to speed up a team is to automate its scaffolding and lookups, which is where the LLM tooling paid off.
+In a system this size I treat observability as part of each feature from the first commit. The LLM tooling paid off most on scaffolding and data lookups, the routine work that slows a team down.

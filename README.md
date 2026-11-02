@@ -8,7 +8,7 @@ Built with [Astro 7](https://astro.build) (static), TypeScript, Tailwind CSS v4 
 collections. Design: **v2 · R2-C Runtime** with the hero **V6 · Blueprint** — a calm, light
 Swiss grid around one live isometric drawing of how software gets made (idea → validate →
 architecture → frontend · backend · services → tests → review → CI/CD → deploy → observe →
-agent loop). _Every number on this page is real._
+agent loop). Every number on the site comes from a position in the CV (`src/data/readouts.ts`).
 
 ## Contents
 
@@ -368,7 +368,7 @@ invented):
   you grew up, first computer, first flight / ride) — there is no placeholder, add real text
   when ready.
 - Czech copy (2026-11-02) awaits Ivan's review, the Ownira tagline in particular
-  („Od datové schránky k vyřízení.“ in `src/content/projects/cs/ownira.md`). Anything filled
+  („Každá zpráva z datové schránky má řešitele a termín.“ in `src/content/projects/cs/ownira.md`). Anything filled
   in later in English (trip notes, hobby write-ups, now, facts) needs its Czech version too —
   until then Czech pages fall back to the English text.
 
@@ -377,11 +377,11 @@ invented):
 Answered:
 
 1. **Philosophy 03** (`src/data/about.ts`), "Checklists over heroics": the v2 wording without
-   the flying sentence is approved — "Good people make bad mistakes when routine is skipped.
-   Runbooks, reviews and tests are how I keep the routine."
+   the flying sentence is approved (tightened in the deslop pass, see below): "Good people make
+   bad mistakes when they skip the routine; runbooks, reviews and tests keep me on it."
 2. **/about personal paragraph** ("…Flying rewards preparation and checklists, riding rewards
-   attention, travel rewards curiosity — the same traits I try to bring to a codebase."):
-   keep as it is.
+   attention, travel rewards curiosity…"): keep as it is. The deslop pass only replaced its
+   em dash with a semicolon.
 3. **/hobbies write-ups:** hidden in production until Ivan writes or confirms them — while an
    entry is `placeholder: true`, `/hobbies` shows only its title and tagline
    (`src/components/hobbies/HobbyModule.astro`). Set `placeholder: false` to publish one.
@@ -391,6 +391,26 @@ Not asked separately (informational, de-aviation of labels): /about "About · cr
 the occasional lesson from the cockpit", empty state "No posts published yet"; `/projects`
 "Products and featured work"; `/experience` meta "Track record of …"; case-study label
 "Proof numbers".
+
+### Deslop pass (2026-11-02)
+
+The whole site was reviewed with the `deslop-ui` and `deslop-writing` skills, which list the
+habits that make a page read as AI-generated. Rules the copy now follows, in both languages:
+
+- No em dashes in visible copy. Use a colon, semicolon, comma, parentheses or a new sentence;
+  date ranges use an unspaced en dash (2025–2026). Czech keeps its typographic quotes „…“.
+- No bold-label bullets (`**Label.** text`) in case studies; write each bullet as a sentence.
+- No announcing honesty ("Every number on this page is real", "only the numbers that are
+  real"): the numbers carry their source instead.
+- No "From X to Y" taglines, triplet slogans or filler words (actually, scalable,
+  well-structured, robust); say what the thing does.
+- Mono labels are sentence case; only the hero drawing legend stays uppercase, because it
+  is the key to the uppercase labels inside the drawing.
+
+Changed copy Ivan may want to check: the Ownira tagline ("Data-box mail with an owner and a
+deadline." / „Každá zpráva z datové schránky má řešitele a termín.“), the hero lede (now names
+all four capabilities), the hobby taglines, the /hobbies heading ("What I do off duty") and
+the About values.
 
 ## Operator
 

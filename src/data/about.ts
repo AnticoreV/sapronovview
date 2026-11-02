@@ -17,16 +17,16 @@ type AboutCopy = {
 const copy: Record<Locale, AboutCopy> = {
   en: {
     story: [
-      "I'm Ivan Sapronov, a backend and fullstack engineer based in Prague with about five years of building and scaling enterprise web applications and services. Most of my time is on the JVM — Java and Kotlin, Spring — and on the Angular frontends, cloud infrastructure and identity systems that real products are made of.",
-      "I started freelancing in Java in 2021, building a CRM with an admin panel and the analytics services behind its React dashboards. At Ableneo the problems got more distributed: Redis caching and reactive services with Spring WebFlux, Keycloak for SSO and CIAM, Kafka with custom connectors, Dockerised services on Kubernetes, and Grafana, Prometheus and InfluxDB to watch it all in production.",
-      "At CCA Group I owned both sides of the stack — a dynamic form engine in Angular that cut the time to create new form types from days to hours, and the Java services behind it, some of which I moved to Kotlin coroutines to roughly halve p95 latency under peak load. At NCR Voyix I designed backend-for-frontend and aggregator services for a system serving around two million users, built a self-service Angular platform for US clients, ran services on GCP with full observability, and started using LLM and agentic tooling to take the routine out of engineering work.",
-      "Most recently I spent three months at CreativeDock building Kotlin/Spring Boot microservices from scratch and fixing the GitLab CI and Argo CD plumbing around them. Right now I'm building {ownira}, now in pilot.",
-      "The rest of my time goes to things with engines and horizons: I am a pilot in training on ultralight aircraft, I ride motorcycles, and I keep a growing list of countries. Flying rewards preparation and checklists, riding rewards attention, travel rewards curiosity — the same traits I try to bring to a codebase.",
+      "I'm Ivan Sapronov, a backend and fullstack engineer in Prague. I've spent about five years building and scaling enterprise web applications and services, mostly on the JVM (Java, Kotlin, Spring), plus the Angular frontends, cloud infrastructure and identity systems around them.",
+      "My first freelance Java project, in 2021, was a CRM with an admin panel and the analytics services behind its React dashboards. Ableneo came next, and the problems got more distributed: Redis caching and reactive services with Spring WebFlux, Keycloak for SSO and CIAM, Kafka with custom connectors, Dockerised services on Kubernetes, and Grafana, Prometheus and InfluxDB to watch it all in production.",
+      "At CCA Group I owned both sides of the stack: a dynamic form engine in Angular that cut the time to create a new form type from days to hours, and the Java services behind it. I moved some of those services to Kotlin coroutines, which roughly halved p95 latency under peak load. Then, at NCR Voyix, I designed backend-for-frontend and aggregator services for a system serving around two million users, built a self-service Angular platform for US clients, ran services on GCP with full observability, and started using LLM and agentic tooling to take the routine out of engineering work.",
+      "Most recently I spent three months at CreativeDock building Kotlin/Spring Boot microservices from scratch and fixing the GitLab CI and Argo CD plumbing around them. Right now I'm building {ownira}, which is in pilot.",
+      "The rest of my time goes to things with engines and horizons: I am a pilot in training on ultralight aircraft, I ride motorcycles, and I keep a growing list of countries. Flying rewards preparation and checklists, riding rewards attention, travel rewards curiosity; I try to bring the same traits to a codebase.",
     ],
     philosophy: [
       {
         title: "Boring infrastructure, interesting products",
-        text: "Pick the well-trodden path for databases, queues and identity, and spend the novelty budget on the thing users actually touch.",
+        text: "Pick the well-trodden path for databases, queues and identity, and spend the novelty budget on what users touch.",
       },
       {
         title: "Correct first, then fast",
@@ -35,11 +35,11 @@ const copy: Record<Locale, AboutCopy> = {
       {
         title: "Checklists over heroics",
         // v2 (2026-10-23): the flying metaphor was removed (no aviation outside the hobby pages).
-        text: "Good people make bad mistakes when routine is skipped. Runbooks, reviews and tests are how I keep the routine.",
+        text: "Good people make bad mistakes when they skip the routine; runbooks, reviews and tests keep me on it.",
       },
       {
-        title: "Ship, then write it down",
-        text: "A decision that isn't written down gets re-made every six months. Short ADRs, honest READMEs and case studies like the ones on this site.",
+        title: "Write decisions down",
+        text: "A decision nobody wrote down gets re-made every six months, so I keep short ADRs and READMEs next to the code.",
       },
     ],
     enjoys: [
@@ -54,47 +54,53 @@ const copy: Record<Locale, AboutCopy> = {
       "Market research for things I might build next",
     ],
     values: [
-      { label: "Honesty", text: "Say what the numbers say. Placeholders beat invented metrics." },
-      { label: "Ownership", text: "Own the outcome, not the ticket." },
-      { label: "Curiosity", text: "New countries, new protocols, new engines — same itch." },
+      {
+        label: "Honesty",
+        text: "I report numbers as measured, and I'd rather leave a gap than invent a metric.",
+      },
+      {
+        label: "Ownership",
+        text: "I follow a change into production and check that it works for the people using it.",
+      },
+      { label: "Curiosity", text: "New protocols and new countries scratch the same itch." },
       {
         label: "Respect for time",
-        text: "Yours, mine and the reader's. Short meetings, clear docs.",
+        text: "Short meetings, and docs you can read in five minutes.",
       },
     ],
     facts: [
-      { icon: "Plane", text: "I fly ultralight aircraft — [hours / licence status]." },
+      { icon: "Plane", text: "I fly ultralight aircraft: [hours / licence status]." },
       { icon: "Bike", text: "Current bike: [MAKE & MODEL]. Longest ride so far: [N km]." },
       { icon: "Globe", text: "Countries visited: [N]. Next up: [COUNTRY]." },
-      { icon: "Dumbbell", text: "[Sport you practise] — [N] sessions a week." },
+      { icon: "Dumbbell", text: "[Sport you practise], [N] sessions a week." },
       { icon: "Cpu", text: "First program: [what it was and in which language]." },
       { icon: "Heart", text: "[An interesting fact nobody would guess]." },
     ],
   },
   cs: {
     story: [
-      "Jsem Ivan Sapronov, backend a fullstack engineer z Prahy. Zhruba pět let stavím a škáluji podnikové webové aplikace a služby. Většinu času trávím na JVM – Java a Kotlin, Spring – a u frontendů v Angularu, cloudové infrastruktury a systémů pro správu identit, ze kterých se skutečné produkty skládají.",
-      "Na volné noze jsem v Javě začal v roce 2021: CRM s administrací a analytické služby pro jeho dashboardy v Reactu. V Ableneo byly problémy distribuovanější: cache v Redisu a reaktivní služby se Spring WebFlux, Keycloak pro SSO a CIAM, Kafka s vlastními konektory, služby v Dockeru na Kubernetes a Grafana, Prometheus a InfluxDB, abych to všechno v produkci uhlídal.",
-      "V CCA Group jsem měl na starosti obě strany stacku – dynamický formulářový engine v Angularu, který zkrátil vytvoření nového typu formuláře ze dnů na hodiny, a služby v Javě za ním. Část z nich jsem převedl na korutiny v Kotlinu, čímž se latence p95 při špičkové zátěži zhruba snížila na polovinu. V NCR Voyix jsem navrhoval služby backend-for-frontend a agregátory pro systém se zhruba dvěma miliony uživatelů, postavil samoobslužnou platformu v Angularu pro klienty v USA, provozoval služby na GCP s plnou observabilitou a začal používat LLM a agentní nástroje, abych z inženýrské práce odstranil rutinu.",
+      "Jsem Ivan Sapronov, backend a fullstack engineer z Prahy. Zhruba pět let stavím a škáluji podnikové webové aplikace a služby, hlavně na JVM (Java, Kotlin, Spring), a k nim frontendy v Angularu, cloudovou infrastrukturu a systémy pro správu identit.",
+      "Na volné noze jsem v Javě začal v roce 2021: CRM s administrací a analytické služby pro jeho dashboardy v Reactu. Pak přišlo Ableneo a s ním distribuovanější problémy: cache v Redisu a reaktivní služby se Spring WebFlux, Keycloak pro SSO a CIAM, Kafka s vlastními konektory, služby v Dockeru na Kubernetes a Grafana, Prometheus a InfluxDB, abych to všechno v produkci uhlídal.",
+      "V CCA Group jsem měl na starosti obě strany stacku: dynamický formulářový engine v Angularu, který zkrátil vytvoření nového typu formuláře ze dnů na hodiny, a služby v Javě za ním. Část z nich jsem převedl na korutiny v Kotlinu, čímž se latence p95 při špičkové zátěži zhruba snížila na polovinu. Potom jsem v NCR Voyix navrhoval služby backend-for-frontend a agregátory pro systém se zhruba dvěma miliony uživatelů, postavil samoobslužnou platformu v Angularu pro klienty v USA, provozoval služby na GCP s plnou observabilitou a začal používat LLM a agentní nástroje, abych z inženýrské práce odstranil rutinu.",
       "Naposledy jsem tři měsíce v CreativeDock stavěl mikroslužby v Kotlinu/Spring Bootu od nuly a opravoval kolem nich infrastrukturu GitLab CI a Argo CD. Teď stavím produkt {ownira}, který je v pilotním provozu.",
-      "Zbytek času patří věcem s motory a obzory: jsem pilot ultralehkých letadel ve výcviku, jezdím na motorce a můj seznam navštívených zemí stále roste. Létání odměňuje přípravu a checklisty, jízda pozornost, cestování zvědavost – stejné vlastnosti se snažím přinášet i do kódu.",
+      "Zbytek času patří věcem s motory a obzory: jsem pilot ultralehkých letadel ve výcviku, jezdím na motorce a můj seznam navštívených zemí stále roste. Létání odměňuje přípravu a checklisty, jízda pozornost a cestování zvědavost; stejné vlastnosti se snažím přinášet i do kódu.",
     ],
     philosophy: [
       {
         title: "Nudná infrastruktura, zajímavé produkty",
-        text: "Pro databáze, fronty a identitu volím osvědčené cesty a rozpočet na novinky utrácím za to, na co uživatelé skutečně sahají.",
+        text: "Pro databáze, fronty a identitu volím osvědčené cesty a rozpočet na novinky utrácím za to, na co uživatelé sahají.",
       },
       {
         title: "Nejdřív správně, pak rychle",
-        text: "Peněženka, která se splete o jeden cent, není peněženka. Nejdřív měřit, pak optimalizovat – a nevěřit benchmarku, který jsem sám nespustil.",
+        text: "Peněženka, která se splete o jeden cent, není peněženka. Nejdřív měřit, pak optimalizovat, a nevěřit benchmarku, který jsem sám nespustil.",
       },
       {
         title: "Checklisty místo hrdinství",
-        text: "I dobří lidé dělají hloupé chyby, když se vynechá rutina. Runbooky, review a testy jsou způsob, jak rutinu dodržuji.",
+        text: "I dobří lidé dělají hloupé chyby, když vynechají rutinu; runbooky, review a testy mě u ní drží.",
       },
       {
-        title: "Vydat, pak sepsat",
-        text: "Rozhodnutí, které není zapsané, se každého půl roku dělá znovu. Krátká ADR, poctivá README a případové studie, jako jsou ty na tomto webu.",
+        title: "Zapisovat rozhodnutí",
+        text: "Rozhodnutí, které nikdo nezapsal, se každého půl roku dělá znovu, a tak vedle kódu držím krátká ADR a README.",
       },
     ],
     enjoys: [
@@ -111,23 +117,26 @@ const copy: Record<Locale, AboutCopy> = {
     values: [
       {
         label: "Poctivost",
-        text: "Říkat, co říkají čísla. Prázdné místo je lepší než vymyšlená metrika.",
+        text: "Čísla uvádím tak, jak jsem je naměřil, a raději nechám mezeru, než abych metriku vymyslel.",
       },
-      { label: "Odpovědnost", text: "Odpovídám za výsledek, ne za tiket." },
+      {
+        label: "Odpovědnost",
+        text: "Změnu sleduji až do produkce a ověřím, že funguje lidem, kteří ji používají.",
+      },
       {
         label: "Zvědavost",
-        text: "Nové země, nové protokoly, nové motory – pořád stejné nutkání.",
+        text: "Nové protokoly i nové země mě lákají ze stejného důvodu.",
       },
       {
         label: "Respekt k času",
-        text: "K vašemu, mému i čtenářovu. Krátké schůzky, jasná dokumentace.",
+        text: "Krátké schůzky a dokumentace, kterou přečtete za pět minut.",
       },
     ],
     facts: [
-      { icon: "Plane", text: "Létám na ultralehkých letadlech – [hodiny / stav licence]." },
+      { icon: "Plane", text: "Létám na ultralehkých letadlech: [hodiny / stav licence]." },
       { icon: "Bike", text: "Aktuální motorka: [ZNAČKA A MODEL]. Nejdelší jízda: [N km]." },
       { icon: "Globe", text: "Navštívené země: [N]. Další na řadě: [ZEMĚ]." },
-      { icon: "Dumbbell", text: "[Sport, který dělám] – [N] tréninků týdně." },
+      { icon: "Dumbbell", text: "[Sport, který dělám], [N] tréninků týdně." },
       { icon: "Cpu", text: "První program: [co to bylo a v jakém jazyce]." },
       { icon: "Heart", text: "[Zajímavost, kterou by nikdo nehádal]." },
     ],

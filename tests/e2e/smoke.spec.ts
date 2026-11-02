@@ -58,7 +58,7 @@ test("unknown route shows the 404 page", async ({ page }) => {
   const response = await page.goto("/no-such-page");
   expect(response?.status()).toBe(404);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "404 — this route isn't deployed.",
+    "404: this route isn't deployed.",
   );
   await expect(page.getByRole("link", { name: "Back to home" })).toHaveAttribute("href", "/");
   expect(await threeRequests(page)).toEqual([]);
@@ -72,10 +72,19 @@ test("every page ends with the contact panel and its routes", async ({ page }) =
   ).toBeVisible();
   await expect(panel.locator('a[href="/contact?topic=hiring"]')).toBeVisible();
   await expect(panel.locator('a[href="/contact?topic=investing"]')).toContainText(
-    "Stage, progress and plans — let's talk.",
+    "Write to me for the current stage and plans.",
   );
   await expect(panel.locator('a[href="/contact?topic=partnering"]')).toBeVisible();
   await expect(panel.locator('a[href^="mailto:"]').first()).toBeVisible();
+});
+
+test("footer: © line, nav and operator line, no status indicator", async ({ page }) => {
+  await page.goto("/");
+  const footer = page.getByRole("contentinfo");
+  await expect(footer).toContainText(`© ${new Date().getFullYear()} Ivan Sapronov`);
+  await expect(footer.getByRole("link", { name: "About" })).toHaveAttribute("href", "/about");
+  await expect(footer.locator("[data-operator]")).toHaveCount(1);
+  await expect(footer).not.toContainText(/healthy/i);
 });
 
 test("contact form: topic from ?topic=, field errors, honest not-connected state", async ({
@@ -83,7 +92,10 @@ test("contact form: topic from ?topic=, field errors, honest not-connected state
 }) => {
   await page.goto("/contact?topic=investing");
   await expect(page.locator("#cf-topic")).toHaveValue("investing");
-  await expect(page.getByText("Form not connected yet", { exact: true })).toBeVisible();
+  // The note above the form (the offline state below can carry the same words).
+  await expect(
+    page.getByRole("note").getByText("Form not connected yet", { exact: true }),
+  ).toBeVisible();
   // On /contact the routes are emails with the subject filled in.
   await expect(page.locator('#contact a[href*="subject=Investing"]')).toBeVisible();
 
@@ -109,11 +121,14 @@ test("contact form: topic from ?topic=, field errors, honest not-connected state
   await expect(page.locator("#cf-message")).toHaveValue(/smoke test/);
 });
 
-test("hero eyebrow never starts a line with a separator", async ({ page }) => {
+test("hero copy: plain eyebrow, lede names the four capabilities", async ({ page }) => {
   await page.goto("/");
-  const text = await page.locator("#top p").first().textContent();
-  expect(text).toContain("FOUNDER\u00a0·\u00a0PRAGUE");
-  expect(text).not.toMatch(/ ·/);
+  const hero = page.locator("#top");
+  await expect(hero.locator("p").first()).toHaveText(
+    "Backend & fullstack engineer, founder, Prague",
+  );
+  await expect(hero).toContainText("design their architecture");
+  await expect(hero).not.toContainText("Every number on this page is real");
 });
 
 test("without a stored choice the theme follows OS changes live", async ({ page }) => {
@@ -194,6 +209,7 @@ test.describe("reduced motion", () => {
     expect(await threeRequests(page)).toEqual([]);
     // Sections are simply there (no reveal state).
     await expect(page.locator("#capabilities")).toHaveCSS("opacity", "1");
+    await expect(page.locator("[data-reveal]")).toHaveCount(0);
   });
 
   test("adventures shows the flat map instead of the globe", async ({ page }) => {
@@ -239,7 +255,7 @@ test("header: availability pill, nav and the menu on phones", async ({ page, isM
   await page.goto("/about");
   const header = page.locator("header").first();
   if (isMobile) {
-    await expect(header.getByText("OPEN TO PROJECTS")).toBeHidden();
+    await expect(header.getByText(/open to projects/i)).toBeHidden();
     await header.getByRole("button", { name: "Open menu" }).click();
     const menu = page.getByRole("dialog", { name: "Site menu" });
     await expect(menu).toBeVisible();
@@ -248,7 +264,7 @@ test("header: availability pill, nav and the menu on phones", async ({ page, isM
     await menu.getByRole("button", { name: "Close menu" }).click();
     await expect(menu).toBeHidden();
   } else {
-    await expect(header.getByText("OPEN TO PROJECTS")).toBeVisible();
+    await expect(header.getByText(/open to projects/i)).toBeVisible();
     const nav = header.getByRole("navigation", { name: "Main" });
     await expect(nav.getByRole("link")).toHaveText([
       "Products",
@@ -276,13 +292,18 @@ test("hero: V6 blueprint poster, legend and the four sourced proof numbers", asy
   );
   const numbers = page.getByRole("list", { name: "Proof numbers" }).locator("li");
   await expect(numbers).toHaveCount(4);
-  await expect(numbers.nth(1)).toContainText("p95 latency, roughly halved · CCA Group");
+  // Caption and source sit on two lines (no " · " join).
+  await expect(numbers.nth(1)).toContainText("p95 latency, roughly halved");
+  await expect(numbers.nth(1)).toContainText("CCA Group");
+  // Static numbers: no count-up attributes.
+  await expect(page.locator("[data-count-to]")).toHaveCount(0);
   // "≈ ½": ≈ is an inline SVG glyph; screen readers get "approximately half".
   await expect(numbers.nth(1)).toContainText("½");
   await expect(numbers.nth(1).locator("svg.glyph-approx")).toHaveCount(1);
   await expect(numbers.nth(1)).toContainText("approximately half");
   for (let i = 0; i < 4; i++) await expect(numbers.nth(i)).toBeVisible();
-  await expect(page.getByText(/^WORKED WITH NCR VOYIX/)).toBeVisible();
+  // Company names joined with commas.
+  await expect(page.getByText(/^worked with ncr voyix, creativedock/i)).toBeVisible();
 });
 
 test("homepage sections in the approved order", async ({ page }) => {
@@ -295,7 +316,9 @@ test("homepage sections in the approved order", async ({ page }) => {
     "Track record",
     "Off duty",
   ]);
-  await expect(page.locator("#build").getByText("From datová schránka to done.")).toBeVisible();
+  await expect(
+    page.locator("#build").getByText("Data-box mail with an owner and a deadline."),
+  ).toBeVisible();
   await expect(page.locator("#capabilities li")).toHaveCount(4);
   await expect(page.locator("#work li")).toHaveCount(3);
 });

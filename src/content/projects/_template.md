@@ -1,7 +1,7 @@
 ---
 # Copy this file, rename it (the filename becomes the URL slug) and fill it in.
 title: "[PROJECT NAME]"
-description: "[ONE-SENTENCE PROJECT DESCRIPTION — max 220 characters]"
+description: "[ONE-SENTENCE PROJECT DESCRIPTION, max 220 characters]"
 date: 2026-01-01
 featured: false
 status: completed # active | in-progress | research | completed | paused | archived
@@ -21,7 +21,7 @@ technologies: ["Java", "Spring Boot"]
 #     value: "[WHO IT IS FOR]"
 role: "[YOUR ROLE]"
 organization: "[COMPANY / TEAM]"
-timeframe: "[2025 — 2026]"
+timeframe: "[2025, 2026]"
 order: 100
 placeholder: true
 draft: true

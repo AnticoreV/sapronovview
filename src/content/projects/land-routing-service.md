@@ -15,16 +15,16 @@ placeholder: true
 
 ## Overview
 
-A small **Java / Maven** service exploring how to compute and serve land routes between points — the kind of building block a logistics or travel product needs.
+A small **Java / Maven** service that computes and serves land routes between points, the kind of building block a logistics or travel product needs.
 
 ## Problem
 
-[What routing problem were you trying to solve — road trips, motorcycle routes, freight?]
+[What routing problem were you trying to solve, road trips, motorcycle routes, freight?]
 
 ## Technical approach
 
-- [Routing engine or algorithm used — e.g. OSRM, GraphHopper, or a custom Dijkstra/A* over OSM data.]
-- [API design — request/response shape.]
+- [Routing engine or algorithm used, e.g. OSRM, GraphHopper, or a custom Dijkstra/A* over OSM data.]
+- [API design, request/response shape.]
 
 ## Challenges
 

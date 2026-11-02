@@ -7,7 +7,7 @@ startDate: 2021-09-01
 endDate: 2022-05-31
 achievements:
   - "Designed and implemented a CRM system with an integrated admin panel, developing core backend logic in Java/Spring"
-  - "Built backend services for data analytics and reporting, enabling real-time dashboards and visualisations in a React frontend"
+  - "Built the analytics and reporting services behind real-time dashboards in a React frontend"
 shipped: "CRM + analytics"
 technologies:
   - Java

@@ -1,6 +1,6 @@
 ---
 title: "Sport"
-tagline: "Strong body, clear head, better code."
+tagline: "Staying fit next to a desk job."
 category: sport
 icon: "Dumbbell"
 images:

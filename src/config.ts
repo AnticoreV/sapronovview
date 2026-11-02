@@ -21,11 +21,11 @@ export const siteConfig = {
   title: "Backend & Fullstack Engineer · Founder",
   /** Meta description (from the approved hero lede). */
   description:
-    "Backend & fullstack engineer and founder in Prague. I build backend systems and products, set up AI agents and automation, and ship services to production.",
+    "Backend & fullstack engineer and founder in Prague. I build backend systems and products, design their architecture, set up AI agents and automation, and ship services to production.",
   /** Hero copy, approved with design v2 (R2-C Runtime + V6 Blueprint hero, 2026-10-23). */
   hero: {
-    eyebrow: "BACKEND & FULLSTACK ENGINEER · FOUNDER · PRAGUE",
-    lede: "I build backend systems and products, set up AI agents and automation, and ship services to production. Every number on this page is real.",
+    eyebrow: "Backend & fullstack engineer, founder, Prague",
+    lede: "I build backend systems and products, design their architecture, set up AI agents and automation, and ship services to production.",
   },
   /** Where you are based. */
   location: "Prague, Czech Republic",
@@ -121,9 +121,9 @@ export const siteCopy: Record<
   en: {
     title: "Backend & Fullstack Engineer · Founder",
     description:
-      "Backend & fullstack engineer and founder in Prague. I build backend systems and products, set up AI agents and automation, and ship services to production.",
-    eyebrow: "BACKEND & FULLSTACK ENGINEER · FOUNDER · PRAGUE",
-    lede: "I build backend systems and products, set up AI agents and automation, and ship services to production. Every number on this page is real.",
+      "Backend & fullstack engineer and founder in Prague. I build backend systems and products, design their architecture, set up AI agents and automation, and ship services to production.",
+    eyebrow: "Backend & fullstack engineer, founder, Prague",
+    lede: "I build backend systems and products, design their architecture, set up AI agents and automation, and ship services to production.",
     currentFocus: "building Ownira (in pilot)",
     experienceSummary: "~5 yrs on the JVM",
     basedIn: "Prague, Czechia",
@@ -136,9 +136,9 @@ export const siteCopy: Record<
   cs: {
     title: "Backend & Fullstack Engineer · zakladatel",
     description:
-      "Backend & fullstack engineer a zakladatel v Praze. Stavím backendové systémy a produkty, nastavuji AI agenty a automatizace a nasazuji služby do produkce.",
-    eyebrow: "BACKEND & FULLSTACK ENGINEER · ZAKLADATEL · PRAHA",
-    lede: "Stavím backendové systémy a produkty, nastavuji AI agenty a automatizace a nasazuji služby do produkce. Každé číslo na této stránce je skutečné.",
+      "Backend & fullstack engineer a zakladatel v Praze. Stavím backendové systémy a produkty, navrhuji jejich architekturu, nastavuji AI agenty a automatizace a nasazuji služby do produkce.",
+    eyebrow: "Backend & fullstack engineer, zakladatel, Praha",
+    lede: "Stavím backendové systémy a produkty, navrhuji jejich architekturu, nastavuji AI agenty a automatizace a nasazuji služby do produkce.",
     currentFocus: "stavím produkt Ownira (v pilotním provozu)",
     experienceSummary: "~5 let na JVM",
     basedIn: "Praha, Česko",

@@ -1,6 +1,6 @@
 ---
 title: "Dobrodružství a poznávání zemí"
-tagline: "Sbírám země – jeden hraniční přechod po druhém."
+tagline: "Země, které jsem navštívil, a ty, které mám ještě na seznamu."
 links:
   - label: "Zobrazit mapu"
     href: /adventures

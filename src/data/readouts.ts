@@ -5,9 +5,6 @@
  * chips on the case rows and the Open Graph cards. Every value must be real and carry its
  * source; every source is a position in src/content/experience/. Never add a number that
  * isn't in the CV. The Czech texts say the same facts ("~2M" → "~2 mil.", "up to 8" → "až 8").
- *
- * `count` lets the HTML number count up once (prefix + 0→to + suffix); values without it
- * are shown as they are.
  */
 import type { Locale } from "@/i18n/locales";
 import { typoDeep } from "@/i18n/typo";
@@ -22,22 +19,17 @@ export type Readout = {
   value: string;
   /** The value in words for screen readers when the symbols don't read well ("hours to minutes"). */
   spoken?: string;
-  /** Optional count-up for the HTML number. */
-  count?: { prefix?: string; to: number; suffix?: string };
   /** One-line context in words, used for screen readers and case studies. */
   detail: string;
   /** Case study the number belongs to (src/content/projects/<slug>.md). */
   project?: string;
-  /** Metric chip on the homepage case rows (mono, uppercase), e.g. "~2M users". */
+  /** Metric chip on the homepage case rows (mono), e.g. "~2M users". */
   chip?: string;
   /** The chip in words for screen readers, when it differs from the plain reading. */
   chipSpoken?: string;
 };
 
-type Text = Pick<
-  Readout,
-  "label" | "value" | "spoken" | "count" | "detail" | "chip" | "chipSpoken"
->;
+type Text = Pick<Readout, "label" | "value" | "spoken" | "detail" | "chip" | "chipSpoken">;
 type Base = Pick<Readout, "id" | "source" | "project">;
 
 const facts = {
@@ -57,7 +49,6 @@ const texts: Record<Locale, Record<ReadoutId, Text>> = {
       label: "Users served",
       value: "~2M",
       spoken: "about 2 million",
-      count: { prefix: "~", to: 2, suffix: "M" },
       detail:
         "Enterprise system serving around two million users, run on GCP with full observability.",
       chip: "~2M users",
@@ -66,7 +57,6 @@ const texts: Record<Locale, Record<ReadoutId, Text>> = {
     downstream: {
       label: "Services behind one BFF",
       value: "up to 8",
-      count: { prefix: "up to ", to: 8 },
       detail: "One backend-for-frontend and aggregator over up to eight downstream services.",
       chip: "up to 8 services",
     },
@@ -75,7 +65,7 @@ const texts: Record<Locale, Record<ReadoutId, Text>> = {
       value: "≈ ½",
       spoken: "approximately half",
       detail:
-        "Kotlin coroutines ran independent downstream calls concurrently — p95 latency roughly halved under peak load.",
+        "Kotlin coroutines ran independent downstream calls concurrently, which roughly halved p95 latency under peak load.",
       chip: "p95 ≈ halved",
     },
     ciQueue: {
@@ -96,7 +86,6 @@ const texts: Record<Locale, Record<ReadoutId, Text>> = {
     services: {
       label: "Greenfield services",
       value: "3",
-      count: { to: 3 },
       detail:
         "Ticketing, booking and subscription services built from scratch in a three-month engagement.",
       chip: "3 services",
@@ -107,7 +96,6 @@ const texts: Record<Locale, Record<ReadoutId, Text>> = {
       label: "Obsloužených uživatelů",
       value: "~2\u00a0mil.",
       spoken: "přibližně 2 miliony",
-      count: { prefix: "~", to: 2, suffix: "\u00a0mil." },
       detail:
         "Podnikový systém pro zhruba dva miliony uživatelů, provozovaný na GCP s plnou observabilitou.",
       chip: "~2 mil. uživatelů",
@@ -116,7 +104,6 @@ const texts: Record<Locale, Record<ReadoutId, Text>> = {
     downstream: {
       label: "Služeb za jedním BFF",
       value: "až\u00a08",
-      count: { prefix: "až\u00a0", to: 8 },
       detail: "Jeden backend-for-frontend a agregátor nad až osmi navazujícími službami.",
       chip: "až 8 služeb",
     },
@@ -125,7 +112,7 @@ const texts: Record<Locale, Record<ReadoutId, Text>> = {
       value: "≈ ½",
       spoken: "přibližně polovina",
       detail:
-        "Korutiny v Kotlinu spouštěly nezávislá volání navazujících služeb souběžně – latence p95 při špičkové zátěži klesla zhruba na polovinu.",
+        "Korutiny v Kotlinu spouštěly nezávislá volání navazujících služeb souběžně, takže latence p95 při špičkové zátěži klesla zhruba na polovinu.",
       chip: "p95 ≈ poloviční",
       chipSpoken: "p95 přibližně poloviční",
     },
@@ -148,7 +135,6 @@ const texts: Record<Locale, Record<ReadoutId, Text>> = {
     services: {
       label: "Nové služby od nuly",
       value: "3",
-      count: { to: 3 },
       detail:
         "Služby pro ticketing, rezervace a předplatné postavené od nuly během tříměsíční spolupráce.",
       chip: "3 služby",
