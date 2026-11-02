@@ -5,9 +5,10 @@
  *
  * Text is set in the site's own typefaces — Schibsted Grotesk for the name, lede and
  * numbers, IBM Plex Mono for labels — converted to vector paths with opentype.js, so
- * the card looks the same on every build machine. Glyphs outside the latin subset
- * (≈, →) fall back to a system font in their cell. The cut-out portrait is
- * composited on the right.
+ * the card looks the same on every build machine. Czech diacritics come from the
+ * latin-ext files; glyphs outside both subsets (≈, →) fall back to a system font in
+ * their cell. The cut-out portrait is composited on the right. One card per language
+ * (/images/og-default.png, /images/og-default-cs.png).
  *
  * To use your own artwork instead, delete the matching endpoint in src/pages/
  * and drop a static file into public/ with the same path.
@@ -16,8 +17,10 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import opentype, { type Font } from "opentype.js";
 import sharp, { type OverlayOptions } from "sharp";
-import { availabilityText, siteConfig } from "@config";
+import { availabilityText, siteConfig, siteCopy } from "@config";
 import { heroReadouts } from "@data/readouts";
+import type { Locale } from "@/i18n/locales";
+import { useT } from "@/i18n/ui";
 
 const root = process.cwd();
 const loadFont = (file: string): Font => {
@@ -25,15 +28,20 @@ const loadFont = (file: string): Font => {
   return opentype.parse(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
 };
 
-let fonts: { display: Font; body: Font; mono: Font; monoBold: Font } | undefined;
+/** A face as [latin, latin-ext]: the first file that has a glyph draws it. */
+type Face = Font[];
+const face = (pkg: string, name: string, weight: number): Face =>
+  ["latin", "latin-ext"].map((subset) =>
+    loadFont(`${pkg}/files/${name}-${subset}-${weight}-normal.woff`),
+  );
+
+let fonts: { display: Face; body: Face; mono: Face; monoBold: Face } | undefined;
 const getFonts = () =>
   (fonts ??= {
-    display: loadFont(
-      "@fontsource/schibsted-grotesk/files/schibsted-grotesk-latin-800-normal.woff",
-    ),
-    body: loadFont("@fontsource/schibsted-grotesk/files/schibsted-grotesk-latin-500-normal.woff"),
-    mono: loadFont("@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff"),
-    monoBold: loadFont("@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-600-normal.woff"),
+    display: face("@fontsource/schibsted-grotesk", "schibsted-grotesk", 800),
+    body: face("@fontsource/schibsted-grotesk", "schibsted-grotesk", 500),
+    mono: face("@fontsource/ibm-plex-mono", "ibm-plex-mono", 500),
+    monoBold: face("@fontsource/ibm-plex-mono", "ibm-plex-mono", 600),
   });
 
 const escape = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -62,7 +70,7 @@ function glyphPath(font: Font, ch: string, size: number): string {
  * Glyphs missing from the latin subset are drawn as system-font <text>.
  */
 function text(
-  font: Font,
+  fontFace: Face,
   value: string,
   x: number,
   y: number,
@@ -73,10 +81,12 @@ function text(
   const glyphs: string[] = [];
   const fallbacks: string[] = [];
   const track = letterSpacing * size;
-  const cell = font.getAdvanceWidth("M", size, { kerning: false });
+  const [base] = fontFace as [Font, ...Font[]];
+  const cell = base.getAdvanceWidth("M", size, { kerning: false });
   let cursor = x;
   for (const ch of value) {
-    if (ch === " " || font.charToGlyphIndex(ch) > 0) {
+    const font = ch === " " ? base : fontFace.find((f) => f.charToGlyphIndex(ch) > 0);
+    if (font) {
       if (ch !== " ") {
         glyphs.push(
           `<path transform="translate(${cursor.toFixed(2)} ${y})" d="${glyphPath(font, ch, size)}"/>`,
@@ -108,12 +118,23 @@ export const iconSvg = (size: number) =>
   ${cube(9, 8, 1.8)}
 </svg>`;
 
-const ogSvg = () => {
+/** The card's lede, in two lines (the hero lede, shortened to fit). */
+export const ogLede: Record<Locale, [string, string]> = {
+  en: [
+    "Backend systems and products, AI agents and",
+    "automation, services shipped to production.",
+  ],
+  cs: ["Backendové systémy a produkty, AI agenti", "a automatizace, služby nasazené do produkce."],
+};
+
+const ogSvg = (locale: Locale) => {
   const f = getFonts();
+  const t = useT(locale);
   const [first, ...rest] = siteConfig.name.split(" ");
-  const status = availabilityText[siteConfig.availability.status].long;
-  const statusWidth = 44 + f.mono.getAdvanceWidth(status, 13) + status.length * 0.02 * 13;
-  const numbers = heroReadouts
+  const status = t(availabilityText[siteConfig.availability.status].key);
+  const statusWidth = 44 + f.mono[0]!.getAdvanceWidth(status, 13) + status.length * 0.02 * 13;
+  const [lede1, lede2] = ogLede[locale];
+  const numbers = heroReadouts(locale)
     .slice(0, 3)
     .map((r, i) => {
       const x = 64 + i * 236;
@@ -132,11 +153,11 @@ const ogSvg = () => {
   <rect x="122" y="44" width="${statusWidth.toFixed(0)}" height="36" rx="18" fill="#FFFFFF" stroke="#D4DAE1"/>
   <circle cx="142" cy="62" r="4" fill="#59C990"/>
   ${text(f.mono, status, 156, 67, 13, "#1C7A4A", 0.02)}
-  ${text(f.mono, siteConfig.hero.eyebrow, 64, 132, 15, "#4D5662", 0.06)}
+  ${text(f.mono, siteCopy[locale].eyebrow, 64, 132, 15, "#4D5662", 0.06)}
   ${text(f.display, first ?? "", 58, 238, 112, "#10141A", -0.045)}
   ${text(f.display, rest.join(" "), 58, 336, 112, "#10141A", -0.045)}
-  ${text(f.body, "Backend systems and products, AI agents and", 64, 390, 25, "#10141A")}
-  ${text(f.body, "automation, services shipped to production.", 64, 423, 25, "#10141A")}
+  ${text(f.body, lede1, 64, 390, 25, "#10141A")}
+  ${text(f.body, lede2, 64, 423, 25, "#10141A")}
   <rect x="64" y="466" width="690" height="1" fill="#10141A"/>
   ${numbers}
 </svg>`;
@@ -155,7 +176,7 @@ function toBody(buf: Buffer): Uint8Array<ArrayBuffer> {
   return bytes;
 }
 
-export async function renderOgImage(): Promise<Uint8Array<ArrayBuffer>> {
+export async function renderOgImage(locale: Locale = "en"): Promise<Uint8Array<ArrayBuffer>> {
   const layers: OverlayOptions[] = [];
   try {
     // Brand book: the green-sweater portrait is the one for social cards.
@@ -167,7 +188,12 @@ export async function renderOgImage(): Promise<Uint8Array<ArrayBuffer>> {
   } catch {
     /* portrait missing — text-only card */
   }
-  return toBody(await sharp(Buffer.from(ogSvg())).composite(layers).png().toBuffer());
+  return toBody(
+    await sharp(Buffer.from(ogSvg(locale)))
+      .composite(layers)
+      .png()
+      .toBuffer(),
+  );
 }
 
 export async function renderTouchIcon(size = 180): Promise<Uint8Array<ArrayBuffer>> {

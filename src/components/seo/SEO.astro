@@ -4,10 +4,12 @@
  * cards, RSS discovery, and Person / WebSite structured data.
  */
 import JsonLd from "@components/seo/JsonLd.astro";
-import { siteConfig } from "@config";
+import { siteConfig, siteCopy } from "@config";
 import { hasWriting } from "@lib/content";
 import { personSchema } from "@lib/schema";
 import { cleanPath } from "@lib/utils";
+import { i18n, localizePath, locales, stripLocale } from "@/i18n";
+import { localeTags, ogLocales } from "@/i18n/locales";
 
 export interface Props {
   title: string;
@@ -27,11 +29,14 @@ export interface Props {
   titleTemplate?: boolean;
 }
 
+const { locale } = i18n(Astro);
+const copy = siteCopy[locale];
+
 const {
   title,
-  description = siteConfig.description,
-  image = siteConfig.ogImage,
-  imageAlt = `${siteConfig.name} — ${siteConfig.title}`,
+  description = copy.description,
+  image = locale === "cs" ? siteConfig.ogImageCs : siteConfig.ogImage,
+  imageAlt = `${siteConfig.name} — ${copy.title}`,
   type = "website",
   noindex = false,
   publishedTime,
@@ -47,7 +52,15 @@ const canonicalUrl = canonical ?? new URL(pathname, site).toString();
 const imageUrl = new URL(image, site).toString();
 const fullTitle = titleTemplate ? `${title} · ${siteConfig.name}` : title;
 
-const isHome = pathname === "/";
+// The same page in every language: hreflang alternates (x-default = English).
+const basePath = stripLocale(pathname);
+const alternates = locales.map((code) => ({
+  hreflang: code,
+  href: new URL(localizePath(basePath, code), site).toString(),
+}));
+const otherLocales = locales.filter((code) => code !== locale);
+
+const isHome = basePath === "/";
 const hasPosts = await hasWriting();
 const [firstName, ...lastNames] = siteConfig.name.split(" ");
 
@@ -59,8 +72,8 @@ const websiteLd = {
   "@id": `${site.origin}/#website`,
   name: siteConfig.name,
   url: site.origin,
-  description: siteConfig.description,
-  inLanguage: siteConfig.locale,
+  description: copy.description,
+  inLanguage: localeTags[locale],
   publisher: { "@id": `${site.origin}/#person` },
 };
 ---
@@ -69,6 +82,8 @@ const websiteLd = {
 <meta name="description" content={description} />
 {/* No canonical on noindex pages (404, empty /writing). */}
 {!noindex && <link rel="canonical" href={canonicalUrl} />}
+{!noindex && alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
+{!noindex && <link rel="alternate" hreflang="x-default" href={alternates[0]!.href} />}
 <meta name="author" content={siteConfig.name} />
 {noindex ? (
   <meta name="robots" content="noindex, nofollow" />
@@ -78,7 +93,10 @@ const websiteLd = {
 
 <meta property="og:type" content={type} />
 <meta property="og:site_name" content={siteConfig.name} />
-<meta property="og:locale" content={siteConfig.ogLocale} />
+<meta property="og:locale" content={ogLocales[locale]} />
+{otherLocales.map((code) => (
+  <meta property="og:locale:alternate" content={ogLocales[code]} />
+))}
 <meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonicalUrl} />
