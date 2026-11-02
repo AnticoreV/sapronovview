@@ -20,8 +20,10 @@ agent loop). _Every number on this page is real._
 - [Proof numbers](#proof-numbers)
 - [3D: hero blueprint and globe](#3d-hero-blueprint-and-globe)
 - [Content](#content)
+- [Languages (English + Czech)](#languages-english--czech)
 - [Placeholders](#placeholders)
 - [Still to fill](#still-to-fill)
+- [Operator](#operator)
 - [Contact form](#contact-form)
 - [SEO](#seo)
 - [Accessibility and performance](#accessibility-and-performance)
@@ -81,15 +83,25 @@ Before pushing: `npm run check && npm run lint && npm run format:check && npm ru
 
 ```text
 src/
-  config.ts                 ← name, title, hero copy, email, availability, socials, nav, stack
-  content.config.ts         ← collection schemas (zod)
+  config.ts                 ← name, email, availability, socials, nav, stack; `siteCopy` = hero /
+                              meta copy per language
+  content.config.ts         ← collection schemas (zod), incl. the Czech `*Cs` collections
   content/                  ← projects, writing, experience, milestones, hobbies, now
-  data/
+                              (+ <collection>/cs/ = Czech versions)
+  i18n/
+    locales.ts              ← locales, localizePath(), stripLocale(), getStaticPaths helper
+    ui.ts                   ← every interface string in EN + CS (typed keys, t())
+    typo.ts                 ← Czech typography (nbsp after one-letter words)
+    index.ts                ← i18n(Astro) → { locale, t, l } for .astro files
+  data/                     ← each file holds { en, cs } texts
     readouts.ts             ← the proof numbers (homepage, case studies, chips, OG card)
-    home.ts                 ← capabilities, contents list, homepage case rows, "worked with" line
+    home.ts                 ← capabilities, contents list, homepage case rows
     contact.ts              ← contact routes (hiring / investing / partnering) + topics
-    about.ts                ← philosophy, values, "what I enjoy", facts
+    about.ts                ← career story, philosophy, values, "what I enjoy", facts
     adventures.ts           ← visited / wishlist places + home base (globe and map)
+  pages/
+    [...lang]/              ← every page, built twice: / … (English) and /cs/… (Czech)
+    404.astro, cs/404.astro ← English / Czech 404 (Cloudflare serves the nearest 404.html)
   scripts/
     hero3d.ts               ← hero "V6 · Blueprint" (three.js + fat lines, lazy)
     globe3d.ts              ← adventures paper globe (three.js, lazy)
@@ -109,7 +121,8 @@ src/
   lib/                      ← content queries, CV check, placeholder helpers, schema, OG image
   styles/global.css         ← design tokens + Tailwind theme + component classes
 scripts/                    ← render-posters.mjs, serve-dist.mjs (tests)
-tests/e2e/                  ← Playwright smoke tests
+tests/e2e/                  ← Playwright: smoke.spec.ts (English site), i18n.spec.ts (Czech, switch,
+                              browser-language redirect, hreflang)
 ```
 
 Component names follow `components.md`: SiteHeader (was HeaderStrip), StatusPill
@@ -200,9 +213,12 @@ client from the track record) and a `detail` sentence. Rules:
 - **No WebGL or reduced motion:** the hero stays on its poster; `/adventures` shows the flat
   d3-geo map instead of the globe. three.js is never downloaded in either case.
 - **Posters** (`src/assets/hero/blueprint-{light,dark}.png`,
-  `src/assets/hero/blueprint-small-{light,dark}.png`, `src/assets/globe/globe-{light,dark}.png`)
-  are rendered from the same scene code at the real stage size — 1440 viewport at 2×, and the
-  phone hero at a 375px stage at 3× (with the phone labels):
+  `src/assets/hero/blueprint-small-{light,dark}.png`, the Czech `…-{light,dark}-cs.png` of
+  both, and `src/assets/globe/globe-{light,dark}.png`) are rendered from the same scene code
+  at the real stage size — 1440 viewport at 2×, and the phone hero at a 375px stage at 3×
+  (with the phone labels). The hero callouts come from the UI dictionary (`hero3d.*` keys),
+  so each language has its own hero posters; `ONLY=cs npm run posters` re-renders just the
+  Czech ones. The globe has no text and one poster pair serves both languages:
 
   ```bash
   npm run build && npm run preview -- --host 127.0.0.1 --port 4321   # in another terminal
@@ -243,7 +259,7 @@ client from the track record) and a `detail` sentence. Rules:
   of the sitemap. Publish one post and it all comes back (the homepage then shows the posts
   as rows above Off duty).
 - **Hobbies / Now / About:** `src/content/hobbies/*.md`, `src/content/now/now.md`,
-  `src/pages/about.astro` + `src/data/about.ts`. Aviation appears only as hobby content
+  `src/pages/[...lang]/about.astro` + `src/data/about.ts`. Aviation appears only as hobby content
   (`/hobbies`, `/adventures`, the off-duty line and the personal paragraph on `/about`).
 - **Adventures:** `src/data/adventures.ts` (+ ISO numeric ids in `src/data/country-ids.ts`).
 - **Public images:** put files in `public/images/` only when they need a stable public URL
@@ -255,6 +271,61 @@ client from the track record) and a `detail` sentence. Rules:
   and `cutout-*` (background removed, dark theme, on a sunken well); alt text in
   `src/lib/portraits.ts`. The homepage card uses the green sweater, `/about` starts on the
   turtleneck.
+
+## Languages (English + Czech)
+
+English is the default and keeps its URLs (`/about`); Czech lives under `/cs/` for every
+page (`/cs`, `/cs/about`, `/cs/projects/ownira`, …). Astro i18n is configured in
+`astro.config.mjs` (`defaultLocale: "en"`, `prefixDefaultLocale: false`); every page sits in
+`src/pages/[...lang]/` and is generated once per language (`localeParams()`).
+
+- **Which language a visitor sees:** a small inline script in `<head>` of the English pages
+  (BaseLayout) sends a first-time visitor whose browser prefers Czech — the first `cs*` / `en*`
+  entry of `navigator.languages` is Czech — to the same page under `/cs` before paint
+  (`location.replace`, keeping `?query` and `#hash`). Everyone else stays on English. Czech
+  pages never redirect; bots, crawlers, Lighthouse and automated browsers
+  (`navigator.webdriver`) are never redirected.
+- **Switch:** "EN | CS" in the header next to the theme toggle (≥ 521px) and in the menu
+  sheet. It links to the same page in the other language and stores the choice in
+  `localStorage` (`lang`), which from then on wins over the browser language.
+- **Header:** with the switch (and the Czech labels) the full header needs about 1000px, so
+  the nav collapses into the menu below 1024px (was 860px), and the availability pill shows
+  in the header from 1240px (the profile card always shows it).
+- **SEO:** `<html lang>`, canonical per language, `hreflang` en / cs / x-default (English) on
+  every page, `og:locale` + `og:locale:alternate`, sitemap alternates (`@astrojs/sitemap`
+  `i18n`), JSON-LD `inLanguage`, and a Czech share card (`/images/og-default-cs.png`). RSS stays
+  English.
+
+**Where the Czech text lives — edit it there:**
+
+| What                                                                                       | File                                                               |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| Interface strings (nav, buttons, labels, headings, form, errors, 404, legend, 3D callouts) | `src/i18n/ui.ts` (`cs` object; keys must match `en`, type-checked) |
+| Hero eyebrow / lede, title, meta description, profile fields, languages                    | `siteCopy.cs` in `src/config.ts`                                   |
+| Proof numbers (labels, values, spoken forms, chips)                                        | `texts.cs` in `src/data/readouts.ts`                               |
+| Capabilities, contents list, homepage case rows                                            | `src/data/home.ts`                                                 |
+| Career story, philosophy, values, "what I enjoy", facts                                    | `src/data/about.ts`                                                |
+| Contact routes, topics, mailto subjects                                                    | `src/data/contact.ts`                                              |
+| City names, trip notes, wishlist reasons (country names come from `Intl.DisplayNames`)     | `czech` in `src/data/adventures.ts`                                |
+| Portrait alt text and switch labels                                                        | `src/lib/portraits.ts`                                             |
+| Projects, experience, hobbies, now                                                         | `src/content/<collection>/cs/<same file name>.md`                  |
+
+A Czech content file holds only the translatable frontmatter (title, description, tagline,
+role, achievements, …) plus the Czech Markdown body; everything else (dates, status, stack,
+links, `placeholder`) comes from the English file, and a missing file or field falls back
+to English (`src/lib/content.ts`). Placeholder hiding, the writing gate and the hidden hobby
+write-ups work the same in Czech. Writing posts stay English: `/cs/writing/…` shows them
+with a "Článek je v angličtině." note and `lang="en"`.
+
+**Czech typography is automatic:** write normal spaces — a non-breaking space after the
+one-letter words k, s, v, z, o, u, a, i is added to UI strings, data, frontmatter and Markdown
+(`src/i18n/typo.ts`, `src/lib/markdown-czech.mjs`). Use „uvozovky“ and an en dash with spaces
+( – ). Dates and numbers follow the language (`Intl`, "2. 11. 2026", "leden 2025 – dosud").
+
+**Status: the Czech copy was translated on 2026-11-02 and awaits Ivan's review** — the
+side-by-side table is in the PR / hand-off notes; the least certain lines are listed there.
+Proper nouns, product names and the usual English dev terms (backend, BFF, CI/CD, review,
+pipeline…) stay English on purpose.
 
 ## Placeholders
 
@@ -293,8 +364,13 @@ invented):
 
 ### Content to add (not hidden — nothing renders until written)
 
-- `src/pages/about.astro`: the personal part of the career story (where you grew up, first
-  computer, first flight / ride) — there is no placeholder, add real text when ready.
+- `src/data/about.ts` (`story`, both languages): the personal part of the career story (where
+  you grew up, first computer, first flight / ride) — there is no placeholder, add real text
+  when ready.
+- Czech copy (2026-11-02) awaits Ivan's review, the Ownira tagline in particular
+  („Od datové schránky k vyřízení.“ in `src/content/projects/cs/ownira.md`). Anything filled
+  in later in English (trip notes, hobby write-ups, now, facts) needs its Czech version too —
+  until then Czech pages fall back to the English text.
 
 ### Copy decisions (Ivan, 2026-10-23)
 
@@ -319,14 +395,16 @@ the occasional lesson from the cockpit", empty state "No posts published yet"; `
 ## Operator
 
 The footer of every page carries the business operator line required by §435 of the Civil
-Code (name, IČO, registered seat), from `siteConfig.operator` in `src/config.ts` (verified
-in ARES on 2026-11-02: sole trader in the Trade Register, not a VAT payer — so no DIČ). The
-same seat and IČO are in the `Person` JSON-LD.
+Code (name, IČO, registered seat), in English or Czech (`footer.operator` in
+`src/i18n/ui.ts`; the data itself is `siteConfig.operator` in `src/config.ts`, verified in ARES
+on 2026-11-02: sole trader in the Trade Register, not a VAT payer — so no DIČ). The same seat
+and IČO are in the `Person` JSON-LD.
 
 ## Contact form
 
 `src/components/contact/ContactForm.astro` (on `/contact`): name, email, topic
-(Hiring / Investing / Partnering / Something else — preselected from `?topic=`), message and
+(Hiring / Investing / Partnering / Something else; in Czech Nábor / Investice / Spolupráce /
+Něco jiného — preselected from `?topic=`, the same ids in both languages), message and
 a `_gotcha` honeypot. States: field errors (`aria-invalid` + message), submitting (busy,
 disabled), success (`role="status"`, only after the endpoint answers OK), failure
 (`role="alert"`, says it failed, gives the email, keeps the text).
@@ -354,7 +432,11 @@ stable `image` at `/images/ivan-sapronov.jpg`) and `WebSite` on the home page,
 `ProfilePage` on `/about` with that Person as `mainEntity`, `BlogPosting`, `CreativeWork`,
 `BreadcrumbList`.
 
-The 1200×630 share image (`/images/og-default.png`) is generated at build time
+Every page has `hreflang` alternates (en, cs, x-default = English) and a canonical URL in
+its own language; see [Languages](#languages-english--czech).
+
+The 1200×630 share image (`/images/og-default.png`, Czech: `/images/og-default-cs.png`) is
+generated at build time
 (`src/lib/brand-images.ts`) in the v2 look: cube mark + "OPEN TO PROJECTS" pill, the
 eyebrow, the name in Schibsted Grotesk 800, the lede, three proof numbers with their mono
 captions and the cut-out portrait. Text is converted to vector paths with opentype.js from
@@ -367,12 +449,16 @@ any build machine). The favicon and touch icon are the isometric cube mark.
   `focus`, 2px offset; `on-accent` on the contact panel), 44px targets in the header,
   breadcrumbs, footer, forms and chips, skip link, labelled fields, status always in words
   (never colour alone), the globe's list as its keyboard equivalent, reduced motion respected
-  everywhere. axe-core 4.10 (WCAG 2.2 AA + best practice): **0 violations** in 78 runs —
-  16 routes (incl. the four case studies and `/404`), light and dark, 1440 and 375, plus runs
-  with motion on and with the menu sheet open.
-- Lighthouse 12.8 (local preview, mobile preset, 2026-10-23, light and dark): `/` Performance
-  99, LCP 2.0 s (the phone poster), TBT 0 ms, CLS 0; `/adventures` 99, LCP 2.1 s (the globe
-  poster), TBT 0 ms, CLS 0; Accessibility, Best practices and SEO 100 on both.
+  everywhere. axe-core 4.10 (WCAG 2.2 AA + best practice), 2026-11-02: **0 violations** in
+  124 runs — 14 routes in English and the same 14 in Czech (incl. the four case studies,
+  `/writing` and the 404), light and dark, 1440 and 375, plus the menu sheet open in both
+  languages and runs with motion on (`/`, `/cs`, `/adventures`, `/cs/adventures`).
+- Lighthouse 12.8 (local build, mobile preset, 2026-11-02, light and dark): `/` Performance
+  96 (LCP 2.6 s, the phone poster), `/cs` 94 (LCP 2.9 s), `/adventures` 94 (LCP 2.7 s),
+  `/cs/adventures` 93 (LCP 3.0 s); TBT 0 ms, CLS 0, Accessibility, Best practices and SEO
+  100 on all four. (The same machine measured `origin/main` at 97 / 96 for `/` and
+  `/adventures` that day — the 2026-10-23 run gave 99 / 99.) Czech pages preload the
+  latin-ext fonts they need above the fold.
 - three.js (~133 KB gzip, plus 14 KB for the hero scene) loads only on `/` and `/adventures`,
   lazily (see above).
 
