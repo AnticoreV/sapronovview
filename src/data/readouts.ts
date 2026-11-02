@@ -1,14 +1,16 @@
 /**
- * Proof numbers — the only numbers on the site.
+ * Proof numbers — the only numbers on the site, in English and Czech.
  *
- * One source of truth for the homepage proof row, the case-study ProofNumbers,
- * the metric chips on the case rows and the Open Graph card. Every value must be
- * real and carry its source; every source is a position in src/content/experience/.
- * Never add a number that isn't in the CV.
+ * One source of truth for the homepage proof row, the case-study ProofNumbers, the metric
+ * chips on the case rows and the Open Graph cards. Every value must be real and carry its
+ * source; every source is a position in src/content/experience/. Never add a number that
+ * isn't in the CV. The Czech texts say the same facts ("~2M" → "~2 mil.", "up to 8" → "až 8").
  *
- * `count` lets the HTML number count up once (prefix + 0→to + suffix); values
- * without it are shown as they are.
+ * `count` lets the HTML number count up once (prefix + 0→to + suffix); values without it
+ * are shown as they are.
  */
+import type { Locale } from "@/i18n/locales";
+import { typoDeep } from "@/i18n/typo";
 
 export type Readout = {
   id: string;
@@ -32,86 +34,145 @@ export type Readout = {
   chipSpoken?: string;
 };
 
-export const readouts = {
-  users: {
-    id: "users",
-    label: "Users served",
-    source: "NCR Voyix",
-    value: "~2M",
-    spoken: "about 2 million",
-    count: { prefix: "~", to: 2, suffix: "M" },
-    detail:
-      "Enterprise system serving around two million users, run on GCP with full observability.",
-    project: "self-service-menu-platform",
-    chip: "~2M users",
-    chipSpoken: "about 2 million users",
-  },
-  downstream: {
-    id: "downstream",
-    label: "Services behind one BFF",
-    source: "NCR Voyix",
-    value: "up to 8",
-    count: { prefix: "up to ", to: 8 },
-    detail: "One backend-for-frontend and aggregator over up to eight downstream services.",
-    project: "self-service-menu-platform",
-    chip: "up to 8 services",
-  },
-  p95: {
-    id: "p95",
-    label: "p95 latency, roughly halved",
-    source: "CCA Group",
-    value: "≈ ½",
-    spoken: "approximately half",
-    detail:
-      "Kotlin coroutines ran independent downstream calls concurrently — p95 latency roughly halved under peak load.",
-    project: "dynamic-form-engine",
-    chip: "p95 ≈ halved",
-  },
-  ciQueue: {
-    id: "ci-queue",
-    label: "CI queue time",
-    source: "CreativeDock",
-    value: "h → min",
-    spoken: "hours to minutes",
-    detail: "GitLab CI build queue times cut from hours to minutes.",
-    project: "creativedock-greenfield-services",
-    chip: "CI h → min",
-    chipSpoken: "CI queue: hours to minutes",
-  },
-  formTypes: {
-    id: "form-types",
-    label: "New form type",
-    source: "CCA Group",
-    value: "days → h",
-    spoken: "days to hours",
-    detail: "Effort to create a new form type went from days to hours.",
-    project: "dynamic-form-engine",
-    chip: "days → hours",
-  },
-  services: {
-    id: "services",
-    label: "Greenfield services",
-    source: "CreativeDock",
-    value: "3",
-    count: { to: 3 },
-    detail:
-      "Ticketing, booking and subscription services built from scratch in a three-month engagement.",
-    project: "creativedock-greenfield-services",
-    chip: "3 services",
-  },
-} satisfies Record<string, Readout>;
+type Text = Pick<
+  Readout,
+  "label" | "value" | "spoken" | "count" | "detail" | "chip" | "chipSpoken"
+>;
+type Base = Pick<Readout, "id" | "source" | "project">;
 
-export type ReadoutId = keyof typeof readouts;
+const facts = {
+  users: { id: "users", source: "NCR Voyix", project: "self-service-menu-platform" },
+  downstream: { id: "downstream", source: "NCR Voyix", project: "self-service-menu-platform" },
+  p95: { id: "p95", source: "CCA Group", project: "dynamic-form-engine" },
+  ciQueue: { id: "ci-queue", source: "CreativeDock", project: "creativedock-greenfield-services" },
+  formTypes: { id: "form-types", source: "CCA Group", project: "dynamic-form-engine" },
+  services: { id: "services", source: "CreativeDock", project: "creativedock-greenfield-services" },
+} satisfies Record<string, Base>;
+
+export type ReadoutId = keyof typeof facts;
+
+const texts: Record<Locale, Record<ReadoutId, Text>> = {
+  en: {
+    users: {
+      label: "Users served",
+      value: "~2M",
+      spoken: "about 2 million",
+      count: { prefix: "~", to: 2, suffix: "M" },
+      detail:
+        "Enterprise system serving around two million users, run on GCP with full observability.",
+      chip: "~2M users",
+      chipSpoken: "about 2 million users",
+    },
+    downstream: {
+      label: "Services behind one BFF",
+      value: "up to 8",
+      count: { prefix: "up to ", to: 8 },
+      detail: "One backend-for-frontend and aggregator over up to eight downstream services.",
+      chip: "up to 8 services",
+    },
+    p95: {
+      label: "p95 latency, roughly halved",
+      value: "≈ ½",
+      spoken: "approximately half",
+      detail:
+        "Kotlin coroutines ran independent downstream calls concurrently — p95 latency roughly halved under peak load.",
+      chip: "p95 ≈ halved",
+    },
+    ciQueue: {
+      label: "CI queue time",
+      value: "h → min",
+      spoken: "hours to minutes",
+      detail: "GitLab CI build queue times cut from hours to minutes.",
+      chip: "CI h → min",
+      chipSpoken: "CI queue: hours to minutes",
+    },
+    formTypes: {
+      label: "New form type",
+      value: "days → h",
+      spoken: "days to hours",
+      detail: "Effort to create a new form type went from days to hours.",
+      chip: "days → hours",
+    },
+    services: {
+      label: "Greenfield services",
+      value: "3",
+      count: { to: 3 },
+      detail:
+        "Ticketing, booking and subscription services built from scratch in a three-month engagement.",
+      chip: "3 services",
+    },
+  },
+  cs: {
+    users: {
+      label: "Obsloužených uživatelů",
+      value: "~2\u00a0mil.",
+      spoken: "přibližně 2 miliony",
+      count: { prefix: "~", to: 2, suffix: "\u00a0mil." },
+      detail:
+        "Podnikový systém pro zhruba dva miliony uživatelů, provozovaný na GCP s plnou observabilitou.",
+      chip: "~2 mil. uživatelů",
+      chipSpoken: "přibližně 2 miliony uživatelů",
+    },
+    downstream: {
+      label: "Služeb za jedním BFF",
+      value: "až\u00a08",
+      count: { prefix: "až\u00a0", to: 8 },
+      detail: "Jeden backend-for-frontend a agregátor nad až osmi navazujícími službami.",
+      chip: "až 8 služeb",
+    },
+    p95: {
+      label: "Latence p95 zhruba na polovinu",
+      value: "≈ ½",
+      spoken: "přibližně polovina",
+      detail:
+        "Korutiny v Kotlinu spouštěly nezávislá volání navazujících služeb souběžně – latence p95 při špičkové zátěži klesla zhruba na polovinu.",
+      chip: "p95 ≈ poloviční",
+      chipSpoken: "p95 přibližně poloviční",
+    },
+    ciQueue: {
+      label: "Čekání ve frontě CI",
+      value: "h → min",
+      spoken: "z hodin na minuty",
+      detail: "Doba čekání buildů ve frontě GitLab CI zkrácená z hodin na minuty.",
+      chip: "CI h → min",
+      chipSpoken: "fronta CI: z hodin na minuty",
+    },
+    formTypes: {
+      label: "Nový typ formuláře",
+      value: "dny → h",
+      spoken: "ze dnů na hodiny",
+      detail: "Práce na novém typu formuláře se zkrátila ze dnů na hodiny.",
+      chip: "dny → hodiny",
+      chipSpoken: "ze dnů na hodiny",
+    },
+    services: {
+      label: "Nové služby od nuly",
+      value: "3",
+      count: { to: 3 },
+      detail:
+        "Služby pro ticketing, rezervace a předplatné postavené od nuly během tříměsíční spolupráce.",
+      chip: "3 služby",
+    },
+  },
+};
+
+texts.cs = typoDeep(texts.cs);
+
+/** Every readout in one locale. */
+export function getReadouts(locale: Locale): Record<ReadoutId, Readout> {
+  return Object.fromEntries(
+    (Object.keys(facts) as ReadoutId[]).map((k) => [k, { ...facts[k], ...texts[locale][k] }]),
+  ) as Record<ReadoutId, Readout>;
+}
 
 /** The four proof numbers under the homepage hero, in order. */
-export const heroReadouts: Readout[] = [
-  readouts.users,
-  readouts.p95,
-  readouts.ciQueue,
-  readouts.downstream,
-];
+export const heroReadoutIds: ReadoutId[] = ["users", "p95", "ciQueue", "downstream"];
+export const heroReadouts = (locale: Locale): Readout[] => {
+  const all = getReadouts(locale);
+  return heroReadoutIds.map((id) => all[id]);
+};
 
 /** Readouts that belong to a case study. */
-export function readoutsFor(projectSlug: string): Readout[] {
-  return Object.values(readouts).filter((r: Readout) => r.project === projectSlug);
+export function readoutsFor(projectSlug: string, locale: Locale): Readout[] {
+  return Object.values(getReadouts(locale)).filter((r) => r.project === projectSlug);
 }

@@ -1,20 +1,37 @@
 /** Shared helpers used across pages and components. */
+import { localeTags, type Locale } from "@/i18n/locales";
 
+/**
+ * A date in the page's language: "Nov 2, 2026" in English, "2. 11. 2026" in Czech
+ * (a day-month-year date in Czech always uses numeric months).
+ */
 export function formatDate(
   date: Date | string | undefined,
   options: Intl.DateTimeFormatOptions = { year: "numeric", month: "short", day: "numeric" },
+  locale: Locale = "en",
 ): string {
   if (!date) return "";
   const d = typeof date === "string" ? new Date(date) : date;
-  return new Intl.DateTimeFormat("en-US", { ...options, timeZone: "UTC" }).format(d);
+  const opts =
+    locale === "cs" && options.day && options.month === "short"
+      ? { ...options, month: "numeric" as const }
+      : options;
+  return new Intl.DateTimeFormat(localeTags[locale], { ...opts, timeZone: "UTC" }).format(d);
 }
 
-export function formatMonthYear(date: Date | string | undefined): string {
-  return formatDate(date, { year: "numeric", month: "short" });
+/** "Jan 2025" / "leden 2025". */
+export function formatMonthYear(date: Date | string | undefined, locale: Locale = "en"): string {
+  return formatDate(date, { year: "numeric", month: locale === "cs" ? "long" : "short" }, locale);
 }
 
-/** "2y 3m" style duration between two dates (end defaults to now). */
-export function formatDuration(start: Date, end?: Date): string {
+const csUnits = {
+  year: { one: "rok", few: "roky", other: "let" },
+  month: { one: "měsíc", few: "měsíce", other: "měsíců" },
+} as const;
+const csPlural = new Intl.PluralRules("cs");
+
+/** "2 yrs 3 mos" / "2 roky 3 měsíce" between two dates (end defaults to now). */
+export function formatDuration(start: Date, end?: Date, locale: Locale = "en"): string {
   const e = end ?? new Date();
   let months =
     (e.getUTCFullYear() - start.getUTCFullYear()) * 12 +
@@ -24,6 +41,15 @@ export function formatDuration(start: Date, end?: Date): string {
   const years = Math.floor(months / 12);
   const rest = months % 12;
   const parts: string[] = [];
+  if (locale === "cs") {
+    const unit = (n: number, u: keyof typeof csUnits) => {
+      const rule = csPlural.select(n) as "one" | "few" | "other";
+      return `${n}\u00a0${csUnits[u][rule] ?? csUnits[u].other}`;
+    };
+    if (years) parts.push(unit(years, "year"));
+    if (rest) parts.push(unit(rest, "month"));
+    return parts.join(" ");
+  }
   if (years) parts.push(`${years} yr${years > 1 ? "s" : ""}`);
   if (rest) parts.push(`${rest} mo${rest > 1 ? "s" : ""}`);
   return parts.join(" ");

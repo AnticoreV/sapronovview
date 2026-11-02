@@ -1,45 +1,81 @@
 /**
- * Contact routes — the three audiences the site is for. Used by the accent
- * contact panel on every page, the menu sheet and the topic select on /contact
- * (preselected from `?topic=`).
+ * Contact routes — the three audiences the site is for, in English and Czech. Used by the
+ * accent contact panel on every page, the menu sheet and the topic select on /contact
+ * (preselected from `?topic=`; the topic ids are the same in both languages).
  */
+import type { Locale } from "@/i18n/locales";
+import { typoDeep } from "@/i18n/typo";
 
 export type TopicId = "hiring" | "investing" | "partnering" | "other";
 
-export const contactRoutes = [
-  {
-    id: "hiring",
-    label: "Hiring",
-    title: "Senior backend, fullstack or tech lead role",
-    text: "CV and availability on request.",
-    subject: "Hiring",
-  },
-  {
-    id: "investing",
-    label: "Investing",
-    title: "Ownira",
-    text: "Stage, progress and plans — let's talk.",
-    subject: "Investing",
-  },
-  {
-    id: "partnering",
-    label: "Partnering",
-    title: "Build, automate or ship together",
-    text: "Contracts, AI automation, platform work.",
-    subject: "Partnership",
-  },
-] as const satisfies ReadonlyArray<{
-  id: TopicId;
+export type ContactRoute = {
+  id: Exclude<TopicId, "other">;
   label: string;
   title: string;
   text: string;
+  /** Email subject line (mailto links and the form). */
   subject: string;
-}>;
+};
+
+const routes: Record<Locale, ContactRoute[]> = {
+  en: [
+    {
+      id: "hiring",
+      label: "Hiring",
+      title: "Senior backend, fullstack or tech lead role",
+      text: "CV and availability on request.",
+      subject: "Hiring",
+    },
+    {
+      id: "investing",
+      label: "Investing",
+      title: "Ownira",
+      text: "Stage, progress and plans — let's talk.",
+      subject: "Investing",
+    },
+    {
+      id: "partnering",
+      label: "Partnering",
+      title: "Build, automate or ship together",
+      text: "Contracts, AI automation, platform work.",
+      subject: "Partnership",
+    },
+  ],
+  cs: [
+    {
+      id: "hiring",
+      label: "Nábor",
+      title: "Pozice senior backend, fullstack nebo tech lead",
+      text: "Životopis a dostupnost na vyžádání.",
+      subject: "Nábor",
+    },
+    {
+      id: "investing",
+      label: "Investice",
+      title: "Ownira",
+      text: "Fáze, pokrok a plány – pojďme si promluvit.",
+      subject: "Investice",
+    },
+    {
+      id: "partnering",
+      label: "Spolupráce",
+      title: "Stavět, automatizovat nebo nasazovat společně",
+      text: "Zakázky, AI automatizace, práce na platformách.",
+      subject: "Spolupráce",
+    },
+  ],
+};
+
+// Czech typography for display; the mailto subjects have no one-letter words to protect.
+routes.cs = typoDeep(routes.cs);
+export const contactRoutes = (locale: Locale): ContactRoute[] => routes[locale];
+
+const otherLabel: Record<Locale, string> = { en: "Something else", cs: "Něco jiného" };
 
 /** Options for the topic select, in order. */
-export const contactTopics: ReadonlyArray<{ id: TopicId; label: string }> = [
-  ...contactRoutes.map((r) => ({ id: r.id, label: r.label })),
-  { id: "other", label: "Something else" },
+export const contactTopics = (locale: Locale): ReadonlyArray<{ id: TopicId; label: string }> => [
+  ...routes[locale].map((r) => ({ id: r.id, label: r.label })),
+  { id: "other", label: otherLabel[locale] },
 ];
 
 export function mailtoFor(email: string, subject?: string, body?: string): string {

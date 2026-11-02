@@ -4,6 +4,7 @@
  * sunken well. Sources live in src/assets/portraits and are optimised by <Picture>.
  */
 import type { ImageMetadata } from "astro";
+import type { Locale } from "@/i18n/locales";
 import studioTurtleneck from "@/assets/portraits/studio-turtleneck.jpg";
 import studioGreen from "@/assets/portraits/studio-green.jpg";
 import studioBlack from "@/assets/portraits/studio-black.jpg";
@@ -16,40 +17,52 @@ import cutoutWhite from "@/assets/portraits/cutout-white.webp";
 export type Portrait = {
   id: "turtleneck" | "green" | "black" | "white";
   /** Label in the portrait switch on /about. */
-  short: string;
+  short: Record<Locale, string>;
   studio: ImageMetadata;
   cutout: ImageMetadata;
-  alt: string;
+  alt: Record<Locale, string>;
 };
 
 export const portraits: Portrait[] = [
   {
     id: "turtleneck",
-    short: "Turtleneck",
+    short: { en: "Turtleneck", cs: "Rolák" },
     studio: studioTurtleneck,
     cutout: cutoutTurtleneck,
-    alt: "Ivan Sapronov in a grey turtleneck, arms crossed, looking at the camera",
+    alt: {
+      en: "Ivan Sapronov in a grey turtleneck, arms crossed, looking at the camera",
+      cs: "Ivan Sapronov v šedém roláku se zkříženýma rukama, dívá se do objektivu",
+    },
   },
   {
     id: "green",
-    short: "Green",
+    short: { en: "Green", cs: "Zelený" },
     studio: studioGreen,
     cutout: cutoutGreen,
-    alt: "Ivan Sapronov smiling in a green sweater, arms crossed",
+    alt: {
+      en: "Ivan Sapronov smiling in a green sweater, arms crossed",
+      cs: "Ivan Sapronov v zeleném svetru se usmívá, ruce má zkřížené",
+    },
   },
   {
     id: "black",
-    short: "Black",
+    short: { en: "Black", cs: "Černý" },
     studio: studioBlack,
     cutout: cutoutBlack,
-    alt: "Ivan Sapronov seated in a black sweater, leaning forward",
+    alt: {
+      en: "Ivan Sapronov seated in a black sweater, leaning forward",
+      cs: "Ivan Sapronov v černém svetru sedí a naklání se dopředu",
+    },
   },
   {
     id: "white",
-    short: "White",
+    short: { en: "White", cs: "Bílý" },
     studio: studioWhite,
     cutout: cutoutWhite,
-    alt: "Ivan Sapronov in a white T-shirt, in profile, looking to the left",
+    alt: {
+      en: "Ivan Sapronov in a white T-shirt, in profile, looking to the left",
+      cs: "Ivan Sapronov v bílém tričku z profilu, dívá se doleva",
+    },
   },
 ];
 

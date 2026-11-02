@@ -6,6 +6,9 @@
  * "Adventures map". Coordinates are decimal degrees (north / east positive).
  */
 
+import type { Locale } from "@/i18n/locales";
+import { typoDeep } from "@/i18n/typo";
+
 export type AdventureStatus = "visited" | "wishlist";
 
 export type AdventureLocation = {
@@ -276,10 +279,81 @@ export const adventures: AdventureLocation[] = [
 
 /* ------------------------------------------------------------- Helpers */
 
-export const priorityLabels: Record<NonNullable<AdventureLocation["priority"]>, string> = {
-  "bucket-list": "Bucket list",
-  someday: "Someday",
+export const priorityLabels: Record<
+  Locale,
+  Record<NonNullable<AdventureLocation["priority"]>, string>
+> = {
+  en: { "bucket-list": "Bucket list", someday: "Someday" },
+  cs: { "bucket-list": "Musím vidět", someday: "Jednou" },
 };
+
+/* --------------------------------------------------------------- Czech */
+
+/**
+ * Czech texts by place id (country names come from Intl.DisplayNames). A missing entry or
+ * field keeps the English text; `[…]` placeholders are hidden in production as in English.
+ */
+const czech: Record<string, Partial<Pick<AdventureLocation, "city" | "description" | "reason">>> = {
+  munich: { city: "Mnichov", description: "[Doplňte krátkou poznámku o cestě]" },
+  berlin: { city: "Berlín", description: "[Doplňte krátkou poznámku o cestě]" },
+  stockholm: { description: "[Doplňte krátkou poznámku o cestě]" },
+  wroclaw: { city: "Vratislav", description: "[Doplňte krátkou poznámku o cestě]" },
+  gdansk: { city: "Gdaňsk", description: "[Doplňte krátkou poznámku o cestě]" },
+  warsaw: { city: "Varšava", description: "[Doplňte krátkou poznámku o cestě]" },
+  soelden: { description: "Lyžování v Ötztalských Alpách." },
+  madrid: { description: "[Doplňte krátkou poznámku o cestě]" },
+  cyprus: { city: "[Které město?]", description: "[Doplňte krátkou poznámku o cestě]" },
+  istanbul: { description: "[Doplňte krátkou poznámku o cestě]" },
+  zakynthos: { description: "[Doplňte krátkou poznámku o cestě]" },
+  venice: { city: "Benátky", description: "[Doplňte krátkou poznámku o cestě]" },
+  rome: { city: "Řím", description: "[Doplňte krátkou poznámku o cestě]" },
+  giza: { city: "Gíza", description: "[Doplňte krátkou poznámku o cestě]" },
+  skopje: { description: "[Doplňte krátkou poznámku o cestě]" },
+  tokyo: {
+    city: "Tokio",
+    reason: "Velikost města, jídlo a vlaky, které odjíždějí na vteřinu přesně.",
+  },
+  kyoto: { city: "Kjóto", reason: "Chrámy, zahrady a starší tvář Japonska." },
+  "new-york": {
+    city: "New York",
+    reason: "Panorama mrakodrapů a neuvěřitelné množství věcí, které se dějí najednou.",
+  },
+  "san-francisco": { reason: "Most, záliv a pobřežní silnice podél Pacifiku jižně od něj." },
+  queenstown: { reason: "Hory, jezera a všechny adrenalinové sporty na jednom místě." },
+  auckland: { reason: "Brána na Severní ostrov a jeho vulkanickou krajinu." },
+  lofoten: {
+    city: "Lofoty",
+    reason: "Fjordy, rybářské vesnice a silnice, které přímo volají po projetí.",
+  },
+  tromso: { reason: "Polární záře za severním polárním kruhem." },
+};
+
+/** Country name in the page language ("Germany" / "Německo"). */
+export function countryName(code: string, english: string, locale: Locale): string {
+  if (locale === "en") return english;
+  return new Intl.DisplayNames(["cs"], { type: "region" }).of(code) ?? english;
+}
+
+/** Every place with its texts in the page language. */
+export function localizedAdventures(locale: Locale): AdventureLocation[] {
+  if (locale === "en") return adventures;
+  return adventures.map((a) => {
+    const t = typoDeep(czech[a.id] ?? {});
+    return {
+      ...a,
+      country: countryName(a.countryCode, a.country, locale),
+      city: t.city ?? a.city,
+      description: t.description ?? a.description,
+      reason: t.reason ?? a.reason,
+    };
+  });
+}
+
+/** Home base in the page language. */
+export const homeFor = (locale: Locale) =>
+  locale === "en"
+    ? home
+    : { ...home, country: countryName(home.countryCode, home.country, locale), city: "Praha" };
 
 export function getAdventuresByStatus(status: AdventureStatus): AdventureLocation[] {
   return adventures.filter((a) => a.status === status);

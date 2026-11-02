@@ -8,6 +8,10 @@
  * they never render in production (see README "Still to fill").
  */
 
+import type { Locale } from "@/i18n/locales";
+import type { UiKey } from "@/i18n/ui";
+import { typoDeep } from "@/i18n/typo";
+
 export type Availability = "open" | "limited" | "closed";
 
 export const siteConfig = {
@@ -56,6 +60,8 @@ export const siteConfig = {
   ogLocale: "en_US",
   /** Default Open Graph image (1200×630), generated at build time — see src/lib/brand-images.ts. */
   ogImage: "/images/og-default.png",
+  /** The same card in Czech (Czech pages). */
+  ogImageCs: "/images/og-default-cs.png",
   /** Stable portrait URL for structured data (public/images/ivan-sapronov.jpg, 800px). */
   personImage: "/images/ivan-sapronov.jpg",
   /** Public profile links. Leave a value empty ("") to hide it. */
@@ -88,14 +94,64 @@ export type SocialKey = keyof typeof siteConfig.social;
 /** Status-pill wording and tone for each availability state. */
 export const availabilityText: Record<
   Availability,
-  { long: string; tone: "ok" | "caution" | "off" }
+  { key: UiKey; tone: "ok" | "caution" | "off" }
 > = {
-  open: { long: "OPEN TO PROJECTS", tone: "ok" },
-  limited: { long: "LIMITED AVAILABILITY", tone: "caution" },
-  closed: { long: "NOT AVAILABLE", tone: "off" },
+  open: { key: "status.open", tone: "ok" },
+  limited: { key: "status.limited", tone: "caution" },
+  closed: { key: "status.closed", tone: "off" },
 };
 
-export type NavItem = { label: string; href: string; match?: string };
+/**
+ * Copy that differs per language (src/i18n/ui.ts holds the interface strings).
+ * `siteConfig` above keeps the English values for structured data and the RSS feed.
+ */
+export const siteCopy: Record<
+  Locale,
+  {
+    title: string;
+    description: string;
+    eyebrow: string;
+    lede: string;
+    currentFocus: string;
+    experienceSummary: string;
+    basedIn: string;
+    languages: Array<{ code: string; name: string; level: string }>;
+  }
+> = {
+  en: {
+    title: "Backend & Fullstack Engineer · Founder",
+    description:
+      "Backend & fullstack engineer and founder in Prague. I build backend systems and products, set up AI agents and automation, and ship services to production.",
+    eyebrow: "BACKEND & FULLSTACK ENGINEER · FOUNDER · PRAGUE",
+    lede: "I build backend systems and products, set up AI agents and automation, and ship services to production. Every number on this page is real.",
+    currentFocus: "building Ownira (in pilot)",
+    experienceSummary: "~5 yrs on the JVM",
+    basedIn: "Prague, Czechia",
+    languages: [
+      { code: "EN", name: "English", level: "Professional" },
+      { code: "CS", name: "Czech", level: "Professional" },
+      { code: "RU", name: "Russian", level: "Native" },
+    ],
+  },
+  cs: {
+    title: "Backend & Fullstack Engineer · zakladatel",
+    description:
+      "Backend & fullstack engineer a zakladatel v Praze. Stavím backendové systémy a produkty, nastavuji AI agenty a automatizace a nasazuji služby do produkce.",
+    eyebrow: "BACKEND & FULLSTACK ENGINEER · ZAKLADATEL · PRAHA",
+    lede: "Stavím backendové systémy a produkty, nastavuji AI agenty a automatizace a nasazuji služby do produkce. Každé číslo na této stránce je skutečné.",
+    currentFocus: "stavím produkt Ownira (v pilotním provozu)",
+    experienceSummary: "~5 let na JVM",
+    basedIn: "Praha, Česko",
+    languages: [
+      { code: "EN", name: "Angličtina", level: "Profesionální" },
+      { code: "CS", name: "Čeština", level: "Profesionální" },
+      { code: "RU", name: "Ruština", level: "Rodilý mluvčí" },
+    ],
+  },
+};
+siteCopy.cs = typoDeep(siteCopy.cs);
+
+export type NavItem = { key: UiKey; href: string; match?: string };
 
 /**
  * Header navigation (approved artboard): Products · Capabilities · Cases · Experience ·
@@ -103,34 +159,34 @@ export type NavItem = { label: string; href: string; match?: string };
  * mobile sheet once a post is published (see SiteHeader.astro).
  */
 export const primaryNav: NavItem[] = [
-  { label: "Products", href: "/#build" },
-  { label: "Capabilities", href: "/#capabilities" },
-  { label: "Cases", href: "/projects", match: "/projects" },
-  { label: "Experience", href: "/experience", match: "/experience" },
-  { label: "About", href: "/about", match: "/about" },
+  { key: "nav.products", href: "/#build" },
+  { key: "nav.capabilities", href: "/#capabilities" },
+  { key: "nav.cases", href: "/projects", match: "/projects" },
+  { key: "nav.experience", href: "/experience", match: "/experience" },
+  { key: "nav.about", href: "/about", match: "/about" },
 ];
 
 /** Footer links (approved artboard): Projects · About · Experience · Hobbies · RSS · Sitemap. */
 export const footerNav: NavItem[] = [
-  { label: "Projects", href: "/projects" },
-  { label: "About", href: "/about" },
-  { label: "Experience", href: "/experience" },
-  { label: "Hobbies", href: "/hobbies" },
-  { label: "RSS", href: "/rss.xml" },
-  { label: "Sitemap", href: "/sitemap-index.xml" },
+  { key: "nav.projects", href: "/projects" },
+  { key: "nav.about", href: "/about" },
+  { key: "nav.experience", href: "/experience" },
+  { key: "nav.hobbies", href: "/hobbies" },
+  { key: "nav.rss", href: "/rss.xml" },
+  { key: "nav.sitemap", href: "/sitemap-index.xml" },
 ];
 
 /** Every page — used by the mobile menu sheet. */
 export const navigation: NavItem[] = [
-  { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
-  { label: "Projects", href: "/projects" },
-  { label: "Experience", href: "/experience" },
-  { label: "Writing", href: "/writing" },
-  { label: "Hobbies", href: "/hobbies" },
-  { label: "Adventures", href: "/adventures" },
-  { label: "Now", href: "/now" },
-  { label: "Contact", href: "/contact" },
+  { key: "nav.home", href: "/" },
+  { key: "nav.about", href: "/about" },
+  { key: "nav.projects", href: "/projects" },
+  { key: "nav.experience", href: "/experience" },
+  { key: "nav.writing", href: "/writing" },
+  { key: "nav.hobbies", href: "/hobbies" },
+  { key: "nav.adventures", href: "/adventures" },
+  { key: "nav.now", href: "/now" },
+  { key: "nav.contact", href: "/contact" },
 ];
 
 /** Navigation with Writing (and the RSS feed) removed while there is nothing to read. */
@@ -143,7 +199,7 @@ export const withWriting = (items: NavItem[], hasPosts: boolean) =>
  */
 export const techStack = [
   {
-    group: "Languages & backend",
+    group: { en: "Languages & backend", cs: "Jazyky a backend" },
     items: [
       "Java",
       "Kotlin",
@@ -158,11 +214,11 @@ export const techStack = [
     ],
   },
   {
-    group: "Frontend",
+    group: { en: "Frontend", cs: "Frontend" },
     items: ["Angular", "RxJS", "NgRx", "React", "Astro", "Tailwind CSS"],
   },
   {
-    group: "Cloud & infrastructure",
+    group: { en: "Cloud & infrastructure", cs: "Cloud a infrastruktura" },
     items: [
       "GCP",
       "AWS (S3, SQS, CloudWatch)",
@@ -176,7 +232,7 @@ export const techStack = [
     ],
   },
   {
-    group: "Data, auth & observability",
+    group: { en: "Data, auth & observability", cs: "Data, autentizace a observabilita" },
     items: [
       "PostgreSQL",
       "Redis",
