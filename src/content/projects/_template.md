@@ -11,6 +11,14 @@ technologies: ["Java", "Spring Boot"]
 # coverAlt: "Screenshot of ..."
 # github: https://github.com/AnticoreV/...
 # website: https://...
+# Own products only: tagline + summary put the project under "What I'm building", and the
+# facts list shows next to STATUS / WEB in the product module.
+# tagline: "[ONE-LINE PROMISE]"
+# summary: "[SHORT MODULE COPY]"
+# domain: "[example.com]"
+# facts:
+#   - label: "For"
+#     value: "[WHO IT IS FOR]"
 role: "[YOUR ROLE]"
 organization: "[COMPANY / TEAM]"
 timeframe: "[2025 — 2026]"

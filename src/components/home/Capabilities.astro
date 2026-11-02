@@ -1,0 +1,33 @@
+---
+/** "What I can do" (02) — four CapabilityCards (src/data/home.ts). */
+import CapabilityCard from "@components/home/CapabilityCard.astro";
+import SectionHeader from "@components/ui/SectionHeader.astro";
+import { capabilities } from "@data/home";
+---
+
+<section
+  id="capabilities"
+  class="band section-gap"
+  aria-labelledby="capabilities-heading"
+  data-reveal
+>
+  <div class="shell flex flex-col gap-9">
+    <SectionHeader
+      id="capabilities-heading"
+      index="02"
+      title="What I can do"
+      tag="BUILD · DIRECT · AUTOMATE · SHIP & RUN"
+    />
+    <ul class="grid grid-cols-[repeat(auto-fit,minmax(min(290px,100%),1fr))] gap-4">
+      {capabilities.map((c) => (
+        <CapabilityCard
+          id={c.id}
+          code={c.code}
+          title={c.title}
+          text={c.text}
+          spotlight={c.spotlight}
+        />
+      ))}
+    </ul>
+  </div>
+</section>

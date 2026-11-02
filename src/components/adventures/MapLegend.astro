@@ -1,54 +1,32 @@
 ---
-/**
- * Legend for the adventures map. Status is conveyed by shape and label,
- * not only by colour: visited = filled dot, wishlist = hollow ring.
- */
+/** Legend: status by shape and word, never colour alone. */
 interface Props {
   class?: string;
 }
 const { class: className } = Astro.props;
 ---
 
-<ul class:list={["adv-legend", className]} aria-label="Map legend">
-  <li>
-    <span class="adv-legend__marker adv-legend__marker--visited" aria-hidden="true"></span>
-    <span>Visited</span>
+<ul
+  class:list={[
+    "mono flex flex-wrap gap-x-5 gap-y-2 text-[12px] font-medium text-ink-muted uppercase",
+    className,
+  ]}
+  aria-label="Map legend"
+>
+  <li class="inline-flex items-center gap-2">
+    <span class="inline-block size-3 rounded-[2px] bg-accent" aria-hidden="true"></span>Home
   </li>
-  <li>
-    <span class="adv-legend__marker adv-legend__marker--wishlist" aria-hidden="true"></span>
-    <span>Want to visit</span>
+  <li class="inline-flex items-center gap-2">
+    <span class="inline-block size-3 rounded-[2px] bg-ink" aria-hidden="true"></span>Visited
+  </li>
+  <li class="inline-flex items-center gap-2">
+    <span
+      class="inline-block size-3 rounded-[2px] border-2 border-dashed border-accent"
+      aria-hidden="true"
+    ></span>
+    Want to visit
+  </li>
+  <li class="legend-route inline-flex items-center gap-2">
+    <span class="inline-block h-0.5 w-4 bg-accent" aria-hidden="true"></span>Route from Prague
   </li>
 </ul>
-
-<style>
-  .adv-legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.25rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    font-size: 0.875rem;
-    color: var(--fg-muted);
-  }
-  .adv-legend li {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .adv-legend__marker {
-    width: var(--adventure-marker-size);
-    height: var(--adventure-marker-size);
-    border-radius: 999px;
-    box-sizing: border-box;
-    flex: none;
-  }
-  .adv-legend__marker--visited {
-    background: var(--adventure-visited);
-    box-shadow: 0 0 0 2px var(--surface);
-  }
-  .adv-legend__marker--wishlist {
-    border: 2px solid var(--adventure-wishlist);
-    background: var(--surface);
-  }
-</style>

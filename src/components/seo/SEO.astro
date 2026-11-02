@@ -5,6 +5,8 @@
  */
 import JsonLd from "@components/seo/JsonLd.astro";
 import { siteConfig } from "@config";
+import { hasWriting } from "@lib/content";
+import { personSchema } from "@lib/schema";
 import { cleanPath } from "@lib/utils";
 
 export interface Props {
@@ -46,22 +48,10 @@ const imageUrl = new URL(image, site).toString();
 const fullTitle = titleTemplate ? `${title} · ${siteConfig.name}` : title;
 
 const isHome = pathname === "/";
+const hasPosts = await hasWriting();
+const [firstName, ...lastNames] = siteConfig.name.split(" ");
 
-const personLd = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "@id": `${site.origin}/#person`,
-  name: siteConfig.name,
-  jobTitle: siteConfig.title,
-  description: siteConfig.description,
-  url: site.origin,
-  email: `mailto:${siteConfig.email}`,
-  image: new URL("/images/about/portrait.jpg", site).toString(),
-  sameAs: Object.values(siteConfig.social).filter(Boolean),
-  ...(siteConfig.location && !siteConfig.location.startsWith("[")
-    ? { address: { "@type": "PostalAddress", addressLocality: siteConfig.location } }
-    : {}),
-};
+const personLd = { "@context": "https://schema.org", ...personSchema(site) };
 
 const websiteLd = {
   "@context": "https://schema.org",
@@ -77,7 +67,8 @@ const websiteLd = {
 
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
-<link rel="canonical" href={canonicalUrl} />
+{/* No canonical on noindex pages (404, empty /writing). */}
+{!noindex && <link rel="canonical" href={canonicalUrl} />}
 <meta name="author" content={siteConfig.name} />
 {noindex ? (
   <meta name="robots" content="noindex, nofollow" />
@@ -98,6 +89,12 @@ const websiteLd = {
 {publishedTime && <meta property="article:published_time" content={publishedTime.toISOString()} />}
 {modifiedTime && <meta property="article:modified_time" content={modifiedTime.toISOString()} />}
 {type === "article" && <meta property="article:author" content={siteConfig.name} />}
+{isHome && type === "profile" && (
+  <>
+    <meta property="profile:first_name" content={firstName} />
+    <meta property="profile:last_name" content={lastNames.join(" ")} />
+  </>
+)}
 {tags.map((tag) => (
   <meta property="article:tag" content={tag} />
 ))}
@@ -110,12 +107,14 @@ const websiteLd = {
 {siteConfig.twitterHandle && <meta name="twitter:creator" content={siteConfig.twitterHandle} />}
 {siteConfig.twitterHandle && <meta name="twitter:site" content={siteConfig.twitterHandle} />}
 
-<link
-  rel="alternate"
-  type="application/rss+xml"
-  title={`${siteConfig.name} — Writing`}
-  href={new URL("/rss.xml", site).toString()}
-/>
+{hasPosts && (
+  <link
+    rel="alternate"
+    type="application/rss+xml"
+    title={`${siteConfig.name} — Writing`}
+    href={new URL("/rss.xml", site).toString()}
+  />
+)}
 <link rel="sitemap" href="/sitemap-index.xml" />
 
 {isHome && <JsonLd data={personLd} />}

@@ -1,0 +1,57 @@
+---
+/**
+ * RecordRow — one position in the track record: YEARS (mono, accent) · COMPANY
+ * (bold) · ROLE · SHIPPED (one real outcome — the position's `shipped` line, a
+ * shortened form of a real achievement). Four cells on desktop, stacked on phones.
+ */
+import Glyphs from "@components/ui/Glyphs.astro";
+import { employmentLabels, shortCompany, shown, yearsLabel, type Position } from "@lib/content";
+
+interface Props {
+  position: Position;
+  href?: string;
+}
+const { position, href } = Astro.props;
+const { data } = position;
+const contract = data.employmentType === "freelance" || data.employmentType === "contract";
+const role = contract ? `${data.role} · ${employmentLabels.contract.toLowerCase()}` : data.role;
+const shipped = shown(data.shipped) ?? shown(data.achievements[0]);
+const Tag = href ? "a" : "div";
+---
+
+<Tag
+  href={href}
+  class:list={[
+    "record grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-x-6 gap-y-1 border-b border-line py-5 no-underline",
+    href && "record--link",
+  ]}
+>
+  <span class="mono text-[14px] text-accent">
+    <span class="sr-only">Years: </span>
+    {yearsLabel(data.startDate, data.endDate)}
+  </span>
+  <span class="font-bold">
+    <span class="sr-only">Company: </span>
+    {shortCompany(data.company)}
+  </span>
+  <span>
+    <span class="sr-only">Role: </span>
+    {role}
+  </span>
+  {shipped && (
+    <span class="text-ink-muted">
+      <span class="sr-only">Shipped: </span>
+      <Glyphs text={shipped} />
+    </span>
+  )}
+</Tag>
+
+<style>
+  .record--link:hover {
+    color: var(--ink);
+  }
+  .record--link:hover span:nth-child(2) {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+</style>

@@ -45,10 +45,6 @@ export function slugify(input: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
-export function isPlaceholder(value: string | undefined | null): boolean {
-  return typeof value === "string" && /^\[.*\]$/.test(value.trim());
-}
-
 /**
  * Normalise a pathname to its canonical, extension-less form:
  * "/index.html" → "/", "/about.html" → "/about", "/about/" → "/about".

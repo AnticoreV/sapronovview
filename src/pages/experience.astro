@@ -1,12 +1,12 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
-import Button from "@components/ui/Button.astro";
-import CTASection from "@components/ui/CTASection.astro";
-import SectionHeading from "@components/ui/SectionHeading.astro";
 import ExperienceItem from "@components/experience/ExperienceItem.astro";
+import RecordRow from "@components/experience/RecordRow.astro";
 import MilestoneList from "@components/experience/MilestoneList.astro";
+import SectionHeader from "@components/ui/SectionHeader.astro";
 import { getMilestones, getPositions, milestoneLabels } from "@lib/content";
+import { cvPath } from "@lib/cv";
 import { siteConfig } from "@config";
 
 const [positions, milestones] = await Promise.all([getPositions(), getMilestones()]);
@@ -16,48 +16,77 @@ const byType = (t: (typeof types)[number]) => milestones.filter((m) => m.data.ty
 
 <BaseLayout
   title="Experience"
-  description={`Career timeline of ${siteConfig.name}: positions, achievements, education, certifications, talks and community work.`}
+  description={`Track record of ${siteConfig.name}: every position since 2021 with what I built and what changed because of it — JVM services, Angular products, identity, Kafka, Kubernetes and cloud.`}
 >
-  <div class="container-site pt-10 sm:pt-14">
-    <Breadcrumbs items={[{ label: "Experience" }]} />
-    <SectionHeading
-      level={1}
-      eyebrow="Experience"
-      title="Career timeline"
-      description="Where I've worked, what I owned and what changed because of it — from a freelance CRM in 2021 to Kotlin microservices and cloud platforms serving millions of users."
-      class="mt-8"
-    >
-      <Button slot="action" href="/contact" variant="secondary" size="sm" arrow>
-        Request a CV
-      </Button>
-    </SectionHeading>
+  <div class="band pt-8 md:pt-10">
+    <div class="shell">
+      <Breadcrumbs items={[{ label: "Experience" }]} />
+      <div class="mt-8 flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="label text-ink-muted">Experience · since 2021</p>
+          <h1 class="display mt-3 text-display-l">Track record</h1>
+        </div>
+        {cvPath ? (
+          <a href={cvPath} class="btn btn-primary" download>
+            Download CV
+          </a>
+        ) : (
+          <a href="/contact?topic=hiring" class="btn btn-primary">
+            CV on request
+          </a>
+        )}
+      </div>
+      <p class="mt-5 max-w-[640px] text-body-l">
+        Where I've worked, what I owned and what changed because of it — from a freelance CRM in
+        2021 to Kotlin microservices and a platform serving around two million users.
+      </p>
+    </div>
   </div>
 
-  <section class="container-site pb-16" aria-labelledby="positions-heading">
-    <h2 id="positions-heading" class="sr-only">
-      Positions
-    </h2>
-    <ol class="space-y-12 sm:space-y-16">
-      {positions.map((position) => (
-        <li class="reveal">
-          <ExperienceItem position={position} />
-        </li>
-      ))}
-    </ol>
+  <section class="band mt-10" aria-label="Track record summary">
+    <div class="shell flex flex-col">
+      <div
+        class="label grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-x-6 gap-y-1 border-t border-b border-t-ink border-b-line py-3 text-ink-muted max-[640px]:hidden"
+        aria-hidden="true"
+      >
+        <span>Years</span>
+        <span>Company</span>
+        <span>Role</span>
+        <span>Shipped</span>
+      </div>
+      <ol class="max-[640px]:border-t max-[640px]:border-ink">
+        {positions.map((p) => (
+          <li>
+            <RecordRow position={p} href={`#${p.id}`} />
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="band section-gap pt-14" aria-labelledby="positions-heading">
+    <div class="shell sheet px-[clamp(16px,5vw,64px)] py-10 md:py-14">
+      <h2
+        id="positions-heading"
+        class="display text-[clamp(28px,3vw,40px)] leading-[1.05] tracking-[-0.03em]"
+      >
+        Positions
+      </h2>
+      <ol class="mt-8 flex flex-col divide-y divide-line">
+        {positions.map((position) => (
+          <li class="py-10 first:pt-0 last:pb-0">
+            <ExperienceItem position={position} />
+          </li>
+        ))}
+      </ol>
+    </div>
   </section>
 
   {milestones.length > 0 && (
-    <section
-      class="border-border bg-surface-muted/60 border-t"
-      aria-labelledby="milestones-heading"
-    >
-      <div class="container-site section">
-        <SectionHeading
-          id="milestones-heading"
-          eyebrow="Beyond the job titles"
-          title="Education, credentials & community"
-        />
-        <div class="grid gap-5 md:grid-cols-2">
+    <section class="band section-gap" aria-labelledby="milestones-heading">
+      <div class="shell flex flex-col gap-6">
+        <SectionHeader id="milestones-heading" title="Education, credentials & community" />
+        <div class="grid gap-4 md:grid-cols-2">
           {types.map((t) => (
             <MilestoneList type={t} items={byType(t)} />
           ))}
@@ -65,9 +94,4 @@ const byType = (t: (typeof types)[number]) => milestones.filter((m) => m.data.ty
       </div>
     </section>
   )}
-  <CTASection
-    title="Want the full story?"
-    description="I'm happy to share a CV, references or walk through any of these roles in detail."
-    primaryLabel="Get in touch"
-  />
 </BaseLayout>

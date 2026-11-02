@@ -1,22 +1,16 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
-import CTASection from "@components/ui/CTASection.astro";
 import AdventuresSection from "@components/adventures/AdventuresSection.astro";
 ---
 
 <BaseLayout
   title="Adventures"
-  description="An interactive world map of the places I've visited and the ones still on the list — tap a marker for the story."
+  description="A paper globe of the countries I've visited, home in Prague and the places still on the list — drag to turn it."
 >
-  <AdventuresSection level={1} class="pt-10 pb-16 sm:pt-14">
-    <div slot="before" class="mb-8">
-      <Breadcrumbs items={[{ label: "Adventures" }]} />
+  <AdventuresSection class="pt-8 pb-16 md:pt-10 md:pb-24">
+    <div slot="before">
+      <Breadcrumbs items={[{ label: "Hobbies", href: "/hobbies" }, { label: "Adventures" }]} />
     </div>
   </AdventuresSection>
-  <CTASection
-    title="Been somewhere I should go?"
-    description="Recommendations for roads, airfields and places worth the detour are always welcome."
-    primaryLabel="Send a tip"
-  />
 </BaseLayout>

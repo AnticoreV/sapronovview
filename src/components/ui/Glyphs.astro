@@ -1,0 +1,61 @@
+---
+/**
+ * Renders a data string ("h → min", "≈ ½", "SKETCH → BUILD → SHIP → LEARN", "p95 ≈ halved")
+ * with → ← ↗ ≈ drawn as inline SVG (see Arrow / Approx). Screen readers get words: either
+ * `spoken` for the whole string (e.g. "hours to minutes"), or "to" / "approximately"
+ * in place of each glyph. Output is one inline element, so spaces survive inside flex
+ * containers such as `.chip`.
+ */
+import Approx from "@components/ui/Approx.astro";
+import Arrow from "@components/ui/Arrow.astro";
+
+interface Props {
+  text: string;
+  /** Accessible wording for the whole string; the visual string is then aria-hidden. */
+  spoken?: string;
+  weight?: "text" | "bold" | "heavy";
+  /** No screen-reader words at all (the caller hides the visual and speaks it itself). */
+  silent?: boolean;
+}
+const { text, spoken, weight = "text", silent = false } = Astro.props;
+const parts = text.split(/(→|←|↗|≈)/).filter((p) => p !== "");
+const words: Record<string, string> = silent
+  ? { "→": "", "←": "", "↗": "", "≈": "" }
+  : { "→": "to", "←": "from", "↗": "", "≈": "approximately" };
+const isGlyph = (p: string) => p in words;
+---
+
+{spoken ? (
+  <>
+    <span aria-hidden="true">
+      {parts.map((p) =>
+        p === "≈" ? (
+          <Approx weight={weight} />
+        ) : isGlyph(p) ? (
+          <Arrow weight={weight} dir={p === "←" ? "left" : p === "↗" ? "up-right" : "right"} />
+        ) : (
+          p
+        ),
+      )}
+    </span>
+    <span class="sr-only">{spoken}</span>
+  </>
+) : (
+  <span>
+    {parts.map((p) =>
+      p === "≈" ? (
+        <>
+          <Approx weight={weight} />
+          <span class="sr-only">{words[p]}</span>
+        </>
+      ) : isGlyph(p) ? (
+        <>
+          <Arrow weight={weight} dir={p === "←" ? "left" : p === "↗" ? "up-right" : "right"} />
+          {words[p] && <span class="sr-only">{words[p]}</span>}
+        </>
+      ) : (
+        p
+      ),
+    )}
+  </span>
+)}

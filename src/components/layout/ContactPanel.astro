@@ -1,0 +1,91 @@
+---
+/**
+ * The accent contact panel that closes every page (approved artboard): "Ready to
+ * ship your project.", three route cards (Hiring / Investing / Partnering), the
+ * email as a pill, Copy, LinkedIn and GitHub. Inside a page the routes open /contact
+ * with the topic preselected; on /contact itself (`level={1}`) they are emails with
+ * the subject filled in.
+ */
+import ContactRoute from "@components/contact/ContactRoute.astro";
+import CopyEmail from "@components/ui/CopyEmail.astro";
+import { siteConfig } from "@config";
+import { contactRoutes, mailtoFor } from "@data/contact";
+
+interface Props {
+  /** Heading level: 2 inside a page, 1 when the panel is the page head (/contact). */
+  level?: 1 | 2;
+  /** Section index before the label, e.g. "05" on the homepage. */
+  index?: string;
+}
+const { level = 2, index } = Astro.props;
+const Heading = level === 1 ? "h1" : "h2";
+const routeHref = (route: (typeof contactRoutes)[number]) =>
+  level === 1 ? mailtoFor(siteConfig.email, route.subject) : `/contact?topic=${route.id}`;
+---
+
+<section
+  id="contact"
+  class:list={["band pb-14", level === 1 && "pt-6"]}
+  aria-labelledby="contact-heading"
+>
+  <div class="contact-panel shell flex flex-col gap-10 rounded-lg bg-accent p-[clamp(20px,5vw,72px)] text-on-accent">
+    <div class="flex flex-col gap-3.5">
+      <span class="label">{index ? `${index} · GET IN TOUCH` : "GET IN TOUCH"}</span>
+      <Heading
+        id="contact-heading"
+        class="display text-[clamp(44px,6.4vw,96px)] leading-[0.95] tracking-[-0.045em]"
+      >
+        Ready to ship
+        <br />
+        your project.
+      </Heading>
+    </div>
+    <ul class="grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-3">
+      {contactRoutes.map((route) => (
+        <li class="flex">
+          <ContactRoute route={route} href={routeHref(route)} level={level === 1 ? 2 : 3} />
+        </li>
+      ))}
+    </ul>
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+      <a
+        href={`mailto:${siteConfig.email}`}
+        class="email-pill inline-flex min-h-[54px] max-w-full items-center rounded-full bg-surface px-5 text-[clamp(15px,1.2vw,17px)] font-bold text-accent no-underline"
+      >
+        <span class="truncate">{siteConfig.email}</span>
+      </a>
+      <CopyEmail tone="accent" />
+      {siteConfig.social.linkedin && (
+        <a
+          href={siteConfig.social.linkedin}
+          class="link-inline inline-flex min-h-11 items-center underline-offset-[6px]"
+          rel="me"
+        >
+          LinkedIn
+        </a>
+      )}
+      {siteConfig.social.github && (
+        <a
+          href={siteConfig.social.github}
+          class="link-inline inline-flex min-h-11 items-center underline-offset-[6px]"
+          rel="me"
+        >
+          GitHub
+        </a>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Focus rings switch to the on-accent colour on the accent fill. */
+  .contact-panel {
+    --focus: var(--on-accent);
+  }
+  .contact-panel a:not(.route):hover {
+    color: var(--on-accent);
+  }
+  .email-pill:hover {
+    color: var(--accent-hover) !important;
+  }
+</style>

@@ -1,114 +1,114 @@
 ---
 /**
- * "Adventures" section: heading, interactive map, legend and details panel.
+ * Adventures: the live paper globe (or, under reduced motion / without WebGL,
+ * the flat d3-geo map) with the country list beside it. The list is the control
+ * for both. Data: src/data/adventures.ts.
  *
- * Drop <AdventuresSection /> into any page. Data lives in src/data/adventures.ts.
- * Colours and sizes are exposed as CSS custom properties on the section so
- * they can be themed without touching the components.
+ * `data-globe="off"` on the section (set by GlobeStage when WebGL is missing)
+ * and `prefers-reduced-motion` both switch to the flat map and its copy.
  */
-import SectionHeading from "@components/ui/SectionHeading.astro";
-import AdventureMap from "@components/adventures/AdventureMap.astro";
 import AdventureDetails from "@components/adventures/AdventureDetails.astro";
+import AdventureMap from "@components/adventures/AdventureMap.astro";
+import GlobeStage from "@components/adventures/GlobeStage.astro";
 import MapLegend from "@components/adventures/MapLegend.astro";
 import { adventures } from "@data/adventures";
 
 interface Props {
-  id?: string;
-  title?: string;
-  description?: string;
-  eyebrow?: string;
-  /** Heading level for the section title (1 on a dedicated page). */
-  level?: 1 | 2;
-  /** Show breadcrumbs slot / extra top padding when used as a page. */
   class?: string;
 }
-const {
-  id = "adventures",
-  eyebrow = "Adventures",
-  title = "Places I've been, places I'm going",
-  description = "A map of the countries I've visited and the ones still on the list. Tap a marker for the story, or a highlighted country for everything in it.",
-  level = 2,
-  class: className,
-} = Astro.props;
+const { class: className } = Astro.props;
+const countries = new Set(
+  adventures.filter((a) => a.status === "visited").map((a) => a.countryCode),
+).size;
 ---
 
 <section
-  id={id}
-  class:list={["adventures container-site", className ?? "section reveal"]}
-  aria-labelledby={`${id}-heading`}
+  id="adventures"
+  class:list={["adventures band", className]}
+  aria-labelledby="adventures-heading"
   data-adventures
 >
-  <slot name="before" />
-  <SectionHeading
-    id={`${id}-heading`}
-    level={level}
-    eyebrow={eyebrow}
-    title={title}
-    description={description}
-  />
+  <div class="shell">
+    <slot name="before" />
+    <p class="label mt-8 text-ink-muted">Off duty · adventures</p>
+    <h1 id="adventures-heading" class="display mt-3 text-display-l">
+      {countries} countries on the map
+    </h1>
+    <p class="mt-5 max-w-[640px] text-body-l">
+      Where I've been, home in Prague, and the places still on the list.
+      <span class="copy-globe">
+        {" "}
+        Drag the globe to turn it; pick a country or a place in the list to fly there.
+      </span>
+      <span class="copy-map"> Pick a country or a place in the list to see it on the map.</span>
+    </p>
 
-  <div class="adventures__layout">
-    <div class="adventures__map card">
-      <AdventureMap locations={adventures} />
-      <div class="adventures__legend">
+    <div class="mt-10 grid items-start gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(300px,1fr)]">
+      <div class="flex flex-col gap-4 lg:sticky lg:top-24">
+        <GlobeStage />
+        <div class="adv-fallback card p-2 sm:p-3">
+          <AdventureMap />
+        </div>
         <MapLegend />
       </div>
+      <section class="places card p-6" aria-labelledby="places-heading">
+        <h2 id="places-heading" class="label text-ink-muted">
+          Countries &amp; places
+        </h2>
+        <div class="mt-5">
+          <AdventureDetails locations={adventures} headingLevel={3} />
+        </div>
+      </section>
     </div>
-    <aside class="adventures__details card" aria-label="Location details">
-      <AdventureDetails locations={adventures} headingLevel={level === 1 ? 2 : 3} />
-    </aside>
   </div>
 </section>
 
 <style>
-  .adventures {
-    /* Theme hooks — override these on the section to restyle the map. */
-    --adventure-visited: var(--accent);
-    --adventure-wishlist: var(--fg-muted);
-    --adventure-marker-size: 12px;
-    --adventure-marker-hit: 32px;
-    --adventure-water: transparent;
-    --adventure-land: var(--surface-strong);
-    --adventure-land-active: color-mix(in oklab, var(--accent) 22%, var(--surface-strong));
-    --adventure-border: var(--surface);
+  .adv-fallback,
+  .copy-map {
+    display: none;
   }
-  @media (pointer: coarse) {
-    .adventures {
-      --adventure-marker-hit: 44px;
+  .adventures[data-globe="off"] :global(.globe-stage),
+  .adventures[data-globe="off"] :global(.legend-route),
+  .adventures[data-globe="off"] .copy-globe {
+    display: none;
+  }
+  .adventures[data-globe="off"] .adv-fallback {
+    display: block;
+  }
+  .adventures[data-globe="off"] .copy-map {
+    display: inline;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .adventures :global(.globe-stage),
+    .adventures :global(.legend-route),
+    .copy-globe {
+      display: none;
+    }
+    .adv-fallback {
+      display: block;
+    }
+    .copy-map {
+      display: inline;
     }
   }
-
-  .adventures__layout {
-    display: grid;
-    gap: 1.25rem;
-    align-items: start;
-  }
-  @media (min-width: 64rem) {
-    .adventures__layout {
-      grid-template-columns: minmax(0, 1.9fr) minmax(280px, 1fr);
-    }
-  }
-
-  .adventures__map {
-    overflow: hidden;
-    padding: 0.5rem;
-  }
-  .adventures__legend {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 0.5rem 0.25rem;
-  }
-  .adventures__details {
-    padding: 1.25rem;
-    max-height: 32rem;
-    overflow-y: auto;
-  }
-  @media (min-width: 64rem) {
-    .adventures__details {
-      position: sticky;
-      top: 5.5rem;
-      max-height: calc(100vh - 6.5rem);
-    }
+  /* The list sits below the globe on phones: skip its rendering (and the latin-ext
+     font its place names need) until it comes near the viewport. */
+  .places {
+    content-visibility: auto;
+    /* Reserve height only — a two-axis size would claim 1200px of width on phones. */
+    contain-intrinsic-block-size: auto 1200px;
   }
 </style>
+
+<script>
+  /** Tell the flat map to load when the globe is switched off (no WebGL). */
+  document.addEventListener("astro:page-load", () => {
+    const section = document.querySelector<HTMLElement>("[data-adventures]");
+    if (!section || section.dataset.fallbackWatch) return;
+    section.dataset.fallbackWatch = "true";
+    new MutationObserver(() =>
+      document.dispatchEvent(new CustomEvent("adventure:fallback")),
+    ).observe(section, { attributes: true, attributeFilter: ["data-globe"] });
+  });
+</script>

@@ -12,15 +12,56 @@ export type Hobby = CollectionEntry<"hobbies">;
 
 const isProd = import.meta.env.PROD;
 
+/**
+ * Placeholders never render in production: entries flagged `placeholder: true`
+ * are dropped from every list, and any value containing `[…]` is hidden field by
+ * field (see `shown()`). `npm run dev` keeps them visible so gaps can be filled.
+ */
+export const hidePlaceholders = isProd;
+
+const PLACEHOLDER = /\[[^\]\n]+\]/;
+
+/** True when a value still contains a `[placeholder]`. */
+export function isPlaceholder(value: string | undefined | null): boolean {
+  return typeof value === "string" && PLACEHOLDER.test(value);
+}
+
+/** The value, or undefined when it is a placeholder in a production build. */
+export function shown<T extends string | undefined | null>(value: T): T | undefined {
+  if (value == null || value === "") return undefined;
+  return hidePlaceholders && isPlaceholder(value) ? undefined : value;
+}
+
+/** Only the real values of a list (placeholders dropped in production). */
+export function shownAll<T>(items: readonly T[], text: (item: T) => string = String): T[] {
+  return hidePlaceholders ? items.filter((i) => !isPlaceholder(text(i))) : [...items];
+}
+
+const visible = (data: { placeholder?: boolean; draft?: boolean }) =>
+  !(isProd && (data.draft || (hidePlaceholders && data.placeholder)));
+
 /* Projects ---------------------------------------------------------------- */
 
 export async function getProjects(): Promise<Project[]> {
-  const all = await getCollection("projects", ({ data }) => !(isProd && data.draft));
+  const all = await getCollection("projects", ({ data }) => visible(data));
   return all.sort((a, b) => {
     if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
     if (a.data.order !== b.data.order) return a.data.order - b.data.order;
     return b.data.date.valueOf() - a.data.date.valueOf();
   });
+}
+
+/**
+ * Projects still being written up (placeholder: true) that have a public GitHub
+ * repository. /projects lists them as compact rows built only from their real
+ * fields (title, description, stack, repository links) — never as case studies.
+ */
+export async function getCodeProjects(): Promise<Project[]> {
+  const all = await getCollection(
+    "projects",
+    ({ data }) => data.placeholder && !data.draft && Boolean(data.github),
+  );
+  return all.sort((a, b) => a.data.order - b.data.order);
 }
 
 export async function getFeaturedProjects(limit = 4): Promise<Project[]> {
@@ -31,8 +72,13 @@ export async function getFeaturedProjects(limit = 4): Promise<Project[]> {
 /* Writing ----------------------------------------------------------------- */
 
 export async function getPosts(): Promise<Post[]> {
-  const all = await getCollection("writing", ({ data }) => !(isProd && data.draft));
+  const all = await getCollection("writing", ({ data }) => visible(data));
   return all.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+}
+
+/** True once at least one post is published (drives nav, RSS link, sitemap, noindex). */
+export async function hasWriting(): Promise<boolean> {
+  return (await getPosts()).length > 0;
 }
 
 export async function getAllTags(posts?: Post[]): Promise<Array<{ tag: string; count: number }>> {
@@ -71,7 +117,7 @@ export function getAdjacentPosts(post: Post, all: Post[]): { prev?: Post; next?:
 /* Experience -------------------------------------------------------------- */
 
 export async function getPositions(): Promise<Position[]> {
-  const all = await getCollection("experience");
+  const all = await getCollection("experience", ({ data }) => visible(data));
   return all.sort((a, b) => {
     const aEnd = a.data.endDate?.valueOf() ?? Infinity;
     const bEnd = b.data.endDate?.valueOf() ?? Infinity;
@@ -81,7 +127,7 @@ export async function getPositions(): Promise<Position[]> {
 }
 
 export async function getMilestones(): Promise<Milestone[]> {
-  const all = await getCollection("milestones");
+  const all = await getCollection("milestones", ({ data }) => visible(data));
   return all.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 }
 
@@ -104,17 +150,20 @@ export const categoryLabels: Record<Project["data"]["category"], string> = {
   hobby: "Hobby project",
 };
 
-export const statusLabels: Record<
-  Project["data"]["status"],
-  { label: string; tone: "green" | "amber" | "gray" | "accent" }
-> = {
-  active: { label: "Active", tone: "green" },
-  "in-progress": { label: "In progress", tone: "green" },
-  research: { label: "Research", tone: "accent" },
-  completed: { label: "Completed", tone: "gray" },
-  paused: { label: "Paused", tone: "amber" },
-  archived: { label: "Archived", tone: "gray" },
-};
+export type StatusTone = "ok" | "caution" | "off";
+
+/** Project status as a pill: word + tone (ok = mint, caution = butter, off = neutral). */
+export const statusLabels: Record<Project["data"]["status"], { label: string; tone: StatusTone }> =
+  {
+    active: { label: "Live", tone: "ok" },
+    pilot: { label: "Pilot", tone: "ok" },
+    "in-progress": { label: "In progress", tone: "caution" },
+    validating: { label: "Validating", tone: "caution" },
+    research: { label: "Research", tone: "caution" },
+    completed: { label: "Completed", tone: "off" },
+    paused: { label: "Paused", tone: "off" },
+    archived: { label: "Archived", tone: "off" },
+  };
 
 export const employmentLabels: Record<Position["data"]["employmentType"], string> = {
   "full-time": "Full-time",
@@ -147,3 +196,18 @@ export const hobbyCategoryLabels: Record<Hobby["data"]["category"], string> = {
   art: "Art",
   experiments: "Side experiments",
 };
+
+/* Track record helpers ------------------------------------------------------ */
+
+/** "CCA Group a.s." → "CCA Group" (legal suffixes are noise in a track record). */
+export function shortCompany(company: string): string {
+  return company.replace(/,?\s+(s\.\s?r\.\s?o\.|a\.\s?s\.|GmbH|Ltd\.?|Inc\.?)$/i, "").trim();
+}
+
+/** "2022–24", "2026" — the YEARS cell of a track-record row. */
+export function yearsLabel(start: Date, end?: Date): string {
+  const a = start.getUTCFullYear();
+  const b = (end ?? new Date()).getUTCFullYear();
+  if (a === b) return String(a);
+  return `${a}–${String(b).slice(-2)}`;
+}

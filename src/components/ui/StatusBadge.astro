@@ -1,0 +1,16 @@
+---
+/**
+ * Project status as a pill (PILOT, VALIDATING, COMPLETED…): dot + word, never colour
+ * alone. ok = ok-soft / ok-ink, caution = butter fill with ink, off = neutral.
+ */
+import type { StatusTone } from "@lib/content";
+
+interface Props {
+  label: string;
+  tone: StatusTone;
+  class?: string;
+}
+const { label, tone, class: className } = Astro.props;
+---
+
+<span class:list={["status-pill", `status-pill--${tone}`, className]}>{label}</span>

@@ -1,0 +1,39 @@
+---
+/**
+ * Arrow glyph (→ ← ↗) as inline SVG. Neither Schibsted Grotesk nor IBM Plex Mono ships
+ * U+2190–2197 in its Latin subsets, so the text arrow fell back to a thin system glyph.
+ * Sized in em, drawn in currentColor, decorative (aria-hidden). `weight` matches the
+ * surrounding text: text (400–500), bold (600–700), heavy (800 numerals).
+ */
+interface Props {
+  dir?: "right" | "left" | "up-right";
+  weight?: "text" | "bold" | "heavy";
+  class?: string;
+}
+const { dir = "right", weight = "text", class: className } = Astro.props;
+const stroke = { text: 1.9, bold: 2.4, heavy: 3 }[weight];
+---
+
+{dir === "up-right" ? (
+  <svg
+    class:list={["glyph glyph-arrow glyph-arrow--up-right", className]}
+    viewBox="0 0 14 14"
+    stroke-width={stroke * 0.8}
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path d="M2.5 11.5 11.5 2.5M4.5 2.5h7v7" />
+  </svg>
+) : (
+  <svg
+    class:list={["glyph glyph-arrow", className]}
+    viewBox="0 0 20 12"
+    stroke-width={stroke}
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path
+      d={dir === "left" ? "M18.5 6H2M7.5 1.5 2 6l5.5 4.5" : "M1.5 6H18M12.5 1.5 18 6l-5.5 4.5"}
+    />
+  </svg>
+)}

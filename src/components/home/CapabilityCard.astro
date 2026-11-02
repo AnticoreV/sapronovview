@@ -1,0 +1,93 @@
+---
+/**
+ * CapabilityCard — one of the four "What I can do" cards with its small isometric
+ * clay icon from the artboard. The spotlight card (Automate) sits on accent-soft with
+ * an accent border (website.md).
+ */
+import type { CapabilityId } from "@data/home";
+
+interface Props {
+  id: CapabilityId;
+  code: string;
+  title: string;
+  text: string;
+  spotlight?: boolean;
+}
+const { id, code, title, text, spotlight = false } = Astro.props;
+---
+
+<li
+  class:list={[
+    "flex flex-col gap-3.5 rounded-md p-7",
+    spotlight ? "border-2 border-accent bg-accent-soft" : "card",
+  ]}
+>
+  {id === "build" && (
+    <svg width="72" height="64" viewBox="0 0 72 64" aria-hidden="true">
+      <path d="M36 30 52 39 36 48 20 39Z" fill="#E9EDF2" />
+      <path d="M20 39 36 48v13L20 52Z" fill="#D3D9E1" />
+      <path d="M52 39 36 48v13l16-9Z" fill="#BAC2CD" />
+      <path d="M36 12 52 21 36 30 20 21Z" fill="#3D63FF" />
+      <path d="M20 21 36 30v13L20 34Z" fill="#2F51E0" />
+      <path d="M52 21 36 30v13l16-9Z" fill="#2443B8" />
+    </svg>
+  )}
+  {id === "direct" && (
+    <svg width="72" height="64" viewBox="0 0 72 64" aria-hidden="true">
+      <path d="M14 40 36 28 58 40" fill="none" stroke="#A9B1BC" stroke-width="2" />
+      <path d="M36 28v-6" stroke="#A9B1BC" stroke-width="2" />
+      <path d="M36 8 46 13.5 36 19 26 13.5Z" fill="#3D63FF" />
+      <path d="M26 13.5 36 19v8l-10-5.5Z" fill="#2F51E0" />
+      <path d="M46 13.5 36 19v8l10-5.5Z" fill="#2443B8" />
+      <path d="M14 36 23 41 14 46 5 41Z" fill="#E9EDF2" />
+      <path d="M5 41 14 46v8l-9-5Z" fill="#D3D9E1" />
+      <path d="M23 41 14 46v8l9-5Z" fill="#BAC2CD" />
+      <path d="M58 36 67 41 58 46 49 41Z" fill="#E9EDF2" />
+      <path d="M49 41 58 46v8l-9-5Z" fill="#D3D9E1" />
+      <path d="M67 41 58 46v8l9-5Z" fill="#BAC2CD" />
+      <path d="M36 40 45 45 36 50 27 45Z" fill="#F4CC52" />
+      <path d="M27 45 36 50v8l-9-5Z" fill="#DDB441" />
+      <path d="M45 45 36 50v8l9-5Z" fill="#C39E34" />
+    </svg>
+  )}
+  {id === "automate" && (
+    <svg width="72" height="64" viewBox="0 0 72 64" aria-hidden="true">
+      <ellipse cx="22" cy="10" rx="9" ry="3.2" fill="#C7CDD5" />
+      <ellipse cx="50" cy="10" rx="9" ry="3.2" fill="#C7CDD5" />
+      <path d="M22 10h28" stroke="#A9B1BC" stroke-width="2.4" />
+      <path d="M30 11 36 8 42 11 36 14Z" fill="#EE8597" />
+      <path d="M30 15 26 30M42 15 46 30" stroke="#A9B1BC" stroke-width="1.6" />
+      <path d="M36 26 52 35 36 44 20 35Z" fill="#E9EDF2" />
+      <path d="M20 35 36 44v14L20 49Z" fill="#D3D9E1" />
+      <path d="M52 35 36 44v14l16-9Z" fill="#BAC2CD" />
+      <circle cx="44" cy="49" r="1.8" fill="#59C990" />
+    </svg>
+  )}
+  {id === "ship" && (
+    <svg width="72" height="64" viewBox="0 0 72 64" aria-hidden="true">
+      <path d="M36 34 66 50 36 66 6 50Z" fill="#E9EDF2" />
+      <path d="M36 14 50 22 36 30 22 22Z" fill="#59C990" />
+      <path d="M22 22 36 30v14L22 36Z" fill="#D3D9E1" />
+      <path d="M50 22 36 30v14l14-8Z" fill="#BAC2CD" />
+      <circle cx="43" cy="35" r="1.8" fill="#1C7A4A" />
+      <path
+        d="M56 30v-14M51 21l5-5 5 5"
+        fill="none"
+        stroke="var(--accent)"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  )}
+  <span
+    class:list={[
+      "mono text-[12px] font-semibold tracking-[0.06em]",
+      spotlight ? "text-accent" : "text-ink-muted",
+    ]}
+  >
+    {code}
+  </span>
+  <h3 class="text-[24px] leading-[1.15] font-bold tracking-[-0.02em]">{title}</h3>
+  <p class="text-[16px] text-ink-muted">{text}</p>
+</li>

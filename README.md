@@ -1,345 +1,431 @@
-# sapronovview — personal website
+# sapronovview — ivansapronov.com
 
-The personal site of **Ivan Sapronov**: part portfolio, part résumé, part technical journal,
-part logbook for flying, riding and travelling.
+The personal site of **Ivan Sapronov**, backend & fullstack engineer and founder in Prague:
+what he builds (Ownira, client systems), what he can do, his track record, writing and — as
+an addition — the hobbies.
 
-Built with [Astro](https://astro.build), TypeScript and Tailwind CSS v4. Fully static,
-almost no client-side JavaScript, self-hosted fonts, content collections for everything
-structured.
+Built with [Astro 7](https://astro.build) (static), TypeScript, Tailwind CSS v4 and content
+collections. Design: **v2 · R2-C Runtime** with the hero **V6 · Blueprint** — a calm, light
+Swiss grid around one live isometric drawing of how software gets made (idea → validate →
+architecture → frontend · backend · services → tests → review → CI/CD → deploy → observe →
+agent loop). _Every number on this page is real._
 
 ## Contents
 
+- [Design source](#design-source)
 - [Quick start](#quick-start)
 - [Scripts](#scripts)
 - [Project structure](#project-structure)
-- [Updating personal details](#updating-personal-details)
-- [Adding a project](#adding-a-project)
-- [Adding an article](#adding-an-article)
-- [Updating experience](#updating-experience)
-- [Hobbies, Now and About](#hobbies-now-and-about)
-- [Adding images](#adding-images)
+- [Design system in code](#design-system-in-code)
+- [Proof numbers](#proof-numbers)
+- [3D: hero blueprint and globe](#3d-hero-blueprint-and-globe)
+- [Content](#content)
 - [Placeholders](#placeholders)
-- [Changing theme colours and fonts](#changing-theme-colours-and-fonts)
+- [Still to fill](#still-to-fill)
 - [Contact form](#contact-form)
 - [SEO](#seo)
+- [Accessibility and performance](#accessibility-and-performance)
 - [Deployment](#deployment)
 - [Tech stack](#tech-stack)
 
+## Design source
+
+| What                                   | Where                                                                                                                                                                                                                     |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Design system (brand book, components) | [Ivan Sapronov Design System v2](https://claude.ai/artifact/4JaRi2cConboCJrfRywX2j) — Runtime, approved with the site 2026-10-23                                                                                          |
+| Approved homepage (R2-C · Runtime)     | [Website canvas](https://claude.ai/artifact/4Vkjua4E3sE3gDtAZohcuk), pages "R2-C · Runtime" (whole homepage) and "V6 · Blueprint" (header + hero)                                                                         |
+| Build spec, tokens, 3D references      | `../claude-design-system/` — `website.md` (spec + approved copy), `components.md`, `tokens.css` / `tokens.json`, `screens/RuntimeDesktop.dc.html` + `screens/HeroV6.dc.html`, `3d/r4v6.html` (hero), `3d/d2.html` (globe) |
+| v1 (D4 · Pre-flight, cockpit panel)    | branch `redesign/20261022` (PR #1) — replaced by v2; nothing of its aviation language is left                                                                                                                             |
+| Old look (signal orange)               | git history before branch `redesign/20261022`                                                                                                                                                                             |
+
+The canvas wins over the design system where they differ. Known differences:
+
+- **Secondary buttons and header pills** use the 1px `line` border from the artboard; the
+  design system lists `line-strong` for secondary buttons. Text buttons are identified by
+  their label (WCAG 1.4.11 does not require the boundary), so the approved look is kept.
+  **Form fields** do use `line-strong` (their boundary is required).
+- **Spotlight capability card** (Automate) is `accent-soft` + 2px `accent` border as
+  `website.md` says (the artboard shows it on white).
+- **Code blocks** sit on `#10141A` with `github-dark-dimmed` in both themes
+  (`components.md`); `website.md` also mentions a github-light pair, which would be
+  unreadable on that background.
+- The artboard's variant chip ("V6 · Blueprint") above the hero is a canvas label and is not
+  rendered on the site.
+
 ## Quick start
 
-Requires **Node.js 22.12+** (see `.nvmrc`).
+Requires **Node.js 22.12+** (see `.nvmrc`). The repo uses **npm**.
 
 ```bash
-npm install
+npm ci
 npm run dev        # http://localhost:4321
 ```
 
 ## Scripts
 
-| Command                | What it does                                              |
-| ---------------------- | --------------------------------------------------------- |
-| `npm run dev`          | Start the dev server with hot reload                      |
-| `npm run build`        | Production build to `dist/`                               |
-| `npm run preview`      | Serve the production build locally                        |
-| `npm run clean`        | Delete `dist/` and Astro's content cache (see note below) |
-| `npm run check`        | Type-check `.astro` and `.ts` files (`astro check`)       |
-| `npm run lint`         | ESLint (TypeScript + Astro rules)                         |
-| `npm run format`       | Prettier (with Astro and Tailwind class-sorting plugins)  |
-| `npm run format:check` | Verify formatting without writing                         |
+| Command            | What it does                                                                           |
+| ------------------ | -------------------------------------------------------------------------------------- |
+| `npm run dev`      | Dev server (placeholders stay visible, marked `[PLACEHOLDER]`)                         |
+| `npm run build`    | Production build to `dist/` (placeholders hidden)                                      |
+| `npm run preview`  | Serve the production build                                                             |
+| `npm run check`    | Type-check `.astro` and `.ts` (`astro check`)                                          |
+| `npm run lint`     | ESLint                                                                                 |
+| `npm run format`   | Prettier (Astro + Tailwind class sorting); `format:check` verifies                     |
+| `npm run test:e2e` | Build, then Playwright smoke tests (desktop 1440 + phone 375)                          |
+| `npm run posters`  | Re-render the 3D posters from the live scenes (see [3D](#3d-hero-blueprint-and-globe)) |
+| `npm run clean`    | Delete `dist/` and Astro's content cache                                               |
 
-Before pushing, run `npm run check && npm run lint && npm run build`.
-
-> **Deleted a content file but it still shows up?** Astro caches the content collections in
-> `node_modules/.astro`. Run `npm run clean` and rebuild.
+Before pushing: `npm run check && npm run lint && npm run format:check && npm run build`.
 
 ## Project structure
 
 ```text
 src/
-  config.ts               ← name, role, email, socials, navigation, tech stack
-  content.config.ts       ← content collection schemas (zod)
-  content/
-    projects/             ← one .md per project (case studies)
-    writing/              ← one .md/.mdx per article
-    experience/           ← one .md per position
-    milestones/           ← education / certifications / talks / awards / community (.yaml)
-    hobbies/              ← one .md per hobby
-    now/now.md            ← the /now page
-  data/about.ts           ← philosophy, values, facts for /about
+  config.ts                 ← name, title, hero copy, email, availability, socials, nav, stack
+  content.config.ts         ← collection schemas (zod)
+  content/                  ← projects, writing, experience, milestones, hobbies, now
+  data/
+    readouts.ts             ← the proof numbers (homepage, case studies, chips, OG card)
+    home.ts                 ← capabilities, contents list, homepage case rows, "worked with" line
+    contact.ts              ← contact routes (hiring / investing / partnering) + topics
+    about.ts                ← philosophy, values, "what I enjoy", facts
+    adventures.ts           ← visited / wishlist places + home base (globe and map)
+  scripts/
+    hero3d.ts               ← hero "V6 · Blueprint" (three.js + fat lines, lazy)
+    globe3d.ts              ← adventures paper globe (three.js, lazy)
   components/
-    layout/               ← Header, Footer
-    seo/                  ← SEO (meta tags), JsonLd
-    ui/                   ← Button, Container, SectionHeading, TechBadge, StatusPill,
-                            SocialLinks, ThemeToggle, Breadcrumbs, CTASection,
-                            PlaceholderImage, PlaceholderBadge, FormattedDate
-    home/                 ← homepage sections
-    projects/             ← ProjectCard, ProjectFilters
-    experience/           ← ExperienceItem, MilestoneList
-    writing/              ← ArticleCard, TagList
-    hobbies/              ← HobbyCard
-  layouts/
-    BaseLayout.astro      ← <head>, header, footer, theme bootstrap, view transitions
-    ProjectLayout.astro   ← case-study page
-    ArticleLayout.astro   ← article page with prev/next + related
-  lib/
-    content.ts            ← typed queries + label maps for collections
-    icons.ts              ← icon registry (lucide names usable from frontmatter)
-    utils.ts              ← dates, reading time, helpers
-  pages/                  ← routes (file-based)
-  styles/global.css       ← design tokens + Tailwind theme
-  lib/brand-images.ts     ← build-time OG image + touch icon generation
-public/
-  images/                 ← static images (unoptimised assets)
-  robots.txt, favicon.svg, site.webmanifest
+    layout/                 ← SiteHeader, Footer, ContactPanel (accent "Ready to ship your project.")
+    home/                   ← Hero, HeroStage, Proof, WhoIAm, Products, Capabilities, CapabilityCard,
+                              Cases, TrackRecord, OffDuty
+    profile/                ← ProfileCard (portrait switch on /about), ContentsList
+    projects/               ← ProductModule, ProjectRow, CodeRow, ProjectFilters
+    experience/             ← RecordRow, ExperienceItem, MilestoneList
+    contact/                ← ContactRoute, ContactForm
+    adventures/             ← GlobeStage, AdventureMap (SVG fallback), AdventureDetails, MapLegend
+    ui/                     ← StatusPill, StatusBadge, ThemeToggle, ProofNumber, SectionHeader,
+                              ThemePicture, LogoMark, CopyEmail, …
+  layouts/                  ← BaseLayout, ProjectLayout + ArticleLayout (Sheets)
+  assets/                   ← portraits, hero + globe posters (optimised by <Picture>)
+  lib/                      ← content queries, CV check, placeholder helpers, schema, OG image
+  styles/global.css         ← design tokens + Tailwind theme + component classes
+scripts/                    ← render-posters.mjs, serve-dist.mjs (tests)
+tests/e2e/                  ← Playwright smoke tests
 ```
 
-Every folder under `src/content/` contains a `_template.*` file. Files starting with an
-underscore are ignored by the build — copy one, rename it, fill it in.
+Component names follow `components.md`: SiteHeader (was HeaderStrip), StatusPill
+(Annunciator), ProfileCard (CrewCard), ContentsList (Checklist), ProductModule
+(InstrumentModule), CapabilityCard (SystemToggle), ProofNumber (Readout), RecordRow
+(LogbookRow), Sheet (Kneeboard: `.sheet` + `.prose-sheet`), ContactPanel (the v1 night
+contact block). The v1 instrument panel (`panel3d.ts`, `PanelStage.astro`), callsign / base
+config, annunciator, checklist ticking and every aviation label are gone.
 
-## Updating personal details
+## Design system in code
 
-Edit **`src/config.ts`**. It holds:
+- **Tokens** live in `src/styles/global.css`, ported 1:1 from `tokens.css` / `tokens.json`:
+  `:root` = light, `.dark` = dark, `@theme inline` maps them to utilities (`bg-surface`,
+  `text-ink-muted`, `border-line`, `bg-accent`, `text-on-accent`, `shadow-pop`, …) and the
+  type scale (`text-display-xl`, `text-display-l`, `text-display-m`, `text-numeral`,
+  `text-heading`, `text-title`, `text-body-l`, …).
+- **Colour means something:** `accent` (deploy blue) = what you can act on (primary buttons,
+  links, focus, the contact panel); `ok-ink` / `ok-soft` = healthy, open, in pilot;
+  `caution` = a butter status fill; `error-ink` = errors only. `clay-*` colours live only in
+  the 3D, the capability icons and the hero legend.
+- **Theme:** light by default; the header toggle (sun / moon, `aria-pressed`) stores the
+  choice in `localStorage` (try/catch); without a stored choice the OS preference wins. The
+  inline script in `BaseLayout` applies it before paint (no flash).
+- **Fonts:** Schibsted Grotesk (variable, wght 400–900) and IBM Plex Mono (400 / 500 / 600),
+  self-hosted from `@fontsource-variable/schibsted-grotesk` and `@fontsource/ibm-plex-mono`
+  through Astro's `fonts` config. Each is split into a **latin** family (preloaded — for the
+  mono only the 500 labels) and a **latin-ext** family (Czech diacritics, loaded on demand,
+  carries the metric-matched fallback); `--font-sans` / `--font-mono` chain them.
+- **Surfaces:** `.card` (surface + 1px line, radius 12), `.lift` (hover: −2px + shadow-pop),
+  `.sheet` + `.prose-sheet` (long reading, 68ch), `.section-head` (1px ink rule, mono index,
+  display-l title, tag), `.btn-primary` / `.btn-secondary` / `.btn-ink`, `.icon-btn`,
+  `.link-more` ("ALL PROJECTS →"), `.chip`, `.status-pill`, `.label`, `.meta`.
+- **Motion:** CSS + small vanilla scripts. Sections marked `data-reveal` rise 12px and fade
+  in once (600ms, IntersectionObserver), proof numbers count up once, cards lift on hover.
+  Reveals only run when the head script sets `html.motion` (JS on, no reduced motion), so
+  without JS or under `prefers-reduced-motion` everything is simply there.
+- **Glyphs:** neither font ships → ← ↗ ≈ in its Latin subsets, so `Arrow` / `Approx`
+  (`src/components/ui/`) draw them as em-sized `currentColor` SVGs with a stroke per text
+  weight, and `Glyphs` renders data strings ("h → min", "≈ ½", chips, the hero legend) with
+  them. Screen readers get words: a readout's `spoken` / `chipSpoken` ("hours to minutes",
+  "approximately half") or "to" / "approximately" per glyph; link arrows are `aria-hidden`.
+  Use `<Arrow />` instead of typing "→" in markup.
+- **Scoped styles and utilities:** Astro's scoped `<style>` is unlayered and beats Tailwind's
+  layered utilities, so components never set `display` in scoped CSS for elements that take
+  a `class` from outside (e.g. `StatusPill` gets `inline-flex` as a utility so
+  `max-[520px]:hidden` works). Don't put `@layer` in component styles: the layer order would
+  then be decided by whichever stylesheet comes first.
 
-- `name`, `title`, `description`, `location`, `email`
-- `availability` — the status pill in the hero (`open` / `limited` / `closed`)
-- `currentFocus` — one line shown on the homepage
-- `social` — GitHub, LinkedIn, X, Instagram, Telegram, YouTube (empty string hides a link)
-- `navigation` — header/footer links
-- `techStack` — the "Technologies I reach for" section
+## Proof numbers
 
-Then:
+`src/data/readouts.ts` is the single source for every number: the four ProofNumbers under
+the hero, the ProofNumbers on case studies, the metric chips on the homepage case rows
+(`chip`) and the OG card. Each readout has a `value`, a `label`, a `source` (the employer /
+client from the track record) and a `detail` sentence. Rules:
 
-1. Set `site` in **`astro.config.mjs`** to your production URL (used for canonical URLs,
-   sitemap, RSS and Open Graph).
-2. Update the `Sitemap:` line in `public/robots.txt` to match.
-3. The share image (`/images/og-default.png`) and touch icon (`/apple-touch-icon.png`) are
-   generated at build time from `siteConfig` by `src/lib/brand-images.ts`. To use your own
-   artwork, delete `src/pages/images/og-default.png.ts` / `src/pages/apple-touch-icon.png.ts`
-   and put static files with the same paths in `public/`.
-4. Replace `public/favicon.svg`.
-5. Rewrite the hero paragraph in `src/components/home/Hero.astro` and the intro copy in
-   `src/components/home/Intro.astro` and `src/pages/about.astro` in your own words.
+- Only numbers that are in `src/content/experience/` — never a new one.
+- `count` (optional) makes the number count up (`prefix` + 0→`to` + `suffix`).
+- `project` links the number to a case study (`/projects/<slug>`).
+- `spoken` / `chipSpoken` say the value in words for screen readers when the symbols don't
+  read well (`h → min` → "hours to minutes").
 
-## Adding a project
+## 3D: hero blueprint and globe
 
-1. Copy `src/content/projects/_template.md` → `src/content/projects/my-project.md`
-   (the filename becomes the URL: `/projects/my-project`).
-2. Fill in the frontmatter:
+- **Hero** (`src/scripts/hero3d.ts`, port of `3d/r4v6.html`, three r184 + `Line2` /
+  `LineGeometry` / `LineMaterial`) — an isometric technical drawing that builds itself in a
+  deterministic 14 s loop: idea sketches (two struck out at the validation gate), the
+  architecture drawn stroke by stroke and filled, test stamps, a rose review mark that erases
+  one link and redraws it through a queue, marching CI/CD dashes, deployed blocks that
+  extrude, a sparkline, and the rose agent orb flying back to sketch the next idea. Cursor →
+  ±10° turn / ±3° tilt (lerped, device tilt ignored). Light / dark palettes from the scene,
+  rebuilt when the theme changes; callout labels are drawn after the self-hosted IBM Plex
+  Mono is ready (no Google Fonts request); `LineMaterial` resolution and width follow the
+  stage size. The live scene starts on the poster's frame (t = 12.85 s, the finished
+  drawing), holds it 1.6 s, then loops. On stages narrower than 600px (phones) the callout
+  labels are drawn 1.8× larger (≈ 9px text at 375 instead of 5) and only IDEA, ARCHITECTURE,
+  TESTS, DEPLOY and the AGENT LOOP tag are shown, so nothing collides.
+- **Globe** (`src/scripts/globe3d.ts`, port of `3d/d2.html`) — paper globe re-skinned to v2:
+  clay-white plate, visited countries in ink, home (Czechia) in accent blue, wishlist
+  countries with a dashed accent outline, accent arcs from Prague. Drag to rotate with
+  inertia; hover shows the country name; clicking a country with places opens its card; the
+  country list is the keyboard / screen-reader equivalent.
+- **Loading rules** (`HeroStage.astro`, `GlobeStage.astro`): the poster is the LCP image and
+  the fallback. `three@0.184.0` is imported dynamically, only on `/` and `/adventures`, only
+  when the stage is visible — on idle on desktop with a mouse, on the first scroll / touch /
+  key on phones. WebGL is probed only at that moment. DPR ≤ 2 (≤ 1.5 on phones); the hero
+  pauses offscreen and in hidden tabs, the globe renders on demand; both dispose on
+  `astro:before-swap`.
+- **No WebGL or reduced motion:** the hero stays on its poster; `/adventures` shows the flat
+  d3-geo map instead of the globe. three.js is never downloaded in either case.
+- **Posters** (`src/assets/hero/blueprint-{light,dark}.png`,
+  `src/assets/hero/blueprint-small-{light,dark}.png`, `src/assets/globe/globe-{light,dark}.png`)
+  are rendered from the same scene code at the real stage size — 1440 viewport at 2×, and the
+  phone hero at a 375px stage at 3× (with the phone labels):
 
-   ```yaml
-   title: "My project"
-   description: "One sentence, max 220 characters."
-   date: 2026-03-01 # used for the year label and ordering
-   featured: true # show on the homepage (max 4, ordered by `order`)
-   status: in-progress # active | in-progress | research | completed | paused | archived
-   category: professional # professional | open-source | personal | experiment | hobby
-   technologies: ["Java", "Spring Boot", "PostgreSQL"]
-   cover: ../../assets/images/projects/my-project.jpg # optional, optimised automatically
-   coverAlt: "Dashboard screenshot"
-   github: https://github.com/you/my-project # optional
-   website: https://my-project.com # optional
-   role: "Backend engineer"
-   organization: "Acme"
-   timeframe: "2025 — 2026"
-   screenshots: # optional
-     - src: ../../assets/images/projects/my-project-1.jpg
-       alt: "Settings screen"
-       caption: "The settings screen"
-   order: 10
-   placeholder: false
-   draft: false # drafts are hidden in production builds
-   ```
+  ```bash
+  npm run build && npm run preview -- --host 127.0.0.1 --port 4321   # in another terminal
+  npm run posters                                                   # BASE_URL=… to override
+  npm run build
+  ```
 
-3. Write the case study in the body using `##` headings — Overview, Problem, Context,
-   My role, Goals, Technical approach, Architecture, Challenges, Decisions & trade-offs,
-   Results, Lessons learned. The headings become the "On this page" table of contents.
+  `ThemePicture` serves the matching light / dark poster (and the phone render below 600px)
+  as AVIF / WebP. Its inline script right after `</picture>` points the dark sources at the
+  stored theme before first paint, so a returning visitor whose stored theme differs from
+  the OS never sees the other poster (the browser's speculative fetch of the OS-theme file
+  may still happen in that case).
 
-Schema: `src/content.config.ts` → `projects`.
+## Content
 
-## Adding an article
-
-1. Copy `src/content/writing/_template.md` → `src/content/writing/my-post.md`
-   (URL: `/writing/my-post`). `.mdx` works too if you want components inside prose.
-2. Frontmatter:
-
-   ```yaml
-   title: "Post title"
-   description: "Used in listings, meta tags and RSS."
-   pubDate: 2026-03-01
-   updatedDate: 2026-03-10 # optional
-   tags: ["java", "spring"] # tag pages are generated automatically
-   cover: ../../assets/images/writing/my-post.jpg # optional
-   coverAlt: "…"
-   featured: false # featured posts appear at the top of /writing
-   draft: false
-   placeholder: false
-   ```
-
-3. Reading time, previous/next navigation, related posts (by shared tags), the RSS feed and
-   BlogPosting JSON-LD are all generated for you.
-
-## Updating experience
-
-- **Positions:** one file per role in `src/content/experience/`. Copy `_template.md`.
-  Omit `endDate` for your current role. `achievements` render as bullet points — favour
-  measurable impact. Set `highlight: true` to show the role on the homepage.
-- **Education, certifications, speaking, awards, community:** one YAML file per item in
-  `src/content/milestones/`. Set `type:` to `education`, `certification`, `speaking`,
-  `award` or `community`.
-
-## Hobbies, Now and About
-
-- **Hobbies:** `src/content/hobbies/*.md`. Each has a category, an icon name (see
-  `src/lib/icons.ts` to add more lucide icons), images, favourites, stats, related projects
-  and links. The body is free-form Markdown.
-- **Now:** `src/content/now/now.md`. Update `updated:` every time you edit it.
-- **About:** copy lives in `src/pages/about.astro`; the philosophy, values, facts and
-  interests lists live in `src/data/about.ts`.
-
-## Adventures map
-
-`/adventures` (`src/pages/adventures.astro` + `src/components/adventures/`) is an interactive
-world map of places visited and places on the wish list. Country outlines are generated at
-build time from the `world-atlas` dataset (simplified with `topojson-simplify`, projected with
-`d3-geo`), so no map library, tiles or API keys are shipped to the browser; the only client
-code is a ~2 KB script for selection and zoom. The homepage shows a lightweight teaser that
-lazy-loads a static SVG snapshot (`/images/adventures-map.svg`, generated by
-`src/pages/images/adventures-map.svg.ts`) and links to the page.
-
-**Add a location:** append an object to `adventures` in `src/data/adventures.ts`:
-
-```ts
-{
-  id: "lisbon",                 // unique, URL-safe; deep link is /#adventure-lisbon
-  country: "Portugal",
-  countryCode: "PT",            // ISO alpha-2; must exist in src/data/country-ids.ts
-  city: "Lisbon",
-  coordinates: { lat: 38.7223, lng: -9.1393 },
-  status: "visited",            // or "wishlist"
-  visitedAt: "2025",            // visited only
-  description: "…",             // visited only
-  // reason: "…", priority: "bucket-list" | "someday"   // wishlist only
-  image: "/images/adventures/lisbon.jpg",  // optional, 16:10 works best
-  href: "/writing/lisbon-trip",             // optional
-}
-```
-
-If the country is not yet in `src/data/country-ids.ts`, add its ISO numeric id there so the
-outline is highlighted and clickable (the build prints a warning otherwise). Extra zoom
-presets live in `mapViews` in the same data file.
-
-**Use it on another page:** `import AdventuresSection from "@components/adventures/AdventuresSection.astro"`
-and render `<AdventuresSection />` (props: `id`, `eyebrow`, `title`, `description`, `level`).
-`<AdventuresTeaser />` is the small homepage card.
-
-**Theme it:** override the custom properties on `.adventures` in `AdventuresSection.astro`
-(`--adventure-visited`, `--adventure-wishlist`, `--adventure-marker-size`, `--adventure-land`, …).
-
-## Adding images
-
-Two options:
-
-1. **Optimised (recommended).** Put files under `src/assets/images/<section>/` and reference
-   them from frontmatter (`cover:`, `images[].src`, `screenshots[].src`) using a relative
-   path such as `../../assets/images/projects/foo.jpg`. Astro resizes them, generates
-   `srcset`, sets width/height (no layout shift) and lazy-loads below the fold.
-2. **Static.** Put files under `public/images/...` and reference them by URL
-   (`/images/...`). Use this for images referenced inside Markdown body text or when you need a
-   stable URL.
-
-Placeholder frames (`<PlaceholderImage />`) are used wherever a photo hasn't been added yet:
-the hero portrait, the About gallery, hobby galleries and any project without a `cover`.
-To replace one in a page, swap the component for `<Image src={...} alt="…" />` from
-`astro:assets`.
+- **Personal details, hero eyebrow and lede, availability:** `src/config.ts`.
+  `availability.status` (`open` / `limited` / `closed`) drives the header StatusPill and the
+  profile card. The production URL is `site` in `astro.config.mjs` (`https://ivansapronov.com`).
+- **Projects:** `src/content/projects/*.md` (copy `_template.md`; filename = URL). Products set
+  `tagline` + `summary` (+ optional `facts`, e.g. FOR · MY ROLE) and appear under "What I'm
+  building"; statuses include `pilot` and `validating`. `featured: true` client work appears as
+  ProductModules on `/projects`. Entries still marked `placeholder: true` that have a `github`
+  URL are listed under "Code on GitHub" as compact rows (no case-study page).
+- **Removed pages:** Apexline was taken off the site (2026-10-23). `/projects/apexline` and the
+  older `/projects/apex-line-market-research` forward to `/projects` (Astro `redirects` in
+  `astro.config.mjs` + a 301 in `public/_redirects` for Cloudflare Pages).
+- **Homepage case rows:** `homeCases` in `src/data/home.ts` (slugs must exist; chips are
+  readout ids).
+- **Experience:** `src/content/experience/*.md`. `shipped` is the track record's SHIPPED cell — a
+  shortened form of a real achievement, never a new claim. Milestones (education,
+  certifications, talks…) go in `src/content/milestones/*.yaml`.
+- **CV download:** drop the PDF at `public/cv/ivan-sapronov-cv.pdf`; the homepage and
+  `/experience` then show "Download CV" instead of "CV on request" (`src/lib/cv.ts`).
+- **Writing:** `src/content/writing/*.md|mdx`, tags → `/writing/tags/<tag>`, RSS at `/rss.xml`.
+  While no post is published (all are drafts / placeholders), the site hides writing
+  automatically: Writing stays out of the menu sheet and the footer, the RSS links
+  disappear, the homepage shows only the Off-duty strip, and `/writing` is `noindex` and out
+  of the sitemap. Publish one post and it all comes back (the homepage then shows the posts
+  as rows above Off duty).
+- **Hobbies / Now / About:** `src/content/hobbies/*.md`, `src/content/now/now.md`,
+  `src/pages/about.astro` + `src/data/about.ts`. Aviation appears only as hobby content
+  (`/hobbies`, `/adventures`, the off-duty line and the personal paragraph on `/about`).
+- **Adventures:** `src/data/adventures.ts` (+ ISO numeric ids in `src/data/country-ids.ts`).
+- **Public images:** put files in `public/images/` only when they need a stable public URL
+  (e.g. `ivan-sapronov.jpg` for structured data, or an image referenced from Markdown body
+  text). The share image and the static map are generated (`src/lib/brand-images.ts`,
+  `src/pages/images/`); a static file with the same path would override them. Everything
+  else belongs in `src/assets/` so `<Picture>` can resize it and serve AVIF / WebP.
+- **Portraits:** `src/assets/portraits/` — `studio-*` (grey studio background, light theme)
+  and `cutout-*` (background removed, dark theme, on a sunken well); alt text in
+  `src/lib/portraits.ts`. The homepage card uses the green sweater, `/about` starts on the
+  turtleneck.
 
 ## Placeholders
 
-Anything in `[SQUARE BRACKETS]` is placeholder text. Content entries also carry a
-`placeholder: true` flag, which renders a small dashed **Placeholder** badge on the site so
-sample data can never be mistaken for real data. Once you've replaced the text, set it to
-`false` (or delete the line).
+Any value containing `[…]` and any entry with `placeholder: true` **never renders in
+production**:
 
-Quick way to find what's left:
+- Entries with `placeholder: true` are dropped from every list and get no page
+  (`src/lib/content.ts`).
+- Field values containing `[…]` are hidden one by one (`shown()` / `shownAll()`).
+- Markdown paragraphs / list items still containing `[…]`, and headings left empty by
+  that, are removed from the body at build time (`src/lib/markdown-hide-placeholders.mjs`).
 
-```bash
-grep -rn "\[YOUR\|\[PROJECT\|\[COMPANY\|placeholder: true" src/
-```
+`npm run dev` keeps everything visible (dev-only `[PLACEHOLDER]` badges) so gaps are easy
+to find: `grep -rn "placeholder: true\|\[[A-Z]" src/content src/data`.
 
-## Changing theme colours and fonts
+## Still to fill
 
-All design tokens are in **`src/styles/global.css`**:
+Hidden in production until real content replaces the placeholder (nothing here may be
+invented):
 
-- `:root { … }` — light palette, `.dark { … }` — dark palette. Both use `oklch()`.
-- The accent colour is `--accent`, `--accent-strong` (for text, higher contrast),
-  `--accent-soft` (tinted backgrounds) and `--accent-glow`. Change these four in both blocks.
-- The `@theme inline { … }` block maps tokens to Tailwind utilities (`bg-surface`,
-  `text-accent-strong`, `rounded-card`, …), so components never hard-code colours.
-- Dark mode is class-based (`.dark` on `<html>`); the toggle stores the choice in
-  `localStorage` and an inline script applies it before first paint.
+| Where                                        | Hidden                                                                                                                                                                                                                                                                                                                                                 |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `content/writing/*` (all 3 posts)            | Whole posts — they are template samples (`placeholder: true`): "Building this site with Astro", "What ultralight flying taught me about checklists", "Notes on integrating Keycloak with Spring Security". Rewrite or approve, then set `placeholder: false`. Until then `/writing` shows "No posts published yet".                                    |
+| `content/projects/correct-context-wallet.md` | Case-study page (organization, year, most body sections are placeholders). Listed under "Code on GitHub" with its real description, stack and repository link.                                                                                                                                                                                         |
+| `content/projects/faradey-android.md`        | Case-study page (organization, year, approach / results sections). Listed under "Code on GitHub".                                                                                                                                                                                                                                                      |
+| `content/projects/land-routing-service.md`   | Case-study page (year, problem / approach sections). Listed under "Code on GitHub".                                                                                                                                                                                                                                                                    |
+| `content/projects/paymont-wallet.md`         | Case-study page (year, most body sections). Listed under "Code on GitHub" with both repositories.                                                                                                                                                                                                                                                      |
+| `content/projects/ownira.md`                 | `timeframe` (start year not confirmed). `website` not set — ownira.cz currently shows a parking page; add `website: https://ownira.cz` when it is live (WEB stays text until then).                                                                                                                                                                    |
+| `content/hobbies/*` (all 4)                  | Photos, stats (hours, licence, home field, bike, longest trip, riding since, countries / continents, next country, discipline, sessions), favourites, the flying-club link, and the write-ups. While `placeholder: true`, only titles and taglines show.                                                                                               |
+| `content/now/now.md`                         | Current Ownira milestone line, "Learning" (2), "Reading" (2 books)                                                                                                                                                                                                                                                                                     |
+| `data/about.ts` → `facts`                    | All 6 facts (flying hours / licence, bike, country count + next, sport, first program, surprising fact) — the Facts section is hidden                                                                                                                                                                                                                  |
+| `data/adventures.ts`                         | Trip notes for 14 visited places, and the Cyprus town (`[Which town?]` — Cyprus shows by country only)                                                                                                                                                                                                                                                 |
+| `content/milestones/`                        | No milestones yet (template only) — the section is hidden                                                                                                                                                                                                                                                                                              |
+| CV                                           | `public/cv/ivan-sapronov-cv.pdf` missing → "CV on request" links to `/contact?topic=hiring`                                                                                                                                                                                                                                                            |
+| Contact form                                 | `PUBLIC_FORM_ACTION` (Formspree endpoint) not set → honest "not connected yet" state. **Connect it only after** the `/contact` privacy note is a full GDPR Art. 13 text: controller and contact, purpose, legal basis, retention period, Formspree as processor in the US (EU–US DPF / SCCs), the visitor's rights, and the right to complain to ÚOOÚ. |
 
-Fonts are configured in `astro.config.mjs` under `fonts` using Astro's Fonts API with the
-**local** provider, pointing at the `@fontsource-variable/*` npm packages (SIL OFL licensed),
-so the build is deterministic and makes no third-party requests. To switch to Google Fonts
-instead, replace a family with:
+### Content to add (not hidden — nothing renders until written)
 
-```js
-{
-  provider: fontProviders.google(),
-  name: "Inter",
-  cssVariable: "--font-family-sans",
-  weights: ["400 600"],
-  subsets: ["latin"],
-}
-```
+- `src/pages/about.astro`: the personal part of the career story (where you grew up, first
+  computer, first flight / ride) — there is no placeholder, add real text when ready.
 
-Astro downloads and self-hosts the files at build time.
+### Copy decisions (Ivan, 2026-10-23)
+
+Answered:
+
+1. **Philosophy 03** (`src/data/about.ts`), "Checklists over heroics": the v2 wording without
+   the flying sentence is approved — "Good people make bad mistakes when routine is skipped.
+   Runbooks, reviews and tests are how I keep the routine."
+2. **/about personal paragraph** ("…Flying rewards preparation and checklists, riding rewards
+   attention, travel rewards curiosity — the same traits I try to bring to a codebase."):
+   keep as it is.
+3. **/hobbies write-ups:** hidden in production until Ivan writes or confirms them — while an
+   entry is `placeholder: true`, `/hobbies` shows only its title and tagline
+   (`src/components/hobbies/HobbyModule.astro`). Set `placeholder: false` to publish one.
+4. **Operator line:** Ivan invoices as an OSVČ, so the footer needs name, IČO and registered
+   seat (§435 OZ) — **waiting for the IČO and the address he wants shown.**
+
+Not asked separately (informational, de-aviation of labels): /about "About · crew" → "About",
+"Installed systems" → "Stack I ship with", "SOP 01…04" → "01…04"; /writing meta lost "— plus
+the occasional lesson from the cockpit", empty state "No posts published yet"; `/projects`
+"Products and featured work"; `/experience` meta "Track record of …"; case-study label
+"Proof numbers".
 
 ## Contact form
 
-The form in `src/pages/contact.astro` is standard HTML that POSTs to `FORM_ACTION`. Set it to
-your provider endpoint:
+`src/components/contact/ContactForm.astro` (on `/contact`): name, email, topic
+(Hiring / Investing / Partnering / Something else — preselected from `?topic=`), message and
+a `_gotcha` honeypot. States: field errors (`aria-invalid` + message), submitting (busy,
+disabled), success (`role="status"`, only after the endpoint answers OK), failure
+(`role="alert"`, says it failed, gives the email, keeps the text).
 
-- **Formspree:** `https://formspree.io/f/<form-id>`
-- **Netlify Forms:** set `action="/contact"` and add `data-netlify="true"` to the `<form>`
-- **Anything else:** any endpoint accepting `name`, `email`, `reason`, `message`
-
-A honeypot field (`_gotcha`) is included for basic spam protection. Until configured, a
-notice is shown and the email address is the primary contact path.
+- **Not connected (now):** the form says "Form not connected yet — email me at …", email
+  stays the primary action, and "Write it as an email" opens the same message (subject from
+  the topic) in the visitor's email app. Nothing is sent from the page.
+- **Connect Formspree:** first extend the privacy note on `/contact` to a full GDPR Art. 13
+  text (see "Still to fill"), then create a form at formspree.io and build with
+  `PUBLIC_FORM_ACTION=https://formspree.io/f/<id>` (e.g. a Cloudflare Pages environment
+  variable). The CSP already allows `https://formspree.io` for `connect-src` and
+  `form-action`.
+- The site sets no cookies and runs no analytics, so there is no consent banner; the theme
+  choice lives in `localStorage` only.
 
 ## SEO
 
-Handled by `src/components/seo/SEO.astro` (used by `BaseLayout`):
+`src/components/seo/SEO.astro`: per-page title / description / canonical (none on `noindex`
+pages such as the 404 and the empty `/writing`), Open Graph + Twitter cards (plus
+`profile:first_name` / `profile:last_name` on the home page), `sitemap-index.xml`,
+`robots.txt`, `rss.xml` (linked only once a post exists).
 
-- Unique `<title>`, meta description and canonical URL per page
-- Open Graph and Twitter card tags (with a default 1200×630 image)
-- `sitemap-index.xml` (`@astrojs/sitemap`), `robots.txt`, `rss.xml`
-- JSON-LD: `Person` and `WebSite` (homepage), `BlogPosting` (articles),
-  `CreativeWork` (projects), `BreadcrumbList` (all pages with breadcrumbs)
+Structured data (`src/lib/schema.ts`): `Person` (`#person`: jobTitle, sameAs, url, and a
+stable `image` at `/images/ivan-sapronov.jpg`) and `WebSite` on the home page,
+`ProfilePage` on `/about` with that Person as `mainEntity`, `BlogPosting`, `CreativeWork`,
+`BreadcrumbList`.
+
+The 1200×630 share image (`/images/og-default.png`) is generated at build time
+(`src/lib/brand-images.ts`) in the v2 look: cube mark + "OPEN TO PROJECTS" pill, the
+eyebrow, the name in Schibsted Grotesk 800, the lede, three proof numbers with their mono
+captions and the cut-out portrait. Text is converted to vector paths with opentype.js from
+`@fontsource/schibsted-grotesk` and `@fontsource/ibm-plex-mono` (so the card is the same on
+any build machine). The favicon and touch icon are the isometric cube mark.
+
+## Accessibility and performance
+
+- WCAG 2.2 AA: token contrast pairs from the design system, visible focus rings (2px
+  `focus`, 2px offset; `on-accent` on the contact panel), 44px targets in the header,
+  breadcrumbs, footer, forms and chips, skip link, labelled fields, status always in words
+  (never colour alone), the globe's list as its keyboard equivalent, reduced motion respected
+  everywhere. axe-core 4.10 (WCAG 2.2 AA + best practice): **0 violations** in 78 runs —
+  16 routes (incl. the four case studies and `/404`), light and dark, 1440 and 375, plus runs
+  with motion on and with the menu sheet open.
+- Lighthouse 12.8 (local preview, mobile preset, 2026-10-23, light and dark): `/` Performance
+  99, LCP 2.0 s (the phone poster), TBT 0 ms, CLS 0; `/adventures` 99, LCP 2.1 s (the globe
+  poster), TBT 0 ms, CLS 0; Accessibility, Best practices and SEO 100 on both.
+- three.js (~133 KB gzip, plus 14 KB for the hero scene) loads only on `/` and `/adventures`,
+  lazily (see above).
 
 ## Deployment
 
-The site is fully static — `npm run build` produces `dist/`.
+Domain: **https://ivansapronov.com** (set as `site` in `astro.config.mjs` and in
+`public/robots.txt`). Hosting: **Cloudflare Pages**:
 
-| Platform             | Settings                                                                                                    |
-| -------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Vercel**           | Import the repo; framework is auto-detected (`vercel.json` included). Build `npm run build`, output `dist`. |
-| **Netlify**          | `netlify.toml` included. Build `npm run build`, publish `dist`.                                             |
-| **Cloudflare Pages** | Build command `npm run build`, output directory `dist`, Node version `22`. `public/_headers` sets caching.  |
-| **GitHub Pages**     | Use the official `withastro/action`; set `site` (and `base` if not at the domain root).                     |
+| Setting                | Value                                              |
+| ---------------------- | -------------------------------------------------- |
+| Build command          | `npm run build`                                    |
+| Build output directory | `dist`                                             |
+| Environment variable   | `NODE_VERSION=22` (and later `PUBLIC_FORM_ACTION`) |
+| Production branch      | `main`                                             |
 
-Remember to set `site` in `astro.config.mjs` before the first deploy.
+`netlify.toml` and `vercel.json` are kept untouched in case another host is ever needed.
+
+### Security headers
+
+`public/_headers` (Cloudflare Pages) sets, for every path:
+
+- `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`,
+  `X-Frame-Options: DENY`, `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+  (no `interest-cohort`, which Chrome reports as unknown);
+- `Strict-Transport-Security: max-age=31536000` (no `includeSubDomains`, no `preload`);
+- a header-level **Content-Security-Policy**:
+
+  ```text
+  default-src 'self'; script-src 'self' 'unsafe-inline' data:; style-src 'self' 'unsafe-inline';
+  img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://formspree.io;
+  form-action 'self' https://formspree.io mailto:; frame-ancestors 'none'; base-uri 'self';
+  object-src 'none'
+  ```
+
+  The site loads nothing from other origins. Inline scripts and styles are allowed because
+  Astro inlines small module scripts and component styles, and the theme bootstrap runs
+  inline before paint. `data:` in `script-src` is for `ClientRouter`: after a swap it inserts
+  an empty `data:` module whose load event makes `astro:page-load` wait until the new page's
+  inline modules have run; blocking it makes initialisation after navigation racy (with
+  inline scripts already allowed it adds no real exposure). `mailto:` in `form-action` is the
+  not-connected form's no-JS fallback. Astro's per-page hash CSP (`security.csp`) was tried
+  earlier and breaks `ClientRouter` navigation, so it stays off.
+
+plus long-lived caching for `/_astro/*`. `public/_redirects` holds the permanent redirects
+(with trailing-slash variants).
+
+`astro preview` ignores `_headers`; `scripts/serve-dist.mjs` applies it the way Cloudflare
+Pages does, so the whole Playwright suite runs under these headers, and one test navigates
+with `ClientRouter` through five pages, starts both 3D scenes and submits the form with zero
+CSP violations. After changing the policy, run `npm run test:e2e` and check the Pages
+preview deploy (console) before merging.
 
 ## Tech stack
 
-- [Astro 7](https://astro.build) — static output, content collections, view transitions,
-  Fonts API, image optimisation (`sharp`)
-- [Tailwind CSS 4](https://tailwindcss.com) via `@tailwindcss/vite`, plus
-  `@tailwindcss/typography` for article prose
-- [lucide-astro](https://github.com/dzeiocom/lucide-astro) icons (tree-shaken SVGs)
-- TypeScript (strict), ESLint (`typescript-eslint` + `eslint-plugin-astro`), Prettier
-- Fonts: Bricolage Grotesque (display) and Inter (body), variable, latin subset, self-hosted
-
-Client-side JavaScript is limited to: the theme toggle, the mobile navigation `<dialog>`,
-the project category filter, the copy-email button and Astro's view-transition router.
-Section reveal animations use CSS scroll-driven animations and respect
-`prefers-reduced-motion`.
+- Astro 7 — static output, content collections, Sätteri Markdown + a placeholder plugin,
+  view transitions (`ClientRouter`), Fonts API, `<Picture>` (AVIF / WebP via `sharp`)
+- Tailwind CSS 4 (`@tailwindcss/vite`), tokens from the design system
+- three.js 0.184.0 (lazy; `Line2` fat lines for the hero), world-atlas + topojson-client
+  (globe), d3-geo (build-time SVG map)
+- TypeScript (strict), ESLint, Prettier, Playwright smoke tests; opentype.js (build-time OG text)
+- Fonts: Schibsted Grotesk and IBM Plex Mono (latin + latin-ext, self-hosted, SIL OFL)

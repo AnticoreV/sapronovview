@@ -20,9 +20,9 @@ export async function getStaticPaths() {
 }
 
 const { project, related } = Astro.props;
-const { Content, headings } = await render(project);
+const { Content } = await render(project);
 ---
 
-<ProjectLayout project={project} headings={headings} related={related}>
+<ProjectLayout project={project} related={related}>
   <Content />
 </ProjectLayout>

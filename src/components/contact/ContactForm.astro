@@ -1,0 +1,340 @@
+---
+/**
+ * Contact form with honest states (Field component rules):
+ * idle → field errors → submitting (busy, disabled) → success | failure.
+ * Posts to Formspree when PUBLIC_FORM_ACTION is set. Until then the form says it
+ * is not connected, keeps the text, and offers the same message as an email.
+ * Never claims success before the endpoint answers.
+ */
+import { siteConfig } from "@config";
+import { contactRoutes, contactTopics } from "@data/contact";
+
+const action = siteConfig.formAction;
+const connected = /^https:\/\/formspree\.io\/f\/[A-Za-z0-9]+$/.test(action);
+const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]));
+---
+
+<div class="card flex flex-col gap-6 p-6 sm:p-8" data-contact>
+  <div class="flex flex-col gap-2">
+    <h2 class="text-heading">Send a message</h2>
+    {!connected && (
+      <p class="text-small text-ink-muted" role="note">
+        <strong class="text-ink">Form not connected yet</strong> — email me at{" "}
+        <a href={`mailto:${siteConfig.email}`} class="link-inline text-ink break-all">
+          {siteConfig.email}
+        </a>
+        . You can still fill it in: I'll hand the text to your email app.
+      </p>
+    )}
+  </div>
+
+  <form
+    class="flex flex-col gap-5"
+    action={connected ? action : `mailto:${siteConfig.email}`}
+    method="POST"
+    enctype={connected ? undefined : "text/plain"}
+    novalidate
+    data-contact-form
+    data-connected={connected ? "true" : "false"}
+    data-email={siteConfig.email}
+    data-subjects={JSON.stringify(subjects)}
+  >
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div class="field">
+        <label for="cf-name">Name</label>
+        <input
+          id="cf-name"
+          name="name"
+          type="text"
+          required
+          autocomplete="name"
+          aria-describedby="cf-name-error"
+        />
+        <p id="cf-name-error" class="field__error" hidden>
+          Tell me who you are — a name is enough.
+        </p>
+      </div>
+      <div class="field">
+        <label for="cf-email">Email</label>
+        <input
+          id="cf-email"
+          name="email"
+          type="email"
+          required
+          autocomplete="email"
+          inputmode="email"
+          aria-describedby="cf-email-error"
+        />
+        <p id="cf-email-error" class="field__error" hidden>
+          I need an email address I can reply to, like name@company.com.
+        </p>
+      </div>
+    </div>
+    <div class="field">
+      <label for="cf-topic">Topic</label>
+      <select id="cf-topic" name="topic">
+        {contactTopics.map((t) => (
+          <option value={t.id}>{t.label}</option>
+        ))}
+      </select>
+    </div>
+    <div class="field">
+      <label for="cf-message">Message</label>
+      <textarea
+        id="cf-message"
+        name="message"
+        rows="6"
+        required
+        minlength="10"
+        aria-describedby="cf-message-error"
+      ></textarea>
+      <p id="cf-message-error" class="field__error" hidden>
+        Write a sentence or two so I know what it's about.
+      </p>
+    </div>
+    {/* Honeypot for bots — hidden from people and screen readers. */}
+    <div class="hidden" aria-hidden="true">
+      <label for="cf-gotcha">Leave this empty</label>
+      <input id="cf-gotcha" name="_gotcha" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <p class="text-small text-ink-muted">
+        No newsletter, no tracking — just a message to my inbox.
+      </p>
+      <button type="submit" class="btn btn-primary" data-submit>
+        <span class="spinner inline-flex" aria-hidden="true" hidden>
+          <svg width="16" height="16" viewBox="0 0 16 16">
+            <circle
+              cx="8"
+              cy="8"
+              r="6"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-dasharray="26 12"
+            ></circle>
+          </svg>
+        </span>
+        <span data-submit-label>{connected ? "Send message" : "Write it as an email"}</span>
+      </button>
+    </div>
+  </form>
+
+  <div aria-live="polite" data-contact-status>
+    <div
+      class="flex flex-col gap-1.5 rounded-md bg-ok-soft p-5"
+      data-state="success"
+      role="status"
+      hidden
+      tabindex="-1"
+    >
+      <p class="label font-semibold text-ok-ink">● MESSAGE RECEIVED</p>
+      <p>Thanks — your message is in my inbox. I'll reply by email.</p>
+    </div>
+    <div
+      class="flex flex-col gap-1.5 rounded-md border-2 border-error-ink bg-surface p-5"
+      data-state="failure"
+      role="alert"
+      hidden
+    >
+      <p class="label font-semibold text-error-ink">MESSAGE NOT SENT</p>
+      <p>
+        Something went wrong on the way. Email me directly at{" "}
+        <a href={`mailto:${siteConfig.email}`} class="link-inline font-semibold">
+          {siteConfig.email}
+        </a>{" "}
+        — your text is still in the form.
+      </p>
+    </div>
+    <div
+      class="flex flex-col gap-2 rounded-md border-2 border-line-strong bg-surface-sunken p-5"
+      data-state="offline"
+      hidden
+    >
+      <p class="label font-semibold">FORM NOT CONNECTED YET</p>
+      <p>
+        Nothing was sent. Email me at{" "}
+        <a href={`mailto:${siteConfig.email}`} class="link-inline font-semibold">
+          {siteConfig.email}
+        </a>{" "}
+        — your text is still in the form.
+      </p>
+      <p>
+        <a href={`mailto:${siteConfig.email}`} class="btn btn-secondary btn-sm" data-mailto>
+          Open it in your email app
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .field label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    color: var(--ink);
+    font: 400 17px/1.4 var(--font-sans);
+  }
+  .field select {
+    padding-right: 36px;
+    appearance: none;
+    background-image:
+      linear-gradient(45deg, transparent 50%, currentColor 50%),
+      linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position:
+      calc(100% - 20px) 50%,
+      calc(100% - 15px) 50%;
+    background-size: 5px 5px;
+    background-repeat: no-repeat;
+  }
+  .field textarea {
+    padding: 12px 14px;
+    resize: vertical;
+  }
+  .field input:hover,
+  .field select:hover,
+  .field textarea:hover {
+    border-color: var(--ink-muted);
+  }
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: var(--ink-muted);
+  }
+  .field input:focus-visible,
+  .field select:focus-visible,
+  .field textarea:focus-visible {
+    border-color: var(--accent);
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  .field [aria-invalid="true"] {
+    border: 2px solid var(--error-ink);
+  }
+  .field__error {
+    color: var(--error-ink);
+    font-size: var(--text-small);
+  }
+  .spinner {
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>
+
+<script>
+  type FieldName = "name" | "email" | "message";
+
+  function setupContactForm() {
+    const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
+    if (!form || form.dataset.bound) return;
+    form.dataset.bound = "true";
+
+    const root = form.closest<HTMLElement>("[data-contact]")!;
+    const connected = form.dataset.connected === "true";
+    const email = form.dataset.email ?? "";
+    const subjects = JSON.parse(form.dataset.subjects ?? "{}") as Record<string, string>;
+    const submit = form.querySelector<HTMLButtonElement>("[data-submit]")!;
+    const spinner = submit.querySelector<HTMLElement>(".spinner");
+    const label = submit.querySelector<HTMLElement>("[data-submit-label]")!;
+    const states = root.querySelectorAll<HTMLElement>("[data-state]");
+    const topic = form.elements.namedItem("topic") as HTMLSelectElement;
+
+    // Preselect the topic from ?topic=hiring|investing|partnering.
+    const wanted = new URLSearchParams(window.location.search).get("topic");
+    if (wanted && [...topic.options].some((o) => o.value === wanted)) topic.value = wanted;
+
+    const show = (state: string | null) =>
+      states.forEach((el) => (el.hidden = el.dataset.state !== state));
+
+    const field = (n: FieldName) =>
+      form.elements.namedItem(n) as HTMLInputElement | HTMLTextAreaElement;
+    const checks: Record<FieldName, (v: string) => boolean> = {
+      name: (v) => v.trim().length > 0,
+      email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()),
+      message: (v) => v.trim().length >= 10,
+    };
+    const validate = (n: FieldName) => {
+      const el = field(n);
+      const ok = checks[n](el.value);
+      el.setAttribute("aria-invalid", String(!ok));
+      const err = document.getElementById(`cf-${n}-error`);
+      if (err) err.hidden = ok;
+      return ok;
+    };
+    // Once a field has been flagged, re-check it while typing (not on blur: hiding the
+    // message on blur shifts the button between mousedown and mouseup and eats the click).
+    (Object.keys(checks) as FieldName[]).forEach((n) =>
+      field(n).addEventListener("input", () => {
+        if (field(n).getAttribute("aria-invalid") === "true") validate(n);
+      }),
+    );
+
+    const busy = (on: boolean) => {
+      submit.disabled = on;
+      submit.setAttribute("aria-busy", String(on));
+      if (spinner) spinner.hidden = !on;
+      label.textContent = on ? "Sending…" : connected ? "Send message" : "Write it as an email";
+    };
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const invalid = (Object.keys(checks) as FieldName[]).filter((n) => !validate(n));
+      if (invalid.length) {
+        field(invalid[0]!).focus();
+        return;
+      }
+      // A filled honeypot means a bot: do nothing, claim nothing.
+      if ((form.elements.namedItem("_gotcha") as HTMLInputElement).value) return;
+
+      if (!connected) {
+        const subject = subjects[topic.value] ?? "Hello";
+        const body = `${field("message").value.trim()}\n\n— ${field("name").value.trim()} (${field("email").value.trim()})`;
+        const params = new URLSearchParams({ subject, body }).toString().replace(/\+/g, "%20");
+        const mailto = root.querySelector<HTMLAnchorElement>("[data-mailto]");
+        if (mailto) mailto.href = `mailto:${email}?${params}`;
+        show("offline");
+        return;
+      }
+
+      show(null);
+      busy(true);
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          body: new FormData(form),
+          headers: { Accept: "application/json" },
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        form.reset();
+        show("success");
+        root.querySelector<HTMLElement>('[data-state="success"]')?.focus();
+      } catch {
+        show("failure");
+      } finally {
+        busy(false);
+      }
+    });
+  }
+  document.addEventListener("astro:page-load", setupContactForm);
+</script>

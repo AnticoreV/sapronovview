@@ -1,0 +1,35 @@
+---
+/**
+ * ContactRoute — one audience route into contact (Hiring / Investing / Partnering):
+ * a surface card on the accent contact panel. Hover: lift.
+ */
+interface Props {
+  route: { id: string; label: string; title: string; text: string };
+  href: string;
+  /** Heading level of the route title. */
+  level?: 2 | 3;
+}
+const { route, href, level = 3 } = Astro.props;
+const Title = level === 2 ? "h2" : "h3";
+---
+
+<a
+  href={href}
+  class="route lift flex w-full flex-col gap-2 rounded-md bg-surface p-6 text-ink no-underline"
+>
+  <span class="mono text-[12px] font-semibold tracking-[0.06em] text-accent uppercase">
+    {route.label}
+  </span>
+  <Title class="text-[21px] leading-[1.25] font-bold">{route.title}</Title>
+  <span class="text-small text-ink-muted">{route.text}</span>
+</a>
+
+<style>
+  .route:hover {
+    color: var(--ink);
+  }
+  .route:focus-visible {
+    outline: 2px solid var(--on-accent);
+    outline-offset: 3px;
+  }
+</style>

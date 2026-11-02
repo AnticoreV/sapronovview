@@ -1,0 +1,168 @@
+---
+/**
+ * ProfileCard — "Who I am" in one surface card (approved artboard): a studio
+ * portrait beside the heading, the current focus and mono fields. Light theme: the
+ * studio portrait; dark theme: the cut-out on a sunken well. With `switcher` (/about)
+ * a segmented control flips between the four portraits (pure CSS: radios + :has()).
+ */
+import ThemePicture from "@components/ui/ThemePicture.astro";
+import { siteConfig } from "@config";
+import { portraitById, portraits, type Portrait } from "@lib/portraits";
+
+interface Props {
+  /** Portrait shown first. The homepage uses green (artboard), /about the turtleneck. */
+  initial?: Portrait["id"];
+  switcher?: boolean;
+  /** Render "Engineer and founder." as a heading (off on /about, where it is the h1). */
+  heading?: false | 2 | 3;
+  /** Load the first portrait eagerly (when the card is above the fold). */
+  eager?: boolean;
+  class?: string;
+}
+const {
+  initial = "green",
+  switcher = false,
+  heading = 2,
+  eager = false,
+  class: className,
+} = Astro.props;
+const first = portraitById(initial);
+const list = switcher ? [first, ...portraits.filter((p) => p.id !== first.id)] : [first];
+const fields = [
+  { k: "Based in", v: siteConfig.basedIn },
+  { k: "Role", v: "Engineer · founder" },
+  { k: "Languages", v: siteConfig.languages.map((l) => l.code).join(" · ") },
+  { k: "Experience", v: siteConfig.experienceSummary },
+];
+const focus = siteConfig.currentFocus.replace(/^./, (c) => c.toLowerCase());
+const Heading = heading === 3 ? "h3" : "h2";
+---
+
+<div
+  class:list={["profile card flex flex-wrap gap-7 p-7", switcher && "profile--switch", className]}
+>
+  <div class="profile__portrait relative shrink-0">
+    {list.map((p, i) => (
+      <div class="profile__shot" data-portrait={p.id} data-default={i === 0 ? "" : undefined}>
+        <ThemePicture
+          light={p.studio}
+          dark={p.cutout}
+          alt={p.alt}
+          widths={[216, 432]}
+          sizes="216px"
+          loading={eager && i === 0 ? "eager" : "lazy"}
+        />
+      </div>
+    ))}
+  </div>
+  <div class="flex min-w-0 flex-[1_1_280px] flex-col gap-5">
+    <div class="flex flex-col gap-1.5">
+      <span class="label text-ink-muted">Who I am</span>
+      {heading !== false && <Heading class="text-heading">Engineer and founder.</Heading>}
+      <p class="text-ink-muted">Now: {focus}.</p>
+    </div>
+    <dl class="grid grid-cols-[repeat(auto-fit,minmax(min(150px,100%),1fr))] content-start gap-x-6 gap-y-3.5">
+      {fields.map((f) => (
+        <div>
+          <dt class="mono text-[12px] text-ink-muted uppercase">{f.k}</dt>
+          <dd class="mt-0.5 font-semibold">{f.v}</dd>
+        </div>
+      ))}
+      <div>
+        <dt class="mono text-[12px] text-ink-muted uppercase">Status</dt>
+        <dd class="mt-0.5 font-semibold text-ok-ink">
+          <span aria-hidden="true">● </span>
+          {siteConfig.availability.label}
+        </dd>
+      </div>
+    </dl>
+    {switcher && (
+      <fieldset class="m-0 border-0 p-0">
+        <legend class="label text-ink-muted">Portrait</legend>
+        <div class="mt-2.5 inline-flex flex-wrap gap-1 rounded-[26px] bg-surface-sunken p-1">
+          {list.map((p, i) => (
+            <label class="segment">
+              <input
+                type="radio"
+                name="profile-portrait"
+                value={p.id}
+                checked={i === 0}
+                class="sr-only"
+              />
+              <span class="segment__label">{p.short}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+    )}
+  </div>
+</div>
+
+<style>
+  .profile__portrait {
+    flex: 0 0 216px;
+    width: 216px;
+    height: 270px;
+  }
+  .profile__shot {
+    position: absolute;
+    inset: 0;
+    display: none;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    background: var(--surface-sunken);
+  }
+  .profile__shot[data-default] {
+    display: block;
+  }
+  .profile__shot :global(picture) {
+    display: contents;
+  }
+  .profile__shot :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 12%;
+  }
+
+  /* Segmented portrait switch (/about). */
+  .profile--switch:has(input:checked) .profile__shot {
+    display: none;
+  }
+  .profile--switch:has(input[value="turtleneck"]:checked) [data-portrait="turtleneck"],
+  .profile--switch:has(input[value="green"]:checked) [data-portrait="green"],
+  .profile--switch:has(input[value="black"]:checked) [data-portrait="black"],
+  .profile--switch:has(input[value="white"]:checked) [data-portrait="white"] {
+    display: block;
+  }
+  .segment {
+    position: relative;
+    cursor: pointer;
+  }
+  .segment__label {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: var(--radius-pill);
+    color: var(--ink-muted);
+    font-size: 15px;
+    font-weight: 600;
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
+  }
+  .segment:hover .segment__label {
+    color: var(--ink);
+  }
+  .segment input:checked + .segment__label {
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+  .segment input:focus-visible + .segment__label {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+</style>

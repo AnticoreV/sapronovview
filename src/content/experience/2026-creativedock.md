@@ -12,6 +12,7 @@ achievements:
   - "Stabilised and scaled an existing GitLab CI pipeline: diagnosed stalled builds and expanded runner capacity, cutting build queue times from hours to minutes, and added a dedicated build-verification phase"
   - "Operated and monitored Kubernetes workloads through Argo CD, using automated sync to keep deployments consistent with desired state"
   - "Worked within an existing AWS environment (S3 for image storage, SQS for messaging, CloudWatch for log observability), shipping improvements to running production services"
+shipped: "3 greenfield services"
 technologies:
   - Kotlin
   - Spring Boot
