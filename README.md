@@ -150,6 +150,9 @@ config, annunciator, checklist ticking and every aviation label are gone.
 - **Theme:** light by default; the header toggle (sun / moon, `aria-pressed`) stores the
   choice in `localStorage` (try/catch); without a stored choice the OS preference wins. The
   inline script in `BaseLayout` applies it before paint (no flash).
+- **Type direction (`type/smaller-headings`):** the same fonts on a smaller scale. The hero
+  name tops out at 88px (artboard: 116), section titles at 46px (64), the contact panel at
+  66px (96); headlines use w750 instead of w800. Sizes are in the `@theme` type tokens.
 - **Fonts:** Schibsted Grotesk (variable, wght 400–900) and IBM Plex Mono (400 / 500 / 600),
   self-hosted from `@fontsource-variable/schibsted-grotesk` and `@fontsource/ibm-plex-mono`
   through Astro's `fonts` config. Each is split into a **latin** family (preloaded — for the
