@@ -4,22 +4,27 @@
  * `tone="accent"` = outline on the accent contact panel (artboard), default = secondary.
  */
 import { siteConfig } from "@config";
+import { i18n } from "@/i18n";
 
 interface Props {
   tone?: "accent" | "default";
   class?: string;
 }
 const { tone = "default", class: className } = Astro.props;
+const { t } = i18n(Astro);
 ---
 
 <button
   type="button"
   class:list={["btn btn-sm", tone === "accent" ? "copy--accent" : "btn-secondary", className]}
   data-copy-email={siteConfig.email}
-  aria-label="Copy email address"
+  data-copy-text={t("copy.button")}
+  data-copied-text={t("copy.done")}
+  data-fallback-text={t("copy.fallback")}
+  aria-label={t("copy.label")}
 >
   <span data-copy-label aria-live="polite">
-    Copy
+    {t("copy.button")}
   </span>
 </button>
 
@@ -45,10 +50,10 @@ const { tone = "default", class: className } = Astro.props;
       button.addEventListener("click", async () => {
         try {
           await navigator.clipboard.writeText(button.dataset.copyEmail ?? "");
-          if (label) label.textContent = "Copied";
-          setTimeout(() => label && (label.textContent = "Copy"), 1800);
+          if (label) label.textContent = button.dataset.copiedText ?? "Copied";
+          setTimeout(() => label && (label.textContent = button.dataset.copyText ?? "Copy"), 1800);
         } catch {
-          if (label) label.textContent = "Select & copy";
+          if (label) label.textContent = button.dataset.fallbackText ?? "Select & copy";
         }
       });
     });

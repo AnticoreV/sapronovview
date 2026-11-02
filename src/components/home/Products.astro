@@ -3,11 +3,13 @@
 import ProductModule from "@components/projects/ProductModule.astro";
 import SectionHeader from "@components/ui/SectionHeader.astro";
 import type { Project } from "@lib/content";
+import { i18n } from "@/i18n";
 
 interface Props {
   products: Project[];
 }
 const { products } = Astro.props;
+const { t } = i18n(Astro);
 ---
 
 {products.length > 0 && (
@@ -16,8 +18,8 @@ const { products } = Astro.props;
       <SectionHeader
         id="build-heading"
         index="01"
-        title="What I'm building"
-        tag={`${products.length > 1 ? "OWN PRODUCTS" : "OWN PRODUCT"} · FOR PARTNERS AND INVESTORS`}
+        title={t("build.title")}
+        tag={t(products.length > 1 ? "build.tagMany" : "build.tag")}
       />
       <ul class="flex flex-col gap-4">
         {products.map((p) => (

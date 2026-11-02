@@ -2,15 +2,19 @@
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
 import AdventuresSection from "@components/adventures/AdventuresSection.astro";
+import { i18n, localeParams } from "@/i18n";
+
+export const getStaticPaths = localeParams;
+
+const { t } = i18n(Astro);
 ---
 
-<BaseLayout
-  title="Adventures"
-  description="A paper globe of the countries I've visited, home in Prague and the places still on the list — drag to turn it."
->
+<BaseLayout title={t("adventures.title")} description={t("adventures.description")}>
   <AdventuresSection class="pt-8 pb-16 md:pt-10 md:pb-24">
     <div slot="before">
-      <Breadcrumbs items={[{ label: "Hobbies", href: "/hobbies" }, { label: "Adventures" }]} />
+      <Breadcrumbs
+        items={[{ label: t("hobbies.title"), href: "/hobbies" }, { label: t("adventures.title") }]}
+      />
     </div>
   </AdventuresSection>
 </BaseLayout>

@@ -6,44 +6,52 @@
  */
 import { footerNav, siteConfig, withWriting } from "@config";
 import { hasWriting } from "@lib/content";
+import { i18n } from "@/i18n";
 
 const links = withWriting(footerNav, await hasWriting());
 const year = new Date().getFullYear();
-const { operator } = siteConfig;
-const operatorLine = [
-  siteConfig.name,
-  `IČO ${operator.ico}`,
-  `${operator.street}, ${operator.postalCode}\u00a0${operator.cityEn}, Czech Republic`,
-  "Sole trader registered in the Czech Trade Register",
-].join(" · ");
+const { t, l } = i18n(Astro);
+// "170 00 Praha 7" never breaks inside the postcode or between postcode and city.
+const operatorLine = t("footer.operator").replace(/170 00 (Praha|Prague) 7/, (m) =>
+  m.replace(/ /g, "\u00a0"),
+);
 ---
 
 <footer class="band pb-safe pt-6">
   <div class="shell meta flex flex-wrap items-center justify-between gap-x-8 gap-y-3 text-[12px] text-ink-muted">
     <span>
-      © {year} {siteConfig.name.toUpperCase()} · {siteConfig.city.toUpperCase()}
+      © {year} {siteConfig.name.toUpperCase()} · {t("footer.city")}
     </span>
-    <nav aria-label="Footer">
+    <nav aria-label={t("footer.label")}>
       <ul class="flex flex-wrap gap-x-5 gap-y-1">
         {links.map((item) => (
           <li>
             <a
-              href={item.href}
+              href={l(item.href)}
               class="inline-flex min-h-11 items-center hover:underline"
               {...(item.href === "/rss.xml" ? { rel: "alternate" } : {})}
             >
-              {item.label}
+              {t(item.key)}
             </a>
           </li>
         ))}
       </ul>
     </nav>
     <span class="inline-flex items-center gap-2 text-ok-ink">
-      <i class="inline-block size-2 rounded-full bg-clay-mint" aria-hidden="true"></i>ALL SERVICES
-      HEALTHY
+      <i class="inline-block size-2 rounded-full bg-clay-mint" aria-hidden="true"></i>
+      {t("footer.healthy")}
     </span>
   </div>
-  <p class="shell meta mt-2 text-[12px] text-ink-muted" data-operator>
+  <p class="operator shell meta mt-2 text-[12px] text-ink-muted" data-operator>
     {operatorLine}
   </p>
 </footer>
+
+<style>
+  /* Rendered (and its latin-ext glyphs fetched: IČO, Argentinská) only near the viewport,
+     so English pages don't load the latin-ext fonts for the footer up front. */
+  .operator {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto 40px;
+  }
+</style>

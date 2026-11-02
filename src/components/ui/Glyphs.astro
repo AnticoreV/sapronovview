@@ -8,6 +8,7 @@
  */
 import Approx from "@components/ui/Approx.astro";
 import Arrow from "@components/ui/Arrow.astro";
+import { i18n } from "@/i18n";
 
 interface Props {
   text: string;
@@ -19,9 +20,10 @@ interface Props {
 }
 const { text, spoken, weight = "text", silent = false } = Astro.props;
 const parts = text.split(/(→|←|↗|≈)/).filter((p) => p !== "");
+const { t } = i18n(Astro);
 const words: Record<string, string> = silent
   ? { "→": "", "←": "", "↗": "", "≈": "" }
-  : { "→": "to", "←": "from", "↗": "", "≈": "approximately" };
+  : { "→": t("glyph.to"), "←": t("glyph.from"), "↗": "", "≈": t("glyph.approx") };
 const isGlyph = (p: string) => p in words;
 ---
 

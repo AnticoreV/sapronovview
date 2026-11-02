@@ -8,51 +8,52 @@ import SectionHeader from "@components/ui/SectionHeader.astro";
 import { getMilestones, getPositions, milestoneLabels } from "@lib/content";
 import { cvPath } from "@lib/cv";
 import { siteConfig } from "@config";
+import { i18n, localeParams } from "@/i18n";
 
-const [positions, milestones] = await Promise.all([getPositions(), getMilestones()]);
-const types = Object.keys(milestoneLabels) as Array<keyof typeof milestoneLabels>;
+export const getStaticPaths = localeParams;
+
+const { locale, t, l } = i18n(Astro);
+const [positions, milestones] = await Promise.all([getPositions(locale), getMilestones()]);
+const types = Object.keys(milestoneLabels.en) as Array<keyof typeof milestoneLabels.en>;
 const byType = (t: (typeof types)[number]) => milestones.filter((m) => m.data.type === t);
 ---
 
 <BaseLayout
-  title="Experience"
-  description={`Track record of ${siteConfig.name}: every position since 2021 with what I built and what changed because of it — JVM services, Angular products, identity, Kafka, Kubernetes and cloud.`}
+  title={t("experience.title")}
+  description={t("experience.description", { name: siteConfig.name })}
 >
   <div class="band pt-8 md:pt-10">
     <div class="shell">
-      <Breadcrumbs items={[{ label: "Experience" }]} />
+      <Breadcrumbs items={[{ label: t("experience.title") }]} />
       <div class="mt-8 flex flex-wrap items-end justify-between gap-6">
         <div>
-          <p class="label text-ink-muted">Experience · since 2021</p>
-          <h1 class="display mt-3 text-display-l">Track record</h1>
+          <p class="label text-ink-muted">{t("experience.eyebrow")}</p>
+          <h1 class="display mt-3 text-display-l">{t("record.title")}</h1>
         </div>
         {cvPath ? (
           <a href={cvPath} class="btn btn-primary" download>
-            Download CV
+            {t("record.cvDownload")}
           </a>
         ) : (
-          <a href="/contact?topic=hiring" class="btn btn-primary">
-            CV on request
+          <a href={l("/contact?topic=hiring")} class="btn btn-primary">
+            {t("record.cvRequest")}
           </a>
         )}
       </div>
-      <p class="mt-5 max-w-[640px] text-body-l">
-        Where I've worked, what I owned and what changed because of it — from a freelance CRM in
-        2021 to Kotlin microservices and a platform serving around two million users.
-      </p>
+      <p class="mt-5 max-w-[640px] text-body-l">{t("experience.intro")}</p>
     </div>
   </div>
 
-  <section class="band mt-10" aria-label="Track record summary">
+  <section class="band mt-10" aria-label={t("experience.summary")}>
     <div class="shell flex flex-col">
       <div
         class="label grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-x-6 gap-y-1 border-t border-b border-t-ink border-b-line py-3 text-ink-muted max-[640px]:hidden"
         aria-hidden="true"
       >
-        <span>Years</span>
-        <span>Company</span>
-        <span>Role</span>
-        <span>Shipped</span>
+        <span>{t("record.years")}</span>
+        <span>{t("record.company")}</span>
+        <span>{t("record.role")}</span>
+        <span>{t("record.shipped")}</span>
       </div>
       <ol class="max-[640px]:border-t max-[640px]:border-ink">
         {positions.map((p) => (
@@ -70,7 +71,7 @@ const byType = (t: (typeof types)[number]) => milestones.filter((m) => m.data.ty
         id="positions-heading"
         class="display text-[clamp(28px,3vw,40px)] leading-[1.05] tracking-[-0.03em]"
       >
-        Positions
+        {t("experience.positions")}
       </h2>
       <ol class="mt-8 flex flex-col divide-y divide-line">
         {positions.map((position) => (
@@ -85,10 +86,10 @@ const byType = (t: (typeof types)[number]) => milestones.filter((m) => m.data.ty
   {milestones.length > 0 && (
     <section class="band section-gap" aria-labelledby="milestones-heading">
       <div class="shell flex flex-col gap-6">
-        <SectionHeader id="milestones-heading" title="Education, credentials & community" />
+        <SectionHeader id="milestones-heading" title={t("experience.milestones")} />
         <div class="grid gap-4 md:grid-cols-2">
-          {types.map((t) => (
-            <MilestoneList type={t} items={byType(t)} />
+          {types.map((type) => (
+            <MilestoneList type={type} items={byType(type)} />
           ))}
         </div>
       </div>

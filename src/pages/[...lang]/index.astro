@@ -16,16 +16,25 @@ import TrackRecord from "@components/home/TrackRecord.astro";
 import OffDuty from "@components/home/OffDuty.astro";
 import { getPositions, getPosts, getProjects } from "@lib/content";
 import { visitedCountryCount } from "@data/adventures";
-import { siteConfig } from "@config";
+import { siteConfig, siteCopy } from "@config";
+import { i18n, localeParams } from "@/i18n";
 
-const [projects, positions, posts] = await Promise.all([getProjects(), getPositions(), getPosts()]);
+export const getStaticPaths = localeParams;
+
+const { locale } = i18n(Astro);
+const copy = siteCopy[locale];
+const [projects, positions, posts] = await Promise.all([
+  getProjects(locale),
+  getPositions(locale),
+  getPosts(),
+]);
 const products = projects.filter((p) => p.data.tagline);
 ---
 
 <BaseLayout
-  title={`${siteConfig.name} — ${siteConfig.title}`}
+  title={`${siteConfig.name} — ${copy.title}`}
   titleTemplate={false}
-  description={siteConfig.description}
+  description={copy.description}
   type="profile"
   contactIndex="05"
 >

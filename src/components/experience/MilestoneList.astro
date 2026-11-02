@@ -2,18 +2,20 @@
 /** Education, certifications, talks, awards or community work — one group. */
 import { milestoneLabels, shown, type Milestone } from "@lib/content";
 import { formatMonthYear } from "@lib/utils";
+import { i18n } from "@/i18n";
 
 interface Props {
   type: Milestone["data"]["type"];
   items: Milestone[];
 }
 const { type, items } = Astro.props;
+const { locale } = i18n(Astro);
 ---
 
 {items.length > 0 && (
   <section aria-labelledby={`milestone-${type}`} class="card p-6">
     <h3 id={`milestone-${type}`} class="label text-ink-muted">
-      {milestoneLabels[type].plural}
+      {milestoneLabels[locale][type].plural}
     </h3>
     <ul class="mt-4 divide-y divide-line">
       {items.map(({ data }) => (
@@ -29,8 +31,8 @@ const { type, items } = Astro.props;
               )}
             </p>
             <p class="meta text-ink-muted">
-              {formatMonthYear(data.date)}
-              {data.endDate && ` — ${formatMonthYear(data.endDate)}`}
+              {formatMonthYear(data.date, locale)}
+              {data.endDate && ` – ${formatMonthYear(data.endDate, locale)}`}
             </p>
           </div>
           {(shown(data.organization) || shown(data.location)) && (

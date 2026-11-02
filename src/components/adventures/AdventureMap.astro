@@ -8,17 +8,16 @@
  * picked in the country list, and the map mirrors the selection (`adventure:select`).
  */
 import { adventures } from "@data/adventures";
+import { i18n } from "@/i18n";
 
+const { t } = i18n(Astro);
 const visited = new Set(adventures.filter((a) => a.status === "visited").map((a) => a.country))
   .size;
 ---
 
 <figure class="adv-map" data-adv-map data-src="/images/adventures-map-base.svg">
   <div class="adv-map__stage" data-adv-stage></div>
-  <figcaption class="sr-only">
-    World map: {visited} visited countries in ink, home in the Czech Republic highlighted, wishlist
-    countries outlined. Use the country list to pick a place.
-  </figcaption>
+  <figcaption class="sr-only">{t("adventures.mapCaption", { n: String(visited) })}</figcaption>
 </figure>
 
 <style>

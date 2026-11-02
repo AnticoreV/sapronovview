@@ -4,29 +4,33 @@ import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
 import ArticleRow from "@components/writing/ArticleRow.astro";
 import TagList from "@components/writing/TagList.astro";
 import { getAllTags, getPosts } from "@lib/content";
+import { i18n, locales } from "@/i18n";
 
 export async function getStaticPaths() {
   const posts = await getPosts();
   const tags = await getAllTags(posts);
-  return tags.map(({ tag }) => ({
-    params: { tag },
-    props: { tag, posts: posts.filter((p) => p.data.tags.includes(tag)), tags },
-  }));
+  return locales.flatMap((locale) =>
+    tags.map(({ tag }) => ({
+      params: { lang: locale === "en" ? undefined : locale, tag },
+      props: { tag, posts: posts.filter((p) => p.data.tags.includes(tag)), tags },
+    })),
+  );
 }
-
 const { tag, posts, tags } = Astro.props;
+const { t } = i18n(Astro);
+const articles = t("articles", { n: posts.length });
 ---
 
 <BaseLayout
-  title={`Posts tagged “${tag}”`}
-  description={`${posts.length} article${posts.length === 1 ? "" : "s"} tagged ${tag}.`}
+  title={t("writing.tagTitle", { tag })}
+  description={t("writing.tagDescription", { articles, tag })}
 >
   <div class="band section-gap pt-8 md:pt-10">
     <div class="shell">
-      <Breadcrumbs items={[{ label: "Writing", href: "/writing" }, { label: `#${tag}` }]} />
-      <p class="label mt-8 text-ink-muted">
-        Tag · {posts.length} article{posts.length === 1 ? "" : "s"}
-      </p>
+      <Breadcrumbs
+        items={[{ label: t("writing.title"), href: "/writing" }, { label: `#${tag}` }]}
+      />
+      <p class="label mt-8 text-ink-muted">{t("writing.tagEyebrow", { articles })}</p>
       <h1 class="display mt-3 text-display-l">#{tag}</h1>
       <TagList tags={tags} active={tag} class="mt-8" />
       <ul class="mt-10 flex flex-col gap-3">

@@ -3,7 +3,10 @@
 interface Props {
   class?: string;
 }
+import { i18n } from "@/i18n";
+
 const { class: className } = Astro.props;
+const { t } = i18n(Astro);
 ---
 
 <ul
@@ -11,22 +14,25 @@ const { class: className } = Astro.props;
     "mono flex flex-wrap gap-x-5 gap-y-2 text-[12px] font-medium text-ink-muted uppercase",
     className,
   ]}
-  aria-label="Map legend"
+  aria-label={t("adventures.legend")}
 >
   <li class="inline-flex items-center gap-2">
-    <span class="inline-block size-3 rounded-[2px] bg-accent" aria-hidden="true"></span>Home
+    <span class="inline-block size-3 rounded-[2px] bg-accent" aria-hidden="true"></span>
+    {t("adventures.legendHome")}
   </li>
   <li class="inline-flex items-center gap-2">
-    <span class="inline-block size-3 rounded-[2px] bg-ink" aria-hidden="true"></span>Visited
+    <span class="inline-block size-3 rounded-[2px] bg-ink" aria-hidden="true"></span>
+    {t("adventures.legendVisited")}
   </li>
   <li class="inline-flex items-center gap-2">
     <span
       class="inline-block size-3 rounded-[2px] border-2 border-dashed border-accent"
       aria-hidden="true"
     ></span>
-    Want to visit
+    {t("adventures.legendWishlist")}
   </li>
   <li class="legend-route inline-flex items-center gap-2">
-    <span class="inline-block h-0.5 w-4 bg-accent" aria-hidden="true"></span>Route from Prague
+    <span class="inline-block h-0.5 w-4 bg-accent" aria-hidden="true"></span>
+    {t("adventures.legendRoute")}
   </li>
 </ul>

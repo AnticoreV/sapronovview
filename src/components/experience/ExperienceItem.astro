@@ -1,22 +1,37 @@
 ---
 /** One position in full: dates, company, role, every achievement, stack. */
-import { render } from "astro:content";
 import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
 import TechBadge from "@components/ui/TechBadge.astro";
-import { employmentLabels, shortCompany, shown, shownAll, type Position } from "@lib/content";
+import {
+  bodyLang,
+  employmentLabels,
+  renderEntry,
+  shortCompany,
+  shown,
+  shownAll,
+  type Position,
+} from "@lib/content";
 import { formatDuration, formatMonthYear } from "@lib/utils";
+import { i18n } from "@/i18n";
 
 interface Props {
   position: Position;
 }
 const { position } = Astro.props;
 const { data } = position;
-const { Content } = await render(position);
+const { locale, t } = i18n(Astro);
+const { Content } = await renderEntry(position);
+const lang = bodyLang(position, locale);
 const isCurrent = !data.endDate;
-const range = `${formatMonthYear(data.startDate)} — ${isCurrent ? "Present" : formatMonthYear(data.endDate)}`;
-const duration = formatDuration(data.startDate, data.endDate);
+const dash = locale === "cs" ? " – " : " — ";
+const range = `${formatMonthYear(data.startDate, locale)}${dash}${isCurrent ? t("experience.present") : formatMonthYear(data.endDate, locale)}`;
+const duration = formatDuration(data.startDate, data.endDate, locale);
 const achievements = shownAll(data.achievements);
-const meta = [employmentLabels[data.employmentType], shown(data.workplace), shown(data.location)]
+const meta = [
+  employmentLabels[locale][data.employmentType],
+  shown(data.workplace),
+  shown(data.location),
+]
   .filter(Boolean)
   .join(" · ");
 ---
@@ -47,7 +62,7 @@ const meta = [employmentLabels[data.employmentType], shown(data.workplace), show
       </div>
       {data.placeholder && <PlaceholderBadge />}
     </div>
-    <div class="mt-3 max-w-[68ch] text-ink-muted">
+    <div class="mt-3 max-w-[68ch] text-ink-muted" lang={lang === locale ? undefined : lang}>
       <Content />
     </div>
     {achievements.length > 0 && (
@@ -63,10 +78,10 @@ const meta = [employmentLabels[data.employmentType], shown(data.workplace), show
       </ul>
     )}
     {data.technologies.length > 0 && (
-      <ul class="mt-5 flex flex-wrap gap-1.5" aria-label="Technologies">
-        {data.technologies.map((t) => (
+      <ul class="mt-5 flex flex-wrap gap-1.5" aria-label={t("experience.technologies")}>
+        {data.technologies.map((tech) => (
           <li>
-            <TechBadge label={t} />
+            <TechBadge label={tech} />
           </li>
         ))}
       </ul>

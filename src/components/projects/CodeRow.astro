@@ -6,14 +6,16 @@
  */
 import Arrow from "@components/ui/Arrow.astro";
 import TechBadge from "@components/ui/TechBadge.astro";
-import { categoryLabels, isPlaceholder, statusLabels, type Project } from "@lib/content";
+import { categoryLabels, isPlaceholder, statusLabel, type Project } from "@lib/content";
+import { i18n } from "@/i18n";
 
 interface Props {
   project: Project;
 }
 const { project } = Astro.props;
 const { data } = project;
-const stack = data.technologies.filter((t) => !isPlaceholder(t));
+const { locale, t } = i18n(Astro);
+const stack = data.technologies.filter((tech) => !isPlaceholder(tech));
 const links = [
   data.github && { label: "GitHub", href: data.github },
   ...data.links.filter((l) => !isPlaceholder(l.label)),
@@ -29,16 +31,16 @@ const links = [
       {data.title}
     </h3>
     <p class="mono text-[12px] text-ink-muted uppercase">
-      {categoryLabels[data.category]} · {statusLabels[data.status].label}
+      {categoryLabels[locale][data.category]} · {statusLabel(data.status, locale).label}
     </p>
   </div>
   <div class="flex flex-col gap-3">
     <p class="text-ink-muted">{data.description}</p>
     {stack.length > 0 && (
-      <ul class="flex flex-wrap gap-1.5" aria-label="Stack">
-        {stack.map((t) => (
+      <ul class="flex flex-wrap gap-1.5" aria-label={t("project.stack")}>
+        {stack.map((tech) => (
           <li>
-            <TechBadge label={t} />
+            <TechBadge label={tech} />
           </li>
         ))}
       </ul>

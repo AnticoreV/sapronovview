@@ -10,7 +10,8 @@
 import Arrow from "@components/ui/Arrow.astro";
 import StatusBadge from "@components/ui/StatusBadge.astro";
 import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
-import { shortCompany, shown, shownAll, statusLabels, type Project } from "@lib/content";
+import { shortCompany, shown, shownAll, statusLabel, type Project } from "@lib/content";
+import { i18n } from "@/i18n";
 
 interface Props {
   project: Project;
@@ -21,7 +22,8 @@ interface Props {
 }
 const { project, level = 3, size = "lg" } = Astro.props;
 const { data } = project;
-const status = statusLabels[data.status];
+const { locale, t, l } = i18n(Astro);
+const status = statusLabel(data.status, locale);
 const Name = level === 2 ? "h2" : "h3";
 const isProduct = size === "lg";
 const org = shown(data.organization);
@@ -35,15 +37,15 @@ const source = isProduct
 const text = data.summary ?? data.description;
 const facts = isProduct
   ? [
-      { label: "Status", value: status.label },
+      { label: t("project.status"), value: status.label },
       ...shownAll(data.facts, (f) => `${f.label} ${f.value}`),
-      shown(data.domain) && { label: "Web", value: shown(data.domain)! },
+      shown(data.domain) && { label: t("project.web"), value: shown(data.domain)! },
     ].filter((f): f is { label: string; value: string } => Boolean(f && f.value))
   : [];
 ---
 
 <a
-  href={`/projects/${project.id}`}
+  href={l(`/projects/${project.id}`)}
   class="product card lift flex h-full w-full flex-wrap gap-x-12 gap-y-8 p-[clamp(24px,3vw,40px)] no-underline"
 >
   <div class="flex flex-[1_1_420px] flex-col gap-4">
@@ -66,7 +68,7 @@ const facts = isProduct
     )}
     <p class="max-w-[560px] text-ink-muted">{text}</p>
     <span class="read-more mt-auto pt-2 font-semibold text-accent">
-      Read the case
+      {t("project.readCase")}
       <Arrow weight="bold" class="ml-[0.35em]" />
     </span>
     {data.placeholder && <PlaceholderBadge />}

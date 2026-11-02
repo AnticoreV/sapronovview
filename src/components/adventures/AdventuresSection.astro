@@ -11,12 +11,15 @@ import AdventureDetails from "@components/adventures/AdventureDetails.astro";
 import AdventureMap from "@components/adventures/AdventureMap.astro";
 import GlobeStage from "@components/adventures/GlobeStage.astro";
 import MapLegend from "@components/adventures/MapLegend.astro";
-import { adventures } from "@data/adventures";
+import { localizedAdventures } from "@data/adventures";
+import { i18n } from "@/i18n";
 
 interface Props {
   class?: string;
 }
 const { class: className } = Astro.props;
+const { locale, t } = i18n(Astro);
+const adventures = localizedAdventures(locale);
 const countries = new Set(
   adventures.filter((a) => a.status === "visited").map((a) => a.countryCode),
 ).size;
@@ -30,17 +33,14 @@ const countries = new Set(
 >
   <div class="shell">
     <slot name="before" />
-    <p class="label mt-8 text-ink-muted">Off duty · adventures</p>
+    <p class="label mt-8 text-ink-muted">{t("adventures.eyebrow")}</p>
     <h1 id="adventures-heading" class="display mt-3 text-display-l">
-      {countries} countries on the map
+      {t("hobbies.mapLine", { countries: t("countries", { n: countries }) })}
     </h1>
     <p class="mt-5 max-w-[640px] text-body-l">
-      Where I've been, home in Prague, and the places still on the list.
-      <span class="copy-globe">
-        {" "}
-        Drag the globe to turn it; pick a country or a place in the list to fly there.
-      </span>
-      <span class="copy-map"> Pick a country or a place in the list to see it on the map.</span>
+      {t("adventures.intro")}
+      <span class="copy-globe"> {t("adventures.copyGlobe")}</span>
+      <span class="copy-map"> {t("adventures.copyMap")}</span>
     </p>
 
     <div class="mt-10 grid items-start gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(300px,1fr)]">
@@ -53,7 +53,7 @@ const countries = new Set(
       </div>
       <section class="places card p-6" aria-labelledby="places-heading">
         <h2 id="places-heading" class="label text-ink-muted">
-          Countries &amp; places
+          {t("adventures.places")}
         </h2>
         <div class="mt-5">
           <AdventureDetails locations={adventures} headingLevel={3} />

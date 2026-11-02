@@ -5,10 +5,17 @@
  * While an entry is `placeholder: true`, production shows only its title and tagline —
  * the write-up stays hidden until Ivan confirms it (2026-10-23).
  */
-import { render } from "astro:content";
 import Arrow from "@components/ui/Arrow.astro";
 import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
-import { hidePlaceholders, hobbyCategoryLabels, shownAll, type Hobby } from "@lib/content";
+import {
+  bodyLang,
+  hidePlaceholders,
+  hobbyCategoryLabels,
+  renderEntry,
+  shownAll,
+  type Hobby,
+} from "@lib/content";
+import { i18n } from "@/i18n";
 
 interface Props {
   hobby: Hobby;
@@ -16,7 +23,9 @@ interface Props {
 }
 const { hobby, index } = Astro.props;
 const { data } = hobby;
-const { Content } = await render(hobby);
+const { locale, t, l } = i18n(Astro);
+const { Content } = await renderEntry(hobby);
+const lang = bodyLang(hobby, locale);
 const showProse = !(hidePlaceholders && data.placeholder);
 const stats = shownAll(data.stats, (s) => `${s.label} ${s.value}`);
 const favorites = shownAll(data.favorites);
@@ -32,7 +41,10 @@ const links = shownAll(data.links, (l) => `${l.label} ${l.href}`).filter(
 >
   <p class="label flex flex-wrap items-center justify-between gap-3 text-ink-muted">
     <span>
-      OFF DUTY {String(index + 1).padStart(2, "0")} · {hobbyCategoryLabels[data.category]}
+      {t("hobbies.module", {
+        n: String(index + 1).padStart(2, "0"),
+        category: hobbyCategoryLabels[locale][data.category],
+      })}
     </span>
     {data.placeholder && <PlaceholderBadge label="Has placeholders" />}
   </p>
@@ -44,7 +56,7 @@ const links = shownAll(data.links, (l) => `${l.label} ${l.href}`).filter(
   </h2>
   <p class="text-body-l font-semibold">{data.tagline}</p>
   {showProse && (
-    <div class="prose-sheet text-ink-muted">
+    <div class="prose-sheet text-ink-muted" lang={lang === locale ? undefined : lang}>
       <Content />
     </div>
   )}
@@ -67,9 +79,9 @@ const links = shownAll(data.links, (l) => `${l.label} ${l.href}`).filter(
   )}
   {links.length > 0 && (
     <p class="flex flex-wrap gap-4">
-      {links.map((l) => (
-        <a href={l.href} class="link-more">
-          {l.label}
+      {links.map((link) => (
+        <a href={l(link.href)} class="link-more">
+          {link.label}
           <Arrow class="ml-[0.4em]" />
         </a>
       ))}

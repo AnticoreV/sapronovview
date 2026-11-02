@@ -4,15 +4,18 @@
  * ("Dark theme", pressed = dark); stores the choice in localStorage (the inline
  * script in BaseLayout applies it before paint) and defaults to the OS preference.
  */
+import { i18n } from "@/i18n";
+
+const { t } = i18n(Astro);
 ---
 
 <button
   type="button"
   class="icon-btn theme-toggle"
   data-theme-toggle
-  aria-label="Dark theme"
+  aria-label={t("theme.label")}
   aria-pressed="false"
-  title="Light / dark theme"
+  title={t("theme.title")}
 >
   <svg
     class="theme-toggle__moon"

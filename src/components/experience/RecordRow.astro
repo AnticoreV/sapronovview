@@ -6,6 +6,7 @@
  */
 import Glyphs from "@components/ui/Glyphs.astro";
 import { employmentLabels, shortCompany, shown, yearsLabel, type Position } from "@lib/content";
+import { i18n } from "@/i18n";
 
 interface Props {
   position: Position;
@@ -13,8 +14,12 @@ interface Props {
 }
 const { position, href } = Astro.props;
 const { data } = position;
+const { locale, t } = i18n(Astro);
 const contract = data.employmentType === "freelance" || data.employmentType === "contract";
-const role = contract ? `${data.role} · ${employmentLabels.contract.toLowerCase()}` : data.role;
+const role = contract
+  ? `${data.role} · ${employmentLabels[locale].contract.toLowerCase()}`
+  : data.role;
+const sr = (key: Parameters<typeof t>[0]) => `${t(key)}: `;
 const shipped = shown(data.shipped) ?? shown(data.achievements[0]);
 const Tag = href ? "a" : "div";
 ---
@@ -27,20 +32,20 @@ const Tag = href ? "a" : "div";
   ]}
 >
   <span class="mono text-[14px] text-accent">
-    <span class="sr-only">Years: </span>
+    <span class="sr-only">{sr("record.years")}</span>
     {yearsLabel(data.startDate, data.endDate)}
   </span>
   <span class="font-bold">
-    <span class="sr-only">Company: </span>
+    <span class="sr-only">{sr("record.company")}</span>
     {shortCompany(data.company)}
   </span>
   <span>
-    <span class="sr-only">Role: </span>
+    <span class="sr-only">{sr("record.role")}</span>
     {role}
   </span>
   {shipped && (
     <span class="text-ink-muted">
-      <span class="sr-only">Shipped: </span>
+      <span class="sr-only">{sr("record.shipped")}</span>
       <Glyphs text={shipped} />
     </span>
   )}

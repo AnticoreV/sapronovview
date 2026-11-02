@@ -1,18 +1,20 @@
 ---
 /** A project as a row card (as on the homepage): title, one-line description, mono meta. */
 import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
-import { categoryLabels, shortCompany, shown, statusLabels, type Project } from "@lib/content";
+import { categoryLabels, shortCompany, shown, statusLabel, type Project } from "@lib/content";
+import { i18n } from "@/i18n";
 
 interface Props {
   project: Project;
 }
 const { project } = Astro.props;
 const { data } = project;
+const { locale, l } = i18n(Astro);
 const org = shown(data.organization);
 const meta = [
-  org ? shortCompany(org) : categoryLabels[data.category],
+  org ? shortCompany(org) : categoryLabels[locale][data.category],
   shown(data.timeframe),
-  statusLabels[data.status].label,
+  statusLabel(data.status, locale).label,
   ...data.technologies.slice(0, 4),
 ]
   .filter(Boolean)
@@ -20,7 +22,7 @@ const meta = [
 ---
 
 <a
-  href={`/projects/${project.id}`}
+  href={l(`/projects/${project.id}`)}
   class="row card lift grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] items-start gap-x-8 gap-y-3 p-7 no-underline"
 >
   <span class="text-[26px] leading-[1.15] font-bold tracking-[-0.02em]">{data.title}</span>

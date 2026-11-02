@@ -82,8 +82,21 @@ createServer(async (req, res) => {
       return;
     }
   }
+  // Like Cloudflare Pages: the nearest 404.html up the path (/cs/… → cs/404.html).
+  let notFound = join(root, "404.html");
+  for (
+    let dir = safe.replace(/\/[^/]*$/, "");
+    dir && dir !== "/";
+    dir = dir.replace(/\/[^/]*$/, "")
+  ) {
+    const candidate = join(root, dir, "404.html");
+    if (candidate.startsWith(root) && (await isFile(candidate))) {
+      notFound = candidate;
+      break;
+    }
+  }
   res.writeHead(404, { ...extra, "Content-Type": types[".html"] });
-  res.end(await readFile(join(root, "404.html")).catch(() => "Not found"));
+  res.end(await readFile(notFound).catch(() => "Not found"));
 }).listen(port, "127.0.0.1", () =>
   console.log(`dist/ on http://127.0.0.1:${port} (${headerRules.length} _headers rules)`),
 );

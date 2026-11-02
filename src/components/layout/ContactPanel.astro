@@ -9,7 +9,8 @@
 import ContactRoute from "@components/contact/ContactRoute.astro";
 import CopyEmail from "@components/ui/CopyEmail.astro";
 import { siteConfig } from "@config";
-import { contactRoutes, mailtoFor } from "@data/contact";
+import { contactRoutes, mailtoFor, type ContactRoute as Route } from "@data/contact";
+import { i18n } from "@/i18n";
 
 interface Props {
   /** Heading level: 2 inside a page, 1 when the panel is the page head (/contact). */
@@ -19,8 +20,11 @@ interface Props {
 }
 const { level = 2, index } = Astro.props;
 const Heading = level === 1 ? "h1" : "h2";
-const routeHref = (route: (typeof contactRoutes)[number]) =>
-  level === 1 ? mailtoFor(siteConfig.email, route.subject) : `/contact?topic=${route.id}`;
+const { locale, t, l } = i18n(Astro);
+const routes = contactRoutes(locale);
+const routeHref = (route: Route) =>
+  level === 1 ? mailtoFor(siteConfig.email, route.subject) : l(`/contact?topic=${route.id}`);
+const eyebrow = t("contact.eyebrow");
 ---
 
 <section
@@ -30,18 +34,18 @@ const routeHref = (route: (typeof contactRoutes)[number]) =>
 >
   <div class="contact-panel shell flex flex-col gap-10 rounded-lg bg-accent p-[clamp(20px,5vw,72px)] text-on-accent">
     <div class="flex flex-col gap-3.5">
-      <span class="label">{index ? `${index} · GET IN TOUCH` : "GET IN TOUCH"}</span>
+      <span class="label">{index ? `${index} · ${eyebrow}` : eyebrow}</span>
       <Heading
         id="contact-heading"
         class="display text-[clamp(44px,6.4vw,96px)] leading-[0.95] tracking-[-0.045em]"
       >
-        Ready to ship
+        {t("contact.title1")}
         <br />
-        your project.
+        {t("contact.title2")}
       </Heading>
     </div>
     <ul class="grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-3">
-      {contactRoutes.map((route) => (
+      {routes.map((route) => (
         <li class="flex">
           <ContactRoute route={route} href={routeHref(route)} level={level === 1 ? 2 : 3} />
         </li>

@@ -8,22 +8,27 @@
  */
 import { siteConfig } from "@config";
 import { contactRoutes, contactTopics } from "@data/contact";
+import { i18n } from "@/i18n";
 
+const { locale, t } = i18n(Astro);
 const action = siteConfig.formAction;
 const connected = /^https:\/\/formspree\.io\/f\/[A-Za-z0-9]+$/.test(action);
-const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]));
+const subjects = Object.fromEntries(contactRoutes(locale).map((r) => [r.id, r.subject]));
+const submitLabel = t(connected ? "form.send" : "form.asEmail");
 ---
 
 <div class="card flex flex-col gap-6 p-6 sm:p-8" data-contact>
   <div class="flex flex-col gap-2">
-    <h2 class="text-heading">Send a message</h2>
+    <h2 class="text-heading">{t("form.title")}</h2>
     {!connected && (
       <p class="text-small text-ink-muted" role="note">
-        <strong class="text-ink">Form not connected yet</strong> — email me at{" "}
+        <strong class="text-ink">{t("form.notConnected")}</strong>
+        {locale === "cs" ? " – " : " — "}
+        {t("form.notConnectedText")}{" "}
         <a href={`mailto:${siteConfig.email}`} class="link-inline text-ink break-all">
           {siteConfig.email}
         </a>
-        . You can still fill it in: I'll hand the text to your email app.
+        {t("form.notConnectedHint")}
       </p>
     )}
   </div>
@@ -38,10 +43,13 @@ const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]))
     data-connected={connected ? "true" : "false"}
     data-email={siteConfig.email}
     data-subjects={JSON.stringify(subjects)}
+    data-default-subject={t("form.defaultSubject")}
+    data-label-sending={t("form.sending")}
+    data-label-submit={submitLabel}
   >
     <div class="grid gap-5 sm:grid-cols-2">
       <div class="field">
-        <label for="cf-name">Name</label>
+        <label for="cf-name">{t("form.name")}</label>
         <input
           id="cf-name"
           name="name"
@@ -51,11 +59,11 @@ const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]))
           aria-describedby="cf-name-error"
         />
         <p id="cf-name-error" class="field__error" hidden>
-          Tell me who you are — a name is enough.
+          {t("form.errName")}
         </p>
       </div>
       <div class="field">
-        <label for="cf-email">Email</label>
+        <label for="cf-email">{t("form.email")}</label>
         <input
           id="cf-email"
           name="email"
@@ -66,20 +74,20 @@ const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]))
           aria-describedby="cf-email-error"
         />
         <p id="cf-email-error" class="field__error" hidden>
-          I need an email address I can reply to, like name@company.com.
+          {t("form.errEmail")}
         </p>
       </div>
     </div>
     <div class="field">
-      <label for="cf-topic">Topic</label>
+      <label for="cf-topic">{t("form.topic")}</label>
       <select id="cf-topic" name="topic">
-        {contactTopics.map((t) => (
-          <option value={t.id}>{t.label}</option>
+        {contactTopics(locale).map((topic) => (
+          <option value={topic.id}>{topic.label}</option>
         ))}
       </select>
     </div>
     <div class="field">
-      <label for="cf-message">Message</label>
+      <label for="cf-message">{t("form.message")}</label>
       <textarea
         id="cf-message"
         name="message"
@@ -89,18 +97,16 @@ const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]))
         aria-describedby="cf-message-error"
       ></textarea>
       <p id="cf-message-error" class="field__error" hidden>
-        Write a sentence or two so I know what it's about.
+        {t("form.errMessage")}
       </p>
     </div>
     {/* Honeypot for bots — hidden from people and screen readers. */}
     <div class="hidden" aria-hidden="true">
-      <label for="cf-gotcha">Leave this empty</label>
+      <label for="cf-gotcha">{t("form.honeypot")}</label>
       <input id="cf-gotcha" name="_gotcha" type="text" tabindex="-1" autocomplete="off" />
     </div>
     <div class="flex flex-wrap items-center justify-between gap-4">
-      <p class="text-small text-ink-muted">
-        No newsletter, no tracking — just a message to my inbox.
-      </p>
+      <p class="text-small text-ink-muted">{t("form.note")}</p>
       <button type="submit" class="btn btn-primary" data-submit>
         <span class="spinner inline-flex" aria-hidden="true" hidden>
           <svg width="16" height="16" viewBox="0 0 16 16">
@@ -115,7 +121,7 @@ const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]))
             ></circle>
           </svg>
         </span>
-        <span data-submit-label>{connected ? "Send message" : "Write it as an email"}</span>
+        <span data-submit-label>{submitLabel}</span>
       </button>
     </div>
   </form>
@@ -128,8 +134,8 @@ const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]))
       hidden
       tabindex="-1"
     >
-      <p class="label font-semibold text-ok-ink">● MESSAGE RECEIVED</p>
-      <p>Thanks — your message is in my inbox. I'll reply by email.</p>
+      <p class="label font-semibold text-ok-ink">● {t("form.success")}</p>
+      <p>{t("form.successText")}</p>
     </div>
     <div
       class="flex flex-col gap-1.5 rounded-md border-2 border-error-ink bg-surface p-5"
@@ -137,13 +143,13 @@ const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]))
       role="alert"
       hidden
     >
-      <p class="label font-semibold text-error-ink">MESSAGE NOT SENT</p>
+      <p class="label font-semibold text-error-ink">{t("form.failure")}</p>
       <p>
-        Something went wrong on the way. Email me directly at{" "}
+        {t("form.failureText")}{" "}
         <a href={`mailto:${siteConfig.email}`} class="link-inline font-semibold">
           {siteConfig.email}
         </a>{" "}
-        — your text is still in the form.
+        {t("form.textKept")}
       </p>
     </div>
     <div
@@ -151,17 +157,17 @@ const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]))
       data-state="offline"
       hidden
     >
-      <p class="label font-semibold">FORM NOT CONNECTED YET</p>
+      <p class="label font-semibold">{t("form.offline")}</p>
       <p>
-        Nothing was sent. Email me at{" "}
+        {t("form.offlineText")}{" "}
         <a href={`mailto:${siteConfig.email}`} class="link-inline font-semibold">
           {siteConfig.email}
         </a>{" "}
-        — your text is still in the form.
+        {t("form.textKept")}
       </p>
       <p>
         <a href={`mailto:${siteConfig.email}`} class="btn btn-secondary btn-sm" data-mailto>
-          Open it in your email app
+          {t("form.openApp")}
         </a>
       </p>
     </div>
@@ -294,7 +300,9 @@ const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]))
       submit.disabled = on;
       submit.setAttribute("aria-busy", String(on));
       if (spinner) spinner.hidden = !on;
-      label.textContent = on ? "Sending…" : connected ? "Send message" : "Write it as an email";
+      label.textContent = on
+        ? (form.dataset.labelSending ?? "Sending…")
+        : (form.dataset.labelSubmit ?? label.textContent);
     };
 
     form.addEventListener("submit", async (event) => {
@@ -308,7 +316,7 @@ const subjects = Object.fromEntries(contactRoutes.map((r) => [r.id, r.subject]))
       if ((form.elements.namedItem("_gotcha") as HTMLInputElement).value) return;
 
       if (!connected) {
-        const subject = subjects[topic.value] ?? "Hello";
+        const subject = subjects[topic.value] ?? form.dataset.defaultSubject ?? "Hello";
         const body = `${field("message").value.trim()}\n\n— ${field("name").value.trim()} (${field("email").value.trim()})`;
         const params = new URLSearchParams({ subject, body }).toString().replace(/\+/g, "%20");
         const mailto = root.querySelector<HTMLAnchorElement>("[data-mailto]");

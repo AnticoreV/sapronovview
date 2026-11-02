@@ -1,10 +1,15 @@
 ---
 /**
+ * The 404 page body, rendered by src/pages/404.astro (English) and src/pages/cs/404.astro
+ * (Czech; Cloudflare Pages serves the nearest 404.html, so /cs/… gets the Czech one).
  * 404 — "this route isn't deployed." with a small static drawing in the hero's V6
  * blueprint line style: a dashed CI/CD arrow into a dashed deploy target where one of
  * the four service blocks is missing (inline SVG, isometric, no three.js on this page).
  */
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { i18n } from "@/i18n";
+
+const { t, l } = i18n(Astro);
 
 // True isometric projection: screen-right = x − z, screen-down = x + z, up = y.
 const S = 62;
@@ -71,16 +76,21 @@ const [ax, ay] = pt(-0.62 - W / 2, 0.33, 0.62 + W / 2);
 const [lx, ly] = [ax - 64, ay + 46];
 ---
 
-<BaseLayout title="Not found" description="That page doesn't exist." noindex>
+<BaseLayout
+  title={t("404.title")}
+  description={t("404.description")}
+  noindex
+  langPaths={{ en: "/", cs: "/cs" }}
+>
   <section class="band section-gap pt-14">
     <div class="shell flex flex-wrap items-center gap-10">
       <div class="flex flex-[1_1_420px] flex-col gap-6">
         <h1 class="display text-[clamp(44px,6vw,88px)] leading-[0.95] tracking-[-0.045em]">
-          404 — this route isn't deployed.
+          {t("404.heading")}
         </h1>
         <div class="flex flex-wrap gap-3">
-          <a href="/" class="btn btn-primary">
-            Back to home
+          <a href={l("/")} class="btn btn-primary">
+            {t("404.back")}
           </a>
         </div>
       </div>
@@ -89,7 +99,7 @@ const [lx, ly] = [ax - 64, ay + 46];
           viewBox="0 0 520 340"
           class="blueprint w-full max-w-[560px]"
           role="img"
-          aria-label="A blueprint drawing of a deploy target: a dashed CI/CD arrow leads to a dashed footprint where three service blocks stand and the fourth is missing, drawn only as a dashed outline."
+          aria-label={t("404.alt")}
         >
           <polyline points={route} class="ci"></polyline>
           <polyline points={arrowHead} class="ink"></polyline>

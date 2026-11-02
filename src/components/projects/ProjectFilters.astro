@@ -5,31 +5,33 @@
  * mirrors the choice in the URL hash.
  */
 import { categoryLabels, type Project } from "@lib/content";
+import { i18n } from "@/i18n";
 
 interface Props {
   projects: Project[];
 }
 const { projects } = Astro.props;
+const { locale, t } = i18n(Astro);
+const labels = categoryLabels[locale];
 const counts = new Map<string, number>();
 for (const p of projects) counts.set(p.data.category, (counts.get(p.data.category) ?? 0) + 1);
-const categories = (Object.keys(categoryLabels) as Array<keyof typeof categoryLabels>).filter((c) =>
-  counts.has(c),
-);
+const categories = (Object.keys(labels) as Array<keyof typeof labels>).filter((c) => counts.has(c));
 ---
 
 {categories.length > 1 && (
   <div
     class="flex flex-wrap items-center gap-2"
     role="group"
-    aria-label="Filter projects by category"
+    aria-label={t("filters.label")}
     data-project-filters
+    data-text-shown={t("filters.shown", { n: "{n}" })}
   >
     <button type="button" data-filter="all" aria-pressed="true" class="filter">
-      All <span class="tabular opacity-70">{projects.length}</span>
+      {t("filters.all")} <span class="tabular opacity-70">{projects.length}</span>
     </button>
     {categories.map((c) => (
       <button type="button" data-filter={c} aria-pressed="false" class="filter">
-        {categoryLabels[c]} <span class="tabular opacity-70">{counts.get(c)}</span>
+        {labels[c]} <span class="tabular opacity-70">{counts.get(c)}</span>
       </button>
     ))}
     <p class="sr-only" aria-live="polite" data-filter-status />
@@ -86,7 +88,8 @@ const categories = (Object.keys(categoryLabels) as Array<keyof typeof categoryLa
         g.hidden = !g.querySelector("[data-category]:not([hidden])");
       });
       buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.filter === filter)));
-      if (status) status.textContent = `${count} project${count === 1 ? "" : "s"} shown`;
+      if (status)
+        status.textContent = (root.dataset.textShown ?? "{n} shown").replace("{n}", String(count));
     };
 
     buttons.forEach((b) =>

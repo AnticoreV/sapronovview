@@ -1,18 +1,21 @@
 ---
-import { render } from "astro:content";
 import ArticleLayout from "@layouts/ArticleLayout.astro";
-import { getAdjacentPosts, getPosts, getRelatedPosts } from "@lib/content";
+import { getAdjacentPosts, getPosts, getRelatedPosts, renderEntry } from "@lib/content";
+import { locales } from "@/i18n";
 
+// Posts are English; the Czech site shows the same posts under /cs/writing/ (marked lang="en").
 export async function getStaticPaths() {
   const posts = await getPosts();
-  return posts.map((post) => ({
-    params: { slug: post.id },
-    props: { post, ...getAdjacentPosts(post, posts), related: getRelatedPosts(post, posts) },
-  }));
+  return locales.flatMap((locale) =>
+    posts.map((post) => ({
+      params: { lang: locale === "en" ? undefined : locale, slug: post.id },
+      props: { post, ...getAdjacentPosts(post, posts), related: getRelatedPosts(post, posts) },
+    })),
+  );
 }
 
 const { post, prev, next, related } = Astro.props;
-const { Content } = await render(post);
+const { Content } = await renderEntry(post);
 ---
 
 <ArticleLayout post={post} prev={prev} next={next} related={related}>

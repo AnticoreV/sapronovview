@@ -1,13 +1,15 @@
 ---
 import { formatDate } from "@lib/utils";
+import { i18n } from "@/i18n";
 interface Props {
   date: Date;
   format?: Intl.DateTimeFormatOptions;
   class?: string;
 }
 const { date, format, class: className } = Astro.props;
+const { locale } = i18n(Astro);
 ---
 
 <time datetime={date.toISOString()} class={className}>
-  {formatDate(date, format)}
+  {formatDate(date, format, locale)}
 </time>

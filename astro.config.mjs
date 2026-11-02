@@ -6,6 +6,7 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { satteri } from "@astrojs/markdown-satteri";
 import { hidePlaceholders } from "./src/lib/markdown-hide-placeholders.mjs";
+import { czechTypography } from "./src/lib/markdown-czech.mjs";
 import { hasPublishedWriting } from "./src/lib/writing-status.mjs";
 
 // Production URL — used for canonical URLs, the sitemap, the RSS feed and Open Graph metadata.
@@ -93,6 +94,16 @@ export default defineConfig({
   redirects: {
     "/projects/apex-line-market-research": "/projects",
     "/projects/apexline": "/projects",
+    "/cs/projects/apex-line-market-research": "/cs/projects",
+    "/cs/projects/apexline": "/cs/projects",
+  },
+  // English keeps today's URLs; Czech lives under /cs/ (pages in src/pages/[...lang]/,
+  // strings in src/i18n/). The browser-language redirect is a small inline script in
+  // BaseLayout, not Astro's server-side routing (this is a static site).
+  i18n: {
+    defaultLocale: "en",
+    locales: ["en", "cs"],
+    routing: { prefixDefaultLocale: false },
   },
   build: {
     format: "file",
@@ -173,7 +184,13 @@ export default defineConfig({
     sitemap({
       filter: (page) =>
         !page.includes("/drafts/") &&
-        (WRITING_PUBLISHED || !/^\/writing(\/|$)/.test(new URL(page).pathname)),
+        !/^(\/cs)?\/404$/.test(new URL(page).pathname) &&
+        (WRITING_PUBLISHED || !/^(\/cs)?\/writing(\/|$)/.test(new URL(page).pathname)),
+      // hreflang alternates for every page (en ↔ cs).
+      i18n: {
+        defaultLocale: "en",
+        locales: { en: "en-US", cs: "cs-CZ" },
+      },
       changefreq: "weekly",
       priority: 0.7,
       lastmod: new Date(),
@@ -183,7 +200,7 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
   markdown: {
-    processor: satteri({ mdastPlugins: hidePlaceholders }),
+    processor: satteri({ mdastPlugins: [...hidePlaceholders, ...czechTypography] }),
     shikiConfig: {
       // Code sits on #10141A with github-dark-dimmed in both themes (components.md, Sheet).
       theme: "github-dark-dimmed",

@@ -6,14 +6,17 @@
 import Glyphs from "@components/ui/Glyphs.astro";
 import SectionHeader from "@components/ui/SectionHeader.astro";
 import { homeCases } from "@data/home";
-import { readouts, type Readout, type ReadoutId } from "@data/readouts";
+import { getReadouts, type Readout, type ReadoutId } from "@data/readouts";
 import type { Project } from "@lib/content";
+import { i18n } from "@/i18n";
 
 interface Props {
   projects: Project[];
 }
 const { projects } = Astro.props;
-const cases = homeCases.filter((c) => projects.some((p) => p.id === c.slug));
+const { locale, t, l } = i18n(Astro);
+const cases = homeCases(locale).filter((c) => projects.some((p) => p.id === c.slug));
+const readouts = getReadouts(locale);
 const readout = (id: ReadoutId): Readout => readouts[id];
 ---
 
@@ -23,15 +26,15 @@ const readout = (id: ReadoutId): Readout => readouts[id];
       <SectionHeader
         id="work-heading"
         index="03"
-        title="Proof in production"
-        href="/projects"
-        linkLabel="All projects"
+        title={t("work.title")}
+        href={l("/projects")}
+        linkLabel={t("work.all")}
       />
       <ul class="flex flex-col gap-3">
         {cases.map((c) => (
           <li>
             <a
-              href={`/projects/${c.slug}`}
+              href={l(`/projects/${c.slug}`)}
               class="case card lift grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] items-start gap-x-8 gap-y-3 p-7 no-underline"
             >
               <h3 class="text-[26px] leading-[1.15] font-bold tracking-[-0.02em]">{c.title}</h3>

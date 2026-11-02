@@ -9,52 +9,38 @@ import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
 import ContactForm from "@components/contact/ContactForm.astro";
 import ContactPanel from "@components/layout/ContactPanel.astro";
 import { siteConfig } from "@config";
+import { i18n, localeParams } from "@/i18n";
 
+export const getStaticPaths = localeParams;
+
+const { t } = i18n(Astro);
 const connected = /^https:\/\/formspree\.io\/f\/[A-Za-z0-9]+$/.test(siteConfig.formAction);
 ---
 
 <BaseLayout
-  title="Contact"
-  description={`Contact ${siteConfig.name} about a senior backend or fullstack role, investing in Ownira, or building, automating and shipping together.`}
+  title={t("contactPage.title")}
+  description={t("contactPage.description", { name: siteConfig.name })}
   contactPanel={false}
 >
   <div class="band pt-8 md:pt-10">
     <div class="shell">
-      <Breadcrumbs items={[{ label: "Contact" }]} />
+      <Breadcrumbs items={[{ label: t("contactPage.title") }]} />
     </div>
   </div>
   <ContactPanel level={1} />
-
-  <section class="band section-gap pt-4" aria-label="Contact form">
+  <section class="band section-gap pt-4" aria-label={t("contactPage.formLabel")}>
     <div class="shell grid items-start gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
       <ContactForm />
       <section
         class="flex flex-col gap-3 text-small text-ink-muted"
         aria-labelledby="privacy-heading"
       >
-        <p class="text-body-l text-ink">
-          Email is the fastest way to reach me. Pick a route above and the subject line is filled in
-          for you.
-        </p>
+        <p class="text-body-l text-ink">{t("contactPage.intro")}</p>
         <h2 id="privacy-heading" class="label mt-4 text-ink">
-          Privacy
+          {t("contactPage.privacy")}
         </h2>
-        {connected ? (
-          <p>
-            The form sends your name, email, topic and message to Formspree (formspree.io), which
-            processes them on my behalf and forwards them to my inbox. I use them only to reply to
-            you.
-          </p>
-        ) : (
-          <p>
-            While the form is not connected, nothing is sent from this page — your text only goes
-            wherever your own email app sends it.
-          </p>
-        )}
-        <p>
-          This site sets no cookies and runs no analytics. Your light / dark theme choice is kept in
-          your browser's local storage and never leaves it.
-        </p>
+        <p>{t(connected ? "contactPage.privacyOn" : "contactPage.privacyOff")}</p>
+        <p>{t("contactPage.cookies")}</p>
       </section>
     </div>
   </section>

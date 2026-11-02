@@ -12,8 +12,12 @@ import ProjectFilters from "@components/projects/ProjectFilters.astro";
 import ProjectRow from "@components/projects/ProjectRow.astro";
 import SectionHeader from "@components/ui/SectionHeader.astro";
 import { getCodeProjects, getProjects } from "@lib/content";
+import { i18n, localeParams } from "@/i18n";
 
-const [all, code] = await Promise.all([getProjects(), getCodeProjects()]);
+export const getStaticPaths = localeParams;
+
+const { locale, t } = i18n(Astro);
+const [all, code] = await Promise.all([getProjects(locale), getCodeProjects(locale)]);
 // Entries still marked placeholder only appear as repository rows (also in dev).
 const projects = all.filter((p) => !p.data.placeholder);
 const products = projects.filter((p) => p.data.tagline);
@@ -21,19 +25,13 @@ const featured = projects.filter((p) => p.data.featured && !p.data.tagline);
 const rest = projects.filter((p) => !p.data.featured && !p.data.tagline);
 ---
 
-<BaseLayout
-  title="Projects"
-  description="Own products and client systems — Ownira, a self-service menu platform, a dynamic form engine and greenfield Kotlin services — each written up as a case study, plus code on GitHub."
->
+<BaseLayout title={t("projects.title")} description={t("projects.description")}>
   <div class="band pt-8 md:pt-10">
     <div class="shell">
-      <Breadcrumbs items={[{ label: "Projects" }]} />
-      <p class="label mt-8 text-ink-muted">Products · client work · case studies</p>
-      <h1 class="display mt-3 text-display-l">Projects</h1>
-      <p class="mt-5 max-w-[640px] text-body-l">
-        Own products and the client systems I built — each written up as a case study, with only the
-        numbers that are real.
-      </p>
+      <Breadcrumbs items={[{ label: t("projects.title") }]} />
+      <p class="label mt-8 text-ink-muted">{t("projects.eyebrow")}</p>
+      <h1 class="display mt-3 text-display-l">{t("projects.title")}</h1>
+      <p class="mt-5 max-w-[640px] text-body-l">{t("projects.intro")}</p>
       <div class="mt-8">
         <ProjectFilters projects={[...projects, ...code]} />
       </div>
@@ -43,7 +41,7 @@ const rest = projects.filter((p) => !p.data.featured && !p.data.tagline);
   <section class="band pt-8 pb-4" aria-labelledby="featured-heading" data-project-group>
     <div class="shell">
       <h2 id="featured-heading" class="sr-only">
-        Products and featured work
+        {t("projects.featured")}
       </h2>
       <ul class="grid grid-cols-[repeat(auto-fit,minmax(min(400px,100%),1fr))] gap-4">
         {products.map((p) => (
@@ -63,7 +61,7 @@ const rest = projects.filter((p) => !p.data.featured && !p.data.tagline);
   {rest.length > 0 && (
     <section class="band pt-12 pb-4" aria-labelledby="archive-heading" data-project-group>
       <div class="shell flex flex-col gap-6">
-        <SectionHeader id="archive-heading" title="Archive" />
+        <SectionHeader id="archive-heading" title={t("projects.archive")} />
         <ul class="flex flex-col gap-3">
           {rest.map((p) => (
             <li data-category={p.data.category}>
@@ -78,7 +76,7 @@ const rest = projects.filter((p) => !p.data.featured && !p.data.tagline);
   {code.length > 0 && (
     <section class="band section-gap pt-12" aria-labelledby="code-heading" data-project-group>
       <div class="shell flex flex-col gap-6">
-        <SectionHeader id="code-heading" title="Code on GitHub" tag="PUBLIC REPOSITORIES" />
+        <SectionHeader id="code-heading" title={t("projects.code")} tag={t("projects.codeTag")} />
         <ul class="border-t border-line">
           {code.map((p) => (
             <li data-category={p.data.category}>

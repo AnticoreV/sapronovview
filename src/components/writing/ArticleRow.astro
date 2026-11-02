@@ -4,6 +4,7 @@ import FormattedDate from "@components/ui/FormattedDate.astro";
 import PlaceholderBadge from "@components/ui/PlaceholderBadge.astro";
 import type { Post } from "@lib/content";
 import { readingTime } from "@lib/utils";
+import { i18n } from "@/i18n";
 
 interface Props {
   post: Post;
@@ -11,18 +12,19 @@ interface Props {
 const { post } = Astro.props;
 const { data } = post;
 const { minutes } = readingTime(post.body ?? "");
+const { locale, t, l } = i18n(Astro);
 ---
 
 <a
-  href={`/writing/${post.id}`}
+  href={l(`/writing/${post.id}`)}
   class="post card lift grid gap-x-8 gap-y-2 p-7 no-underline md:grid-cols-[1fr_220px]"
 >
-  <span class="flex flex-col gap-2">
+  <span class="flex flex-col gap-2" lang={locale === "en" ? undefined : "en"}>
     <span class="text-heading">{data.title}</span>
     <span class="text-ink-muted">{data.description}</span>
   </span>
   <span class="mono text-[12px] leading-relaxed text-ink-muted uppercase md:text-right">
-    <FormattedDate date={data.pubDate} /> · {minutes} min
+    <FormattedDate date={data.pubDate} /> · {t("writing.min", { n: String(minutes) })}
     <br />
     {data.tags.join(" · ")}
     {data.placeholder && <PlaceholderBadge label="Sample" />}

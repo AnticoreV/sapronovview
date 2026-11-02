@@ -1,6 +1,7 @@
 ---
 /** Mono breadcrumb trail with BreadcrumbList structured data. */
 import JsonLd from "@components/seo/JsonLd.astro";
+import { i18n } from "@/i18n";
 
 interface Crumb {
   label: string;
@@ -12,7 +13,12 @@ interface Props {
 }
 const { items, class: className } = Astro.props;
 const site = Astro.site ?? new URL("http://localhost:4321");
-const all: Crumb[] = [{ label: "Home", href: "/" }, ...items];
+const { t, l } = i18n(Astro);
+// Crumb hrefs are written in English ("/projects"); they follow the page's language.
+const all: Crumb[] = [{ label: t("nav.home"), href: "/" }, ...items].map((c) => ({
+  ...c,
+  href: c.href ? l(c.href) : undefined,
+}));
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
@@ -25,7 +31,7 @@ const jsonLd = {
 };
 ---
 
-<nav aria-label="Breadcrumb" class:list={["label text-ink-muted", className]}>
+<nav aria-label={t("breadcrumb.label")} class:list={["label text-ink-muted", className]}>
   <ol class="flex flex-wrap items-center gap-x-2 gap-y-1">
     {all.map((c, i) => (
       <li class="flex items-center gap-2">

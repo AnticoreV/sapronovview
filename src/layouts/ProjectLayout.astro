@@ -13,36 +13,41 @@ import TechBadge from "@components/ui/TechBadge.astro";
 import ProjectRow from "@components/projects/ProjectRow.astro";
 import SectionHeader from "@components/ui/SectionHeader.astro";
 import JsonLd from "@components/seo/JsonLd.astro";
-import { categoryLabels, shortCompany, shown, statusLabels, type Project } from "@lib/content";
+import { categoryLabels, shortCompany, shown, statusLabel, type Project } from "@lib/content";
 import { readoutsFor } from "@data/readouts";
 import { siteConfig } from "@config";
 import { cleanPath } from "@lib/utils";
+import { i18n, type Locale } from "@/i18n";
+import { localeTags } from "@/i18n/locales";
 
 interface Props {
   project: Project;
   related: Project[];
+  /** Language of the rendered body (a Czech page may fall back to the English body). */
+  bodyLang?: Locale;
 }
-const { project, related } = Astro.props;
+const { project, related, bodyLang } = Astro.props;
+const { locale, t, l } = i18n(Astro);
 const { data } = project;
-const status = statusLabels[data.status];
+const status = statusLabel(data.status, locale);
 const site = Astro.site ?? new URL("http://localhost:4321");
 const isProduct = Boolean(data.tagline);
 const org = shown(data.organization);
 const eyebrow = [
   isProduct
-    ? "Product"
+    ? t("project.product")
     : data.category === "professional"
-      ? "Case study"
-      : categoryLabels[data.category],
+      ? t("project.caseStudy")
+      : categoryLabels[locale][data.category],
   org && org !== data.title ? shortCompany(org) : undefined,
   shown(data.timeframe)?.replace(/\s+—\s+/g, "–"),
 ]
   .filter(Boolean)
   .join(" · ");
-const readouts = readoutsFor(project.id);
+const readouts = readoutsFor(project.id, locale);
 const role = shown(data.role);
 const links = [
-  data.website && { label: "Live site", href: data.website },
+  data.website && { label: t("project.liveSite"), href: data.website },
   data.github && { label: "GitHub", href: data.github },
   ...data.links,
 ].filter(Boolean) as Array<{ label: string; href: string }>;
@@ -54,6 +59,7 @@ const jsonLd = {
   name: data.title,
   description: data.description,
   url: new URL(cleanPath(Astro.url.pathname), site).toString(),
+  inLanguage: localeTags[locale],
   author: { "@type": "Person", name: siteConfig.name, url: site.origin },
   keywords: data.technologies.join(", "),
   ...(data.github ? { codeRepository: data.github } : {}),
@@ -69,7 +75,9 @@ const jsonLd = {
 >
   <article class="band section-gap pt-8">
     <div class="shell">
-      <Breadcrumbs items={[{ label: "Projects", href: "/projects" }, { label: data.title }]} />
+      <Breadcrumbs
+        items={[{ label: t("projects.title"), href: "/projects" }, { label: data.title }]}
+      />
     </div>
     <div class="sheet mx-auto mt-6 max-w-[848px] px-[clamp(16px,6vw,64px)] py-10 md:py-16">
       <p class="label flex flex-wrap items-center gap-x-4 gap-y-2 text-ink-muted">
@@ -88,13 +96,13 @@ const jsonLd = {
       <p class="mt-4 text-body-l">{data.description}</p>
       {role && (
         <p class="mono mt-5 text-[12px] font-medium tracking-[0.04em] text-ink-muted uppercase">
-          Role · <span class="font-semibold text-ink">{role}</span>
+          {t("project.role")} · <span class="font-semibold text-ink">{role}</span>
         </p>
       )}
       {readouts.length > 0 && (
         <ul
           class="mt-8 grid grid-cols-[repeat(auto-fit,minmax(min(220px,100%),1fr))] gap-x-6 border-t border-ink"
-          aria-label="Proof numbers"
+          aria-label={t("project.proof")}
         >
           {readouts.map((r) => (
             <li class="flex border-b border-line py-5">
@@ -103,16 +111,20 @@ const jsonLd = {
           ))}
         </ul>
       )}
-      <div class="prose-sheet mt-10" data-project-body>
+      <div
+        class="prose-sheet mt-10"
+        data-project-body
+        lang={bodyLang && bodyLang !== locale ? bodyLang : undefined}
+      >
         <slot />
       </div>
       {data.technologies.length > 0 && (
         <div class="mt-10 border-t border-line pt-6">
-          <h2 class="label text-ink-muted">Stack</h2>
+          <h2 class="label text-ink-muted">{t("project.stack")}</h2>
           <ul class="mt-3 flex flex-wrap gap-1.5">
-            {data.technologies.map((t) => (
+            {data.technologies.map((tech) => (
               <li>
-                <TechBadge label={t} />
+                <TechBadge label={tech} />
               </li>
             ))}
           </ul>
@@ -120,20 +132,20 @@ const jsonLd = {
       )}
       {links.length > 0 && (
         <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2">
-          {links.map((l) => (
-            <a href={l.href} class="link-more" rel="noopener noreferrer">
-              {l.label}
+          {links.map((link) => (
+            <a href={l(link.href)} class="link-more" rel="noopener noreferrer">
+              {link.label}
               <Arrow dir="up-right" class="ml-[0.35em]" />
             </a>
           ))}
         </div>
       )}
       <div class="mt-10 flex flex-wrap items-center gap-4">
-        <a href={`/contact?topic=${topic}`} class="btn btn-primary">
-          {isProduct ? "Let's talk" : "Discuss a similar project"}
+        <a href={l(`/contact?topic=${topic}`)} class="btn btn-primary">
+          {t(isProduct ? "project.letsTalk" : "project.discuss")}
         </a>
-        <a href="/projects" class="btn btn-secondary">
-          All projects
+        <a href={l("/projects")} class="btn btn-secondary">
+          {t("project.allProjects")}
         </a>
       </div>
     </div>
@@ -142,9 +154,9 @@ const jsonLd = {
       <section class="shell mt-16 flex flex-col gap-6" aria-labelledby="related-heading">
         <SectionHeader
           id="related-heading"
-          title="More projects"
-          href="/projects"
-          linkLabel="All projects"
+          title={t("project.more")}
+          href={l("/projects")}
+          linkLabel={t("project.allProjects")}
         />
         <ul class="flex flex-col gap-3">
           {related.map((p) => (

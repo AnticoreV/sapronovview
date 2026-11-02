@@ -4,16 +4,19 @@
  * numbered rows (01 Products I build … 05 Get in touch), each → its section.
  */
 import Arrow from "@components/ui/Arrow.astro";
-import { contents } from "@data/home";
+import { contents as contentsFor } from "@data/home";
+import { i18n } from "@/i18n";
 
 interface Props {
   class?: string;
 }
 const { class: className } = Astro.props;
+const { locale, t } = i18n(Astro);
+const contents = contentsFor(locale);
 ---
 
-<nav aria-label="On this page" class:list={["card flex flex-col gap-1 p-7", className]}>
-  <p class="label pb-2 text-ink-muted">Before you hire, invest or partner</p>
+<nav aria-label={t("contents.label")} class:list={["card flex flex-col gap-1 p-7", className]}>
+  <p class="label pb-2 text-ink-muted">{t("contents.title")}</p>
   <ol class="flex flex-col">
     {contents.map((item, i) => {
       const last = i === contents.length - 1;

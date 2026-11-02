@@ -4,15 +4,18 @@
  * ink rule, then the "worked with" byline.
  */
 import ProofNumber from "@components/ui/ProofNumber.astro";
-import { heroReadouts } from "@data/readouts";
-import { workedWith } from "@data/home";
+import { heroReadouts as readoutsFor } from "@data/readouts";
+import { i18n } from "@/i18n";
+
+const { locale, t } = i18n(Astro);
+const heroReadouts = readoutsFor(locale);
 ---
 
-<section class="band pt-10 pb-16" aria-label="Proof in numbers" data-reveal>
+<section class="band pt-10 pb-16" aria-label={t("proof.label")} data-reveal>
   <div class="shell flex flex-col gap-[18px]">
     <ul
       class="grid grid-cols-[repeat(auto-fit,minmax(min(250px,100%),1fr))] border-t border-ink"
-      aria-label="Proof numbers"
+      aria-label={t("proof.list")}
     >
       {heroReadouts.map((r, i) => (
         <li class:list={["flex border-b border-line py-6", i < heroReadouts.length - 1 && "pr-6"]}>
@@ -20,6 +23,6 @@ import { workedWith } from "@data/home";
         </li>
       ))}
     </ul>
-    <p class="label text-ink-muted">{workedWith}</p>
+    <p class="label text-ink-muted">{t("proof.workedWith").replace(/ · /g, "\u00a0· ")}</p>
   </div>
 </section>

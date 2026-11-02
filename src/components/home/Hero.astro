@@ -4,12 +4,16 @@
  * Email me + What I build, and the live "Blueprint" scene with its legend.
  */
 import HeroStage from "@components/home/HeroStage.astro";
-import { siteConfig } from "@config";
+import { siteConfig, siteCopy } from "@config";
+import { i18n } from "@/i18n";
+
+const { locale, t } = i18n(Astro);
+const copy = siteCopy[locale];
 
 const [first, ...rest] = siteConfig.name.split(" ");
 // "A · B · C": a line may end with "·" but never start with it, and the last item keeps
 // its separator ("FOUNDER · PRAGUE" stays together on phones).
-const parts = siteConfig.hero.eyebrow.split(" · ");
+const parts = copy.eyebrow.split(" · ");
 const eyebrow = parts
   .map((p, i) => (i === 0 ? p : i === parts.length - 1 ? `\u00a0·\u00a0${p}` : `\u00a0· ${p}`))
   .join("");
@@ -24,13 +28,13 @@ const eyebrow = parts
         <br />
         {rest.join(" ")}
       </h1>
-      <p class="max-w-[520px] text-body-l">{siteConfig.hero.lede}</p>
+      <p class="max-w-[520px] text-body-l">{copy.lede}</p>
       <div class="flex flex-wrap items-center gap-3">
         <a href={`mailto:${siteConfig.email}`} class="btn btn-primary">
-          Email me
+          {t("hero.email")}
         </a>
         <a href="#build" class="btn btn-secondary">
-          What I build
+          {t("hero.build")}
         </a>
       </div>
     </div>

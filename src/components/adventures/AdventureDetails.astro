@@ -10,8 +10,9 @@
  *   out `adventure:select` { id, country, lat, lng }   (map + globe follow)
  */
 import Arrow from "@components/ui/Arrow.astro";
-import { groupByCountry, home, priorityLabels, type AdventureLocation } from "@data/adventures";
+import { groupByCountry, homeFor, priorityLabels, type AdventureLocation } from "@data/adventures";
 import { shown } from "@lib/content";
+import { i18n } from "@/i18n";
 
 interface Props {
   locations: AdventureLocation[];
@@ -19,33 +20,42 @@ interface Props {
 }
 const { locations, headingLevel = 3 } = Astro.props;
 const H = `h${headingLevel}` as "h2" | "h3";
+const { locale, t, l } = i18n(Astro);
+const home = homeFor(locale);
 const name = (a: AdventureLocation) => shown(a.city) ?? a.country;
 const visitedCountries = groupByCountry(locations.filter((l) => l.status === "visited"));
 const wishlistCountries = groupByCountry(locations.filter((l) => l.status === "wishlist"));
 const countries = groupByCountry(locations);
 const statusLabel = (s: AdventureLocation["status"]) =>
-  s === "visited" ? "Visited" : "Want to visit";
+  t(s === "visited" ? "adventures.statusVisited" : "adventures.statusWishlist");
 const groups = [
   {
     key: "visited",
-    title: `Visited · ${visitedCountries.length} countries`,
+    title: t("adventures.visited", {
+      countries: t("countries", { n: visitedCountries.length }),
+    }),
     items: visitedCountries,
   },
   {
     key: "wishlist",
-    title: `Want to visit · ${wishlistCountries.length}`,
+    title: t("adventures.wishlist", { n: String(wishlistCountries.length) }),
     items: wishlistCountries,
   },
 ];
 ---
 
-<div class="adv-details" data-adv-details>
+<div
+  class="adv-details"
+  data-adv-details
+  data-text-shown={t("adventures.shown", { name: "{name}" })}
+  data-text-closed={t("adventures.closed")}
+>
   <p class="sr-only" aria-live="polite" data-adv-announce></p>
 
   <div data-adv-view="list">
     <p class="label flex items-center gap-2 text-ink-muted">
       <span class="adv-dot adv-dot--home" aria-hidden="true"></span>
-      Home base · {home.city}, {home.country}
+      {t("adventures.home", { place: `${home.city}, ${home.country}` })}
     </p>
     {groups.map((group) => (
       <section aria-labelledby={`adv-group-${group.key}`} class="mt-6">
@@ -98,9 +108,11 @@ const groups = [
           <span class:list={["adv-dot", `adv-dot--${a.status}`]} aria-hidden="true" />
           {statusLabel(a.status)}
           {a.status === "visited" && shown(a.visitedAt) && <span>· {a.visitedAt}</span>}
-          {a.status === "wishlist" && a.priority && <span>· {priorityLabels[a.priority]}</span>}
+          {a.status === "wishlist" && a.priority && (
+            <span>· {priorityLabels[locale][a.priority]}</span>
+          )}
         </p>
-        <button type="button" class="adv-close" data-adv-close aria-label="Close details">
+        <button type="button" class="adv-close" data-adv-close aria-label={t("adventures.close")}>
           <svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true">
             <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" />
           </svg>
@@ -113,13 +125,13 @@ const groups = [
       {a.status === "visited" && shown(a.description) && <p class="mt-4">{a.description}</p>}
       {a.status === "wishlist" && shown(a.reason) && (
         <p class="mt-4">
-          <span class="font-semibold">Why: </span>
+          <span class="font-semibold">{t("adventures.why")}</span>
           {a.reason}
         </p>
       )}
       {a.href && (
-        <a href={a.href} class="link-more mt-4">
-          {a.hrefLabel ?? "Read more"}
+        <a href={l(a.href)} class="link-more mt-4">
+          {a.hrefLabel ?? t("more")}
           <Arrow class="ml-[0.4em]" />
         </a>
       )}
@@ -138,8 +150,8 @@ const groups = [
       hidden
     >
       <div class="flex items-center justify-between gap-3">
-        <p class="label text-ink-muted">Country</p>
-        <button type="button" class="adv-close" data-adv-close aria-label="Close details">
+        <p class="label text-ink-muted">{t("adventures.country")}</p>
+        <button type="button" class="adv-close" data-adv-close aria-label={t("adventures.close")}>
           <svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true">
             <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" />
           </svg>
@@ -244,6 +256,8 @@ const groups = [
   type Pick = { id?: string | null; country?: string | null };
 
   function setupDetails(details: HTMLElement) {
+    const shownText = (name: string) =>
+      (details.dataset.textShown ?? "{name}. Details shown.").replace("{name}", name.trim());
     if (details.dataset.bound) return;
     details.dataset.bound = "true";
     const section = details.closest<HTMLElement>("[data-adventures]") ?? document.body;
@@ -284,7 +298,7 @@ const groups = [
       mark(id, null);
       history.replaceState(null, "", `#adventure-${id}`);
       if (announce)
-        announce.textContent = `${card.querySelector("h2, h3")?.textContent ?? id}. Details shown.`;
+        announce.textContent = shownText(card.querySelector("h2, h3")?.textContent ?? id);
       if (focus) card.focus({ preventScroll: true });
       emit({
         id,
@@ -300,7 +314,7 @@ const groups = [
       mark(null, code);
       history.replaceState(null, "", location.pathname + location.search);
       if (announce)
-        announce.textContent = `${card.querySelector("h2, h3")?.textContent ?? code}. Details shown.`;
+        announce.textContent = shownText(card.querySelector("h2, h3")?.textContent ?? code);
       if (focus) card.focus({ preventScroll: true });
       emit({
         id: null,
@@ -313,7 +327,7 @@ const groups = [
       view("list");
       mark(null, null);
       history.replaceState(null, "", location.pathname + location.search);
-      if (announce) announce.textContent = "Details closed.";
+      if (announce) announce.textContent = details.dataset.textClosed ?? "Details closed.";
       emit({ id: null, country: null });
       lastTrigger?.focus({ preventScroll: true });
       lastTrigger = null;

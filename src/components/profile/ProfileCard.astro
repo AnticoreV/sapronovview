@@ -6,8 +6,9 @@
  * a segmented control flips between the four portraits (pure CSS: radios + :has()).
  */
 import ThemePicture from "@components/ui/ThemePicture.astro";
-import { siteConfig } from "@config";
+import { siteCopy } from "@config";
 import { portraitById, portraits, type Portrait } from "@lib/portraits";
+import { i18n } from "@/i18n";
 
 interface Props {
   /** Portrait shown first. The homepage uses green (artboard), /about the turtleneck. */
@@ -28,13 +29,14 @@ const {
 } = Astro.props;
 const first = portraitById(initial);
 const list = switcher ? [first, ...portraits.filter((p) => p.id !== first.id)] : [first];
+const { locale, t } = i18n(Astro);
+const copy = siteCopy[locale];
 const fields = [
-  { k: "Based in", v: siteConfig.basedIn },
-  { k: "Role", v: "Engineer · founder" },
-  { k: "Languages", v: siteConfig.languages.map((l) => l.code).join(" · ") },
-  { k: "Experience", v: siteConfig.experienceSummary },
+  { k: t("who.basedIn"), v: copy.basedIn },
+  { k: t("who.role"), v: t("who.roleValue") },
+  { k: t("who.languages"), v: copy.languages.map((l) => l.code).join(" · ") },
+  { k: t("who.experience"), v: copy.experienceSummary },
 ];
-const focus = siteConfig.currentFocus.replace(/^./, (c) => c.toLowerCase());
 const Heading = heading === 3 ? "h3" : "h2";
 ---
 
@@ -47,7 +49,7 @@ const Heading = heading === 3 ? "h3" : "h2";
         <ThemePicture
           light={p.studio}
           dark={p.cutout}
-          alt={p.alt}
+          alt={p.alt[locale]}
           widths={[216, 432]}
           sizes="216px"
           loading={eager && i === 0 ? "eager" : "lazy"}
@@ -57,9 +59,9 @@ const Heading = heading === 3 ? "h3" : "h2";
   </div>
   <div class="flex min-w-0 flex-[1_1_280px] flex-col gap-5">
     <div class="flex flex-col gap-1.5">
-      <span class="label text-ink-muted">Who I am</span>
-      {heading !== false && <Heading class="text-heading">Engineer and founder.</Heading>}
-      <p class="text-ink-muted">Now: {focus}.</p>
+      <span class="label text-ink-muted">{t("who.label")}</span>
+      {heading !== false && <Heading class="text-heading">{t("who.heading")}</Heading>}
+      <p class="text-ink-muted">{t("who.now", { focus: copy.currentFocus })}</p>
     </div>
     <dl class="grid grid-cols-[repeat(auto-fit,minmax(min(150px,100%),1fr))] content-start gap-x-6 gap-y-3.5">
       {fields.map((f) => (
@@ -69,16 +71,16 @@ const Heading = heading === 3 ? "h3" : "h2";
         </div>
       ))}
       <div>
-        <dt class="mono text-[12px] text-ink-muted uppercase">Status</dt>
+        <dt class="mono text-[12px] text-ink-muted uppercase">{t("who.status")}</dt>
         <dd class="mt-0.5 font-semibold text-ok-ink">
           <span aria-hidden="true">● </span>
-          {siteConfig.availability.label}
+          {t("status.openLabel")}
         </dd>
       </div>
     </dl>
     {switcher && (
       <fieldset class="m-0 border-0 p-0">
-        <legend class="label text-ink-muted">Portrait</legend>
+        <legend class="label text-ink-muted">{t("who.portrait")}</legend>
         <div class="mt-2.5 inline-flex flex-wrap gap-1 rounded-[26px] bg-surface-sunken p-1">
           {list.map((p, i) => (
             <label class="segment">
@@ -89,7 +91,7 @@ const Heading = heading === 3 ? "h3" : "h2";
                 checked={i === 0}
                 class="sr-only"
               />
-              <span class="segment__label">{p.short}</span>
+              <span class="segment__label">{p.short[locale]}</span>
             </label>
           ))}
         </div>

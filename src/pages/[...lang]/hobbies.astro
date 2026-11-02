@@ -4,24 +4,22 @@ import Breadcrumbs from "@components/ui/Breadcrumbs.astro";
 import HobbyModule from "@components/hobbies/HobbyModule.astro";
 import { getHobbies } from "@lib/content";
 import { visitedCountryCount as countries } from "@data/adventures";
+import { i18n, localeParams } from "@/i18n";
 
-const hobbies = await getHobbies();
+export const getStaticPaths = localeParams;
+
+const { locale, t, l } = i18n(Astro);
+const hobbies = await getHobbies(locale);
 ---
 
-<BaseLayout
-  title="Hobbies"
-  description="Off duty: ultralight aviation, motorcycles, adventures and country visiting, and sport — the part of the site that isn't a résumé."
->
+<BaseLayout title={t("hobbies.title")} description={t("hobbies.description")}>
   <div class="band pt-8 md:pt-10">
     <div class="shell">
-      <Breadcrumbs items={[{ label: "Hobbies" }]} />
-      <p class="label mt-8 text-ink-muted">Off duty</p>
-      <h1 class="display mt-3 text-display-l">Wings, wheels and wanderlust</h1>
-      <p class="mt-5 max-w-[640px] text-body-l">
-        What I do when the laptop is closed. Flying rewards preparation, riding rewards attention,
-        travel rewards curiosity — the same habits I bring to a codebase.
-      </p>
-      <nav aria-label="Jump to hobby" class="mt-8 flex flex-wrap gap-2">
+      <Breadcrumbs items={[{ label: t("hobbies.title") }]} />
+      <p class="label mt-8 text-ink-muted">{t("hobbies.eyebrow")}</p>
+      <h1 class="display mt-3 text-display-l">{t("hobbies.h1")}</h1>
+      <p class="mt-5 max-w-[640px] text-body-l">{t("hobbies.intro")}</p>
+      <nav aria-label={t("hobbies.jump")} class="mt-8 flex flex-wrap gap-2">
         {hobbies.map((h) => (
           <a href={`#${h.id}`} class="chip">
             {h.data.title}
@@ -41,22 +39,20 @@ const hobbies = await getHobbies();
 
   <section class="band section-gap pt-8" aria-labelledby="map-teaser">
     <a
-      href="/adventures"
+      href={l("/adventures")}
       class="teaser shell card lift flex flex-wrap items-center justify-between gap-6 p-7 no-underline sm:p-8"
     >
       <span class="flex flex-col gap-2">
-        <span class="label text-ink-muted">Adventures · globe</span>
+        <span class="label text-ink-muted">{t("hobbies.teaser")}</span>
         <span
           id="map-teaser"
           class="display text-[clamp(28px,3vw,40px)] leading-none tracking-[-0.03em]"
         >
-          {countries} countries on the map
+          {t("hobbies.mapLine", { countries: t("countries", { n: countries }) })}
         </span>
-        <span class="text-ink-muted">
-          Where I've been, home in Prague, and the places still on the list.
-        </span>
+        <span class="text-ink-muted">{t("hobbies.teaserText")}</span>
       </span>
-      <span class="btn btn-primary">Open the globe</span>
+      <span class="btn btn-primary">{t("hobbies.openGlobe")}</span>
     </a>
   </section>
 </BaseLayout>
