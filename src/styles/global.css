@@ -163,8 +163,9 @@
   --text-code: 15px;
   --text-code--line-height: 1.6;
 
-  /* Header nav collapses into the menu at ≤ 860px (artboard media query). */
-  --breakpoint-nav: 53.8125rem;
+  /* Header nav collapses into the menu below 1024px. The artboard said ≤ 860px, but with
+     the EN | CS switch (and Czech labels) the full header needs ~1000px. */
+  --breakpoint-nav: 64rem;
 }
 
 /* ------------------------------------------------------------------ */

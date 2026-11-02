@@ -2,22 +2,32 @@
 /**
  * SiteHeader — sticky header from the approved artboard: cube mark + name, nav
  * (Products · Capabilities · Cases · Experience · About), availability pill, theme
- * toggle and the Contact pill. ≤ 860px the nav and Contact collapse into a 44px menu
+ * toggle, EN | CS switch and the Contact pill. Below 1024px the nav and Contact collapse into a 44px menu
  * button that opens a full-height sheet with every route (native <dialog>: focus
  * trapping, Escape and an inert page for free). A 1px line appears once scrolled.
  */
 import LogoMark from "@components/ui/LogoMark.astro";
 import StatusPill from "@components/ui/StatusPill.astro";
 import ThemeToggle from "@components/ui/ThemeToggle.astro";
+import LanguageSwitch from "@components/ui/LanguageSwitch.astro";
 import { navigation, primaryNav, siteConfig, withWriting } from "@config";
 import { contactRoutes } from "@data/contact";
 import { hasWriting } from "@lib/content";
 import { cleanPath } from "@lib/utils";
+import { i18n, stripLocale, type Locale } from "@/i18n";
+
+interface Props {
+  /** Language-switch targets when they differ from "this page in the other language". */
+  langPaths?: Partial<Record<Locale, string>>;
+}
+const { langPaths } = Astro.props;
+const { locale, t, l } = i18n(Astro);
 
 // Writing joins the menu sheet once a post is published.
 const sheetNav = withWriting(navigation, await hasWriting());
 
-const pathname = cleanPath(Astro.url.pathname);
+// Active states compare the path without its /cs prefix against the English hrefs.
+const pathname = stripLocale(cleanPath(Astro.url.pathname));
 const isActive = (match?: string) =>
   match ? pathname === match || pathname.startsWith(`${match}/`) : false;
 const isCurrent = (href: string) =>
@@ -28,25 +38,25 @@ const isCurrent = (href: string) =>
   <div class="band py-[18px]">
     <div class="shell flex items-center justify-between gap-6">
       <a
-        href="/"
+        href={l("/")}
         class="inline-flex min-h-11 shrink-0 items-center gap-2.5 text-[20px] font-extrabold tracking-[-0.02em] no-underline hover:text-ink"
       >
         <LogoMark />
         {siteConfig.name}
       </a>
 
-      <nav aria-label="Main" class="max-nav:hidden">
+      <nav aria-label={t("nav.main")} class="max-nav:hidden">
         <ul class="flex items-center gap-7 text-[15px] font-medium">
           {primaryNav.map((item) => {
             const active = isActive(item.match);
             return (
               <li>
                 <a
-                  href={item.href}
+                  href={l(item.href)}
                   aria-current={active ? "page" : undefined}
                   class:list={["nav-link", active && "nav-link--active"]}
                 >
-                  {item.label}
+                  {t(item.key)}
                 </a>
               </li>
             );
@@ -55,15 +65,17 @@ const isCurrent = (href: string) =>
       </nav>
 
       <div class="flex items-center gap-2.5">
-        <StatusPill class="max-[520px]:hidden" />
+        {/* The pill needs ≥ 1240px beside the nav and EN | CS; the profile card repeats it. */}
+        <StatusPill class="max-[1239px]:hidden" />
+        <LanguageSwitch class="max-[520px]:hidden" paths={langPaths} />
         <ThemeToggle />
-        <a href="/contact" class="btn btn-ink btn-sm max-nav:hidden">
-          Contact
+        <a href={l("/contact")} class="btn btn-ink btn-sm max-nav:hidden">
+          {t("nav.contact")}
         </a>
         <button
           type="button"
           class="icon-btn nav:hidden"
-          aria-label="Open menu"
+          aria-label={t("menu.open")}
           aria-haspopup="dialog"
           aria-controls="site-menu"
           aria-expanded="false"
@@ -80,7 +92,7 @@ const isCurrent = (href: string) =>
   <dialog
     id="site-menu"
     class="m-0 h-dvh max-h-none w-full max-w-none bg-bg p-0 text-ink backdrop:bg-black/40 open:flex open:flex-col nav:hidden"
-    aria-label="Site menu"
+    aria-label={t("menu.label")}
   >
     <div class="band pt-safe shrink-0 border-b border-line">
       <div class="flex items-center justify-between gap-4 py-[18px]">
@@ -88,28 +100,28 @@ const isCurrent = (href: string) =>
           <LogoMark />
           {siteConfig.name}
         </span>
-        <button type="button" class="icon-btn" aria-label="Close menu" data-close-menu>
+        <button type="button" class="icon-btn" aria-label={t("menu.close")} data-close-menu>
           <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
             <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.6"></path>
           </svg>
         </button>
       </div>
     </div>
-    <nav aria-label="All pages" class="band flex-1 overflow-y-auto py-6">
+    <nav aria-label={t("menu.pages")} class="band flex-1 overflow-y-auto py-6">
       <ol class="flex flex-col">
         {sheetNav.map((item, i) => {
           const current = isCurrent(item.href);
           return (
             <li>
               <a
-                href={item.href}
+                href={l(item.href)}
                 aria-current={current ? "page" : undefined}
                 class:list={[
                   "flex min-h-[52px] items-center justify-between border-b border-line py-3 text-[22px] font-bold tracking-[-0.01em] no-underline",
                   current && "text-accent",
                 ]}
               >
-                <span>{item.label}</span>
+                <span>{t(item.key)}</span>
                 <span class="meta text-ink-muted" aria-hidden="true">
                   {String(i + 1).padStart(2, "0")}
                 </span>
@@ -118,11 +130,11 @@ const isCurrent = (href: string) =>
           );
         })}
       </ol>
-      <p class="label mt-8 text-ink-muted">Get in touch</p>
+      <p class="label mt-8 text-ink-muted">{t("menu.getInTouch")}</p>
       <ul class="mt-3 flex flex-wrap gap-2">
-        {contactRoutes.map((r) => (
+        {contactRoutes(locale).map((r) => (
           <li>
-            <a href={`/contact?topic=${r.id}`} class="chip uppercase">
+            <a href={l(`/contact?topic=${r.id}`)} class="chip uppercase">
               {r.label}
             </a>
           </li>
@@ -133,6 +145,10 @@ const isCurrent = (href: string) =>
           {siteConfig.email}
         </a>
       </p>
+      <div class="mt-8 flex items-center gap-3">
+        <span class="label text-ink-muted">{t("lang.label")}</span>
+        <LanguageSwitch paths={langPaths} />
+      </div>
     </nav>
   </dialog>
 </header>
@@ -199,7 +215,7 @@ const isCurrent = (href: string) =>
       document.documentElement.style.overflow = "";
     });
     dialog.querySelectorAll("a").forEach((a) => a.addEventListener("click", close));
-    window.matchMedia("(min-width: 53.8125rem)").addEventListener("change", (e) => {
+    window.matchMedia("(min-width: 64rem)").addEventListener("change", (e) => {
       if (e.matches) close();
     });
   }

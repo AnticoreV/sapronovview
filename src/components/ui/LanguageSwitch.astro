@@ -1,0 +1,99 @@
+---
+/**
+ * LanguageSwitch — "EN | CS" in the header (next to the theme toggle) and in the menu
+ * sheet. Each code links to the same page in that language; the current one carries
+ * aria-current. A click stores the choice (localStorage "lang"), which then wins over the
+ * browser language in the redirect script in BaseLayout.
+ */
+import { localeNames, locales, localizePath, stripLocale } from "@/i18n/locales";
+import { i18n } from "@/i18n";
+import { cleanPath } from "@lib/utils";
+
+interface Props {
+  class?: string;
+  /** Override the target paths (e.g. 404 pages link to the other home page). */
+  paths?: Partial<Record<(typeof locales)[number], string>>;
+}
+const { class: className, paths } = Astro.props;
+const { locale, t } = i18n(Astro);
+const base = stripLocale(cleanPath(Astro.url.pathname));
+const links = locales.map((code) => ({
+  code,
+  href: paths?.[code] ?? localizePath(base, code),
+  current: code === locale,
+}));
+---
+
+<div
+  class:list={["lang-switch mono inline-flex items-center", className]}
+  role="group"
+  aria-label={t("lang.label")}
+>
+  {links.map((link, i) => (
+    <>
+      {i > 0 && (
+        <span class="lang-switch__sep" aria-hidden="true">
+          |
+        </span>
+      )}
+      <a
+        href={link.href}
+        hreflang={link.code}
+        lang={link.code}
+        aria-current={link.current ? "true" : undefined}
+        data-lang-choice={link.code}
+        class="lang-switch__link"
+      >
+        {link.code.toUpperCase()}
+        <span class="sr-only"> – {localeNames[link.code]}</span>
+      </a>
+    </>
+  ))}
+</div>
+
+<style>
+  /* No `display` here: it is the inline-flex utility, so `class` can hide the switch. */
+  .lang-switch {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+  .lang-switch__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: var(--radius-pill);
+    color: var(--ink-muted);
+    text-decoration: none;
+    text-underline-offset: 5px;
+    text-decoration-thickness: 1px;
+  }
+  .lang-switch__link:hover {
+    color: var(--accent);
+    text-decoration-line: underline;
+  }
+  .lang-switch__link[aria-current] {
+    color: var(--ink);
+    text-decoration-line: underline;
+  }
+  .lang-switch__sep {
+    color: var(--line-strong, var(--ink-muted));
+  }
+</style>
+
+<script>
+  // One delegated listener for every switch on the page (header + menu sheet), kept
+  // across view-transition swaps: an explicit choice is stored and wins from now on.
+  document.addEventListener("click", (event) => {
+    const link = (event.target as Element | null)?.closest<HTMLElement>("[data-lang-choice]");
+    if (!link?.dataset.langChoice) return;
+    try {
+      localStorage.setItem("lang", link.dataset.langChoice);
+    } catch {
+      /* storage unavailable — the choice lasts for this visit only */
+    }
+  });
+</script>

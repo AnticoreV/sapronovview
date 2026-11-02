@@ -10,7 +10,7 @@ import SEO, { type Props as SEOProps } from "@components/seo/SEO.astro";
 import SiteHeader from "@components/layout/SiteHeader.astro";
 import Footer from "@components/layout/Footer.astro";
 import ContactPanel from "@components/layout/ContactPanel.astro";
-import { siteConfig } from "@config";
+import { i18n, type Locale } from "@/i18n";
 import "@styles/global.css";
 
 interface Props extends SEOProps {
@@ -20,12 +20,15 @@ interface Props extends SEOProps {
   contactPanel?: boolean;
   /** Section index shown on the contact panel ("05 · GET IN TOUCH" on the homepage). */
   contactIndex?: string;
+  /** Language-switch targets when they differ from "this page in the other language". */
+  langPaths?: Partial<Record<Locale, string>>;
 }
-const { class: className, contactPanel = true, contactIndex, ...seo } = Astro.props;
+const { class: className, contactPanel = true, contactIndex, langPaths, ...seo } = Astro.props;
+const { locale, t } = i18n(Astro);
 ---
 
 <!doctype html>
-<html lang={siteConfig.locale}>
+<html lang={locale}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -83,12 +86,54 @@ const { class: className, contactPanel = true, contactIndex, ...seo } = Astro.pr
         }
       })();
     </script>
+    {/* Language: English pages (no /cs prefix) send a first-time visitor whose browser
+        prefers Czech to the same page under /cs — before paint, keeping ?query and #hash.
+        A stored choice from the EN | CS switch always wins; Czech pages never redirect;
+        bots, crawlers and automated browsers are never redirected. */}
+    {locale === "en" && <script is:inline>
+      (() => {
+        try {
+          if (navigator.webdriver) return;
+          if (
+            /bot|crawl|spider|lighthouse|slurp|facebookexternalhit|preview/i.test(
+              navigator.userAgent,
+            )
+          )
+            return;
+          let lang = null;
+          try {
+            lang = localStorage.getItem("lang");
+          } catch {
+            /* storage unavailable */
+          }
+          if (lang !== "cs" && lang !== "en") {
+            const prefs =
+              navigator.languages && navigator.languages.length
+                ? navigator.languages
+                : [navigator.language || ""];
+            const first = prefs
+              .map((l) => String(l).toLowerCase())
+              .find((l) => /^(cs|en)(-|$)/.test(l));
+            lang = first && first.startsWith("cs") ? "cs" : "en";
+          }
+          if (lang !== "cs") return;
+          const path = location.pathname.replace(/\/index\.html$/, "/").replace(/\.html$/, "");
+          location.replace((path === "/" ? "/cs" : "/cs" + path) + location.search + location.hash);
+        } catch {
+          /* stay on the English page */
+        }
+      })();
+    </script>}
     {/* Latin subsets are preloaded (mono: the 500 labels only); latin-ext (Czech
-        diacritics) and the other mono weights load on demand. */}
+        diacritics) is preloaded on Czech pages and loads on demand on English ones; the
+        other mono weights load on demand. */}
     <Font cssVariable="--font-schibsted" preload />
-    <Font cssVariable="--font-schibsted-ext" />
+    <Font cssVariable="--font-schibsted-ext" preload={locale === "cs"} />
     <Font cssVariable="--font-plex-mono" preload={[{ weight: 500 }]} />
-    <Font cssVariable="--font-plex-mono-ext" />
+    <Font
+      cssVariable="--font-plex-mono-ext"
+      preload={locale === "cs" ? [{ weight: 500 }] : false}
+    />
 
     <SEO {...seo} />
     <ClientRouter fallback="swap" />
@@ -99,9 +144,9 @@ const { class: className, contactPanel = true, contactIndex, ...seo } = Astro.pr
       href="#main"
       class="btn btn-primary btn-sm sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-5 focus:py-2.5"
     >
-      Skip to content
+      {t("skip")}
     </a>
-    <SiteHeader />
+    <SiteHeader langPaths={langPaths} />
     <main id="main" class:list={["flex-1 outline-none", className]} tabindex="-1">
       <slot />
     </main>
