@@ -26,6 +26,18 @@ export const siteConfig = {
   /** Where you are based. */
   location: "Prague, Czech Republic",
   city: "Prague",
+  /**
+   * Business operator (§435 OZ: name, IČO and registered seat on the website), verified in
+   * ARES on 2026-11-02: sole trader (legal form 101) in the Trade Register, not a VAT payer
+   * (so no DIČ is shown). Rendered in the footer of every page.
+   */
+  operator: {
+    ico: "23157852",
+    street: "Argentinská 1624/32",
+    postalCode: "170 00",
+    city: "Praha 7",
+    cityEn: "Prague 7",
+  },
   /** "Based in" line on the profile card (approved artboard wording). */
   basedIn: "Prague, Czechia",
   /** Public contact email (the professional address from the CV). */

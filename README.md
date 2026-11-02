@@ -309,14 +309,19 @@ Answered:
 3. **/hobbies write-ups:** hidden in production until Ivan writes or confirms them — while an
    entry is `placeholder: true`, `/hobbies` shows only its title and tagline
    (`src/components/hobbies/HobbyModule.astro`). Set `placeholder: false` to publish one.
-4. **Operator line:** Ivan invoices as an OSVČ, so the footer needs name, IČO and registered
-   seat (§435 OZ) — **waiting for the IČO and the address he wants shown.**
 
 Not asked separately (informational, de-aviation of labels): /about "About · crew" → "About",
 "Installed systems" → "Stack I ship with", "SOP 01…04" → "01…04"; /writing meta lost "— plus
 the occasional lesson from the cockpit", empty state "No posts published yet"; `/projects`
 "Products and featured work"; `/experience` meta "Track record of …"; case-study label
 "Proof numbers".
+
+## Operator
+
+The footer of every page carries the business operator line required by §435 of the Civil
+Code (name, IČO, registered seat), from `siteConfig.operator` in `src/config.ts` (verified
+in ARES on 2026-11-02: sole trader in the Trade Register, not a VAT payer — so no DIČ). The
+same seat and IČO are in the `Person` JSON-LD.
 
 ## Contact form
 

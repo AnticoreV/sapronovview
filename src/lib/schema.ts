@@ -16,10 +16,18 @@ export function personSchema(site: URL) {
     image: new URL(siteConfig.personImage, site).toString(),
     sameAs: Object.values(siteConfig.social).filter(Boolean),
     knowsLanguage: siteConfig.languages.map((l) => l.name),
+    // Registered seat of the sole-trader business (ARES; also in the footer).
     address: {
       "@type": "PostalAddress",
-      addressLocality: siteConfig.city,
+      streetAddress: siteConfig.operator.street,
+      postalCode: siteConfig.operator.postalCode,
+      addressLocality: siteConfig.operator.city,
       addressCountry: "CZ",
+    },
+    identifier: {
+      "@type": "PropertyValue",
+      propertyID: "IČO",
+      value: siteConfig.operator.ico,
     },
   };
 }

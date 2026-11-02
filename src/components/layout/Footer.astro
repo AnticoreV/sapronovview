@@ -2,12 +2,20 @@
 /**
  * Footer (approved artboard): © line, Projects · About · Experience · Hobbies · RSS ·
  * Sitemap (RSS only once a post is published), and the "all services healthy" status.
+ * Below it, one quiet operator line (§435 OZ: name, IČO, registered seat).
  */
 import { footerNav, siteConfig, withWriting } from "@config";
 import { hasWriting } from "@lib/content";
 
 const links = withWriting(footerNav, await hasWriting());
 const year = new Date().getFullYear();
+const { operator } = siteConfig;
+const operatorLine = [
+  siteConfig.name,
+  `IČO ${operator.ico}`,
+  `${operator.street}, ${operator.postalCode}\u00a0${operator.cityEn}, Czech Republic`,
+  "Sole trader registered in the Czech Trade Register",
+].join(" · ");
 ---
 
 <footer class="band pb-safe pt-6">
@@ -35,4 +43,7 @@ const year = new Date().getFullYear();
       HEALTHY
     </span>
   </div>
+  <p class="shell meta mt-2 text-[12px] text-ink-muted" data-operator>
+    {operatorLine}
+  </p>
 </footer>
