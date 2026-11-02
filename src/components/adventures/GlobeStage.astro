@@ -7,15 +7,35 @@
 import ThemePicture from "@components/ui/ThemePicture.astro";
 import posterLight from "@/assets/globe/globe-light.png";
 import posterDark from "@/assets/globe/globe-dark.png";
-import { adventures, home } from "@data/adventures";
+import isoCountries from "i18n-iso-countries";
+import { adventures } from "@data/adventures";
+import { i18n } from "@/i18n";
 
+const { locale, t } = i18n(Astro);
 const visited = new Set(adventures.filter((a) => a.status === "visited").map((a) => a.countryCode));
-const alt = `Globe centred on Europe: ${visited.size} visited countries in ink, home in ${home.country} highlighted in blue, routes from ${home.city} to every visited place, wishlist countries outlined.`;
+const alt = t("adventures.globeAlt", { n: String(visited.size) });
+// Hover names on the globe in Czech: every world-atlas country by ISO numeric id, plus the
+// three features world-atlas ships without an id (keyed by their English name).
+let names: Record<string, string> | undefined;
+if (locale !== "en") {
+  const display = new Intl.DisplayNames([locale], { type: "region" });
+  names = Object.fromEntries(
+    Object.entries(isoCountries.getNumericCodes()).map(([num, alpha2]) => [
+      num,
+      display.of(alpha2) ?? alpha2,
+    ]),
+  );
+  Object.assign(names, { "N. Cyprus": "Severní Kypr", Somaliland: "Somaliland", Kosovo: "Kosovo" });
+}
 const sizes = "(min-width: 1100px) 720px, 92vw";
 const widths = [360, 540, 720, 1080, 1440];
 ---
 
-<div class="globe-stage relative mx-auto aspect-square w-full max-w-[720px]" data-globe-stage>
+<div
+  class="globe-stage relative mx-auto aspect-square w-full max-w-[720px]"
+  data-globe-stage
+  data-names={names ? JSON.stringify(names) : undefined}
+>
   <span class="globe-poster">
     <ThemePicture
       light={posterLight}
@@ -127,8 +147,15 @@ const widths = [360, 540, 720, 1080, 1440];
     try {
       const { mountGlobe } = await import("@/scripts/globe3d");
       if (!stage.isConnected) return;
+      let names: Record<string, string> | undefined;
+      try {
+        names = stage.dataset.names ? JSON.parse(stage.dataset.names) : undefined;
+      } catch {
+        names = undefined;
+      }
       handle = await mountGlobe(canvas, {
         capture,
+        names,
         onPick: (country) =>
           section?.dispatchEvent(new CustomEvent("adventure:pick", { detail: { country } })),
         onHover: (name, x, y) => {

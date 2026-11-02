@@ -48,6 +48,7 @@
     "d3-geo": "^3.1.1",
     "eslint": "^9.39.5",
     "eslint-plugin-astro": "^1.7.0",
+    "i18n-iso-countries": "^7.14.0",
     "opentype.js": "2.0.0",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^1.0.0",

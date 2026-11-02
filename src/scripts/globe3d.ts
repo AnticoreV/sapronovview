@@ -57,6 +57,11 @@ export type GlobeOptions = {
   onHover?: (name: string | null, x: number, y: number) => void;
   onFirstFrame?: () => void;
   capture?: { dpr: number };
+  /**
+   * Country names in the page language, by world-atlas id (ISO numeric) or, for the
+   * few features without one, by their English name. Missing → the English name.
+   */
+  names?: Record<string, string>;
 };
 
 type Palette = {
@@ -445,7 +450,8 @@ export async function mountGlobe(
     const f = hit(e.clientX, e.clientY);
     const r = stage.getBoundingClientRect();
     const alpha = f ? alphaByNumeric.get(String(f.id)) : undefined;
-    const name = f ? ((alpha && nameByCode.get(alpha)) ?? f.properties.name) : null;
+    const localName = f && options.names?.[f.id === undefined ? f.properties.name : String(f.id)];
+    const name = f ? (localName ?? (alpha && nameByCode.get(alpha)) ?? f.properties.name) : null;
     options.onHover?.(name, e.clientX - r.left, e.clientY - r.top);
     canvas.style.cursor = alpha && withPlaces.has(alpha) ? "pointer" : "grab";
   };
