@@ -68,6 +68,6 @@ export const portraits: Portrait[] = [
 
 export const defaultPortrait = portraits[0]!;
 
-/** A portrait by id (the homepage card uses the green sweater, as on the artboard). */
+/** A portrait by id (the hero uses the green sweater, the homepage card the turtleneck). */
 export const portraitById = (id: Portrait["id"]): Portrait =>
   portraits.find((p) => p.id === id) ?? defaultPortrait;

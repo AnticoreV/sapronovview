@@ -27,7 +27,8 @@ const offDuty = t("offduty.line", { countries: t("countries", { n: countries }) 
       linkLabel={t("aboutHome.more")}
     />
     <div class="flex flex-wrap items-start gap-x-12 gap-y-8">
-      <ProfileCard class="flex-[3_1_560px]" initial="green" heading={false} />
+      {/* The hero already shows the green sweater; the card shows a second shot. */}
+      <ProfileCard class="flex-[3_1_560px]" initial="turtleneck" heading={false} />
       <div class="flex flex-[2_1_360px] flex-col gap-4">
         {paragraphs.map((p, i) => (
           <p class:list={[i === 0 && "text-body-l"]}>{p}</p>

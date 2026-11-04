@@ -286,7 +286,7 @@ client from the track record) and a `detail` sentence. Rules:
   else belongs in `src/assets/` so `<Picture>` can resize it and serve AVIF / WebP.
 - **Portraits:** `src/assets/portraits/` — `studio-*` (grey studio background, light theme)
   and `cutout-*` (background removed, dark theme, on a sunken well); alt text in
-  `src/lib/portraits.ts`. The homepage card uses the green sweater, `/about` starts on the
+  `src/lib/portraits.ts`. The hero uses the green sweater (as the share card does), the homepage card and `/about` start on the
   turtleneck.
 
 ## Languages (English + Czech)

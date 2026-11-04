@@ -127,7 +127,19 @@ test("contact form: topic from ?topic=, field errors, honest not-connected state
 test("hero copy: role line, CV lede, three ways in, no founder", async ({ page }) => {
   await page.goto("/");
   const hero = page.locator("#top");
-  await expect(hero.locator("h1 + p")).toHaveText("Backend & fullstack software engineer");
+  await expect(
+    hero.getByText("Backend & fullstack software engineer", { exact: true }),
+  ).toBeVisible();
+  // The portrait sits beside the name, as tall as it, and loads with the page.
+  const portrait = hero.getByRole("img", { name: "Ivan Sapronov smiling, in a green sweater" });
+  await expect(portrait).toBeVisible();
+  await expect(portrait).toHaveAttribute("loading", "eager");
+  const name = (await hero.locator("h1").boundingBox())!;
+  const photo = (await hero.locator(".hero-portrait").boundingBox())!;
+  expect(photo.x).toBeGreaterThan(name.x + name.width - 1);
+  expect(Math.abs(photo.height - name.height)).toBeLessThan(4);
+  // The About card further down shows a different shot.
+  await expect(page.locator('#about [data-portrait="turtleneck"]')).toHaveCount(1);
   await expect(hero).toContainText("Kotlin and Java on Spring Boot");
   await expect(hero).not.toContainText(/founder/i);
   await expect(hero.getByRole("link", { name: "Let's work together" })).toHaveAttribute(

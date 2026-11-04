@@ -11,7 +11,7 @@ import { portraitById, portraits, type Portrait } from "@lib/portraits";
 import { i18n } from "@/i18n";
 
 interface Props {
-  /** Portrait shown first. The homepage uses green (artboard), /about the turtleneck. */
+  /** Portrait shown first (the homepage and /about start on the turtleneck). */
   initial?: Portrait["id"];
   switcher?: boolean;
   /** Render "Engineer and founder." as a heading (off on /about, where it is the h1). */
