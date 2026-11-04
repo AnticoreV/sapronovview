@@ -130,14 +130,18 @@ test("hero copy: role line, CV lede, three ways in, no founder", async ({ page }
   await expect(
     hero.getByText("Backend & fullstack software engineer", { exact: true }),
   ).toBeVisible();
-  // The portrait sits beside the name, as tall as it, and loads with the page.
-  const portrait = hero.getByRole("img", { name: "Ivan Sapronov smiling, in a green sweater" });
-  await expect(portrait).toBeVisible();
-  await expect(portrait).toHaveAttribute("loading", "eager");
+  // The portrait sits inline after "Ivan", one line tall, and loads with the page. It is
+  // decorative inside the heading, so the heading still reads "Ivan Sapronov".
+  await expect(hero.getByRole("heading", { level: 1 })).toHaveAccessibleName(/^Ivan\s+Sapronov$/);
+  const photo = hero.locator("h1 .hero-photo");
+  await expect(photo).toBeVisible();
+  await expect(photo).toHaveAttribute("aria-hidden", "true");
+  await expect(photo.locator("img")).toHaveAttribute("loading", "eager");
+  const line = (await hero.locator("h1 .hero-line").boundingBox())!;
+  const box = (await photo.boundingBox())!;
   const name = (await hero.locator("h1").boundingBox())!;
-  const photo = (await hero.locator(".hero-portrait").boundingBox())!;
-  expect(photo.x).toBeGreaterThan(name.x + name.width - 1);
-  expect(Math.abs(photo.height - name.height)).toBeLessThan(4);
+  expect(box.y).toBeLessThan(name.y + name.height / 2); // first line, not the second
+  expect(box.x + box.width).toBeLessThanOrEqual(line.x + line.width + 1);
   // The About card further down shows a different shot.
   await expect(page.locator('#about [data-portrait="turtleneck"]')).toHaveCount(1);
   await expect(hero).toContainText("Kotlin and Java on Spring Boot");
