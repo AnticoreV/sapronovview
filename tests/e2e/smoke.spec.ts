@@ -96,8 +96,11 @@ test("contact form: topic from ?topic=, field errors, honest not-connected state
   await expect(
     page.getByRole("note").getByText("Form not connected yet", { exact: true }),
   ).toBeVisible();
-  // On /contact the routes are emails with the subject filled in.
+  // On /contact the routes (and the CV request) are emails with the subject filled in.
   await expect(page.locator('#contact a[href*="subject=Investing"]')).toBeVisible();
+  await expect(
+    page.locator("#contact").getByRole("link", { name: /^(Download CV|CV on request)$/ }),
+  ).toHaveAttribute("href", /^(mailto:.+subject=CV|\/cv\/)/);
 
   const submit = page.locator("[data-contact-form] button[type=submit]");
   await submit.click();
@@ -342,6 +345,33 @@ test("homepage sections in the restructured order", async ({ page }) => {
   ).toBeVisible();
   await expect(page.locator("#product")).toContainText("A side venture alongside client work");
   await expect(page.locator("#about #off-duty")).toContainText("ULL pilot in training");
+});
+
+test("wide screens use the full width (no text column beside empty space)", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "desktop layout");
+  // A 13" MacBook window (1470) and a narrower desktop window (1180): scene beside the text.
+  for (const width of [1180, 1470]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const text = (await page.locator("#hero-heading").boundingBox())!;
+    const stage = (await page.locator(".hero-media").boundingBox())!;
+    expect(stage.x, `hero at ${width}`).toBeGreaterThan(text.x + 400);
+    expect(stage.y, `hero at ${width}`).toBeLessThan(text.y + text.height);
+  }
+  // Tech stack: ten categories in two columns of five.
+  const rows = page.locator("#stack dl > div");
+  const first = (await rows.nth(0).boundingBox())!;
+  const sixth = (await rows.nth(5).boundingBox())!;
+  expect(sixth.x).toBeGreaterThan(first.x + 500);
+  expect(Math.abs(sixth.y - first.y)).toBeLessThan(2);
+  // Timeline: each position's technologies sit to the right of its achievements.
+  const entry = page.locator("#experience ol > li").first();
+  const bullets = (await entry.locator("ul").first().boundingBox())!;
+  const tech = (await entry.locator('ul[aria-label="Technologies"]').boundingBox())!;
+  expect(tech.x).toBeGreaterThan(bullets.x + bullets.width);
 });
 
 test("about: heading, portrait switch, ProfilePage structured data", async ({ page }) => {

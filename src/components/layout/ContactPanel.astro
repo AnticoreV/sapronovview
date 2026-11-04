@@ -74,7 +74,10 @@ const routeHref = (route: Route) =>
           GitHub
         </a>
       )}
-      <CvLink class="link-inline inline-flex min-h-11 items-center underline-offset-[6px]" />
+      <CvLink
+        class="link-inline inline-flex min-h-11 items-center underline-offset-[6px]"
+        mailto={level === 1}
+      />
     </div>
   </div>
 </section>

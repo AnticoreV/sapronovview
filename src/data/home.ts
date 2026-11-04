@@ -66,7 +66,7 @@ const expertiseText: Record<Locale, Expertise[]> = {
     },
     {
       id: "fullstack",
-      title: "Full-stack development",
+      title: "Fullstack development",
       text: "The web app on top of the services: typed component libraries, dynamic forms and self-service tools.",
       stack: ["Angular", "React", "TypeScript", "RxJS", "NgRx"],
       spotlight: false,

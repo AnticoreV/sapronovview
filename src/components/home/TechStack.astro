@@ -3,12 +3,15 @@
  * "Tech stack": the CV's skills by category (src/data/stack.ts), one row per category.
  * Core chips (everyday stack) are solid; "worked with" chips are dashed and muted, so
  * the split reads without percentages or ratings. Screen readers get two named lists.
+ * From 1100px the categories run down two columns (five rows each), so the chips fill
+ * the width instead of leaving the right half of the page empty.
  */
 import SectionHeader from "@components/ui/SectionHeader.astro";
 import { stack } from "@data/stack";
 import { i18n } from "@/i18n";
 
 const { locale, t } = i18n(Astro);
+const rows = Math.ceil(stack.length / 2);
 ---
 
 <section id="stack" class="band section-gap" aria-labelledby="stack-heading">
@@ -28,9 +31,12 @@ const { locale, t } = i18n(Astro);
         </span>
       </p>
     </SectionHeader>
-    <dl class="flex flex-col">
+    <dl
+      class="grid min-[1100px]:grid-flow-col min-[1100px]:grid-cols-2 min-[1100px]:grid-rows-[repeat(var(--stack-rows),auto)] min-[1100px]:gap-x-12"
+      style={`--stack-rows: ${rows}`}
+    >
       {stack.map((g) => (
-        <div class="grid gap-x-6 gap-y-2.5 border-b border-line py-4 sm:grid-cols-[200px_1fr]">
+        <div class="grid content-start gap-x-6 gap-y-2.5 border-b border-line py-4 sm:grid-cols-[160px_1fr]">
           <dt class="pt-1 font-semibold">{g.label[locale]}</dt>
           <dd class="flex flex-wrap gap-1.5">
             <ul class="flex flex-wrap gap-1.5" aria-label={t("stack.core")}>
