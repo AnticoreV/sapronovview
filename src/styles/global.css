@@ -382,8 +382,7 @@
   }
 
   /* Buttons: radius-sm. Primary: accent fill. Secondary: surface with a 1px line border.
-     Pills are reserved for status pills, the round icon button and the portrait set into
-     the hero name. */
+     Pills are reserved for status pills and the round icon button. */
   .btn {
     display: inline-flex;
     align-items: center;

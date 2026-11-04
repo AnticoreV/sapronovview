@@ -1,6 +1,6 @@
 ---
 /**
- * Hero: name with the portrait beside it, role line, lede, the three ways in (Let's work together → #contact, View
+ * Hero: name, role line, lede, the three ways in (Let's work together → #contact, View
  * experience → #experience, the CV), four facts at a glance and the companies I've
  * worked with; the live "Blueprint" scene with its legend on the right.
  *
@@ -8,25 +8,17 @@
  * takes the rest, so a laptop window never shows the text alone with empty space beside
  * it. Below that the scene moves under the text; once the text column is wider than
  * 720px (tablets, narrow desktop windows) the lede widens and the facts sit in one row.
- *
- * Portrait: the green-sweater shot (the one on the share card) set inline after "Ivan",
- * like a word in the name: a pill as tall as the line, sized in em so it scales with the
- * type, filling the space the short first line leaves. Light theme: the studio photo;
- * dark theme: the cut-out on a sunken well, as in ProfileCard. It is decorative inside
- * the heading (the name is right there; the About card carries the described portrait).
  */
 import HeroStage from "@components/home/HeroStage.astro";
 import CvLink from "@components/ui/CvLink.astro";
-import ThemePicture from "@components/ui/ThemePicture.astro";
 import { siteConfig, siteCopy } from "@config";
 import { heroFacts } from "@data/home";
-import { portraitById } from "@lib/portraits";
 import { i18n } from "@/i18n";
 
 const { locale, t } = i18n(Astro);
 const copy = siteCopy[locale];
 const facts = heroFacts(locale);
-const portrait = portraitById("green");
+
 const [first, ...rest] = siteConfig.name.split(" ");
 ---
 
@@ -35,19 +27,7 @@ const [first, ...rest] = siteConfig.name.split(" ");
     <div class="@container flex min-w-0 flex-col gap-6">
       <div class="flex flex-col gap-4">
         <h1 id="hero-heading" class="display text-display-xl">
-          <span class="hero-line">
-            {first}
-            <span class="hero-photo" aria-hidden="true">
-              <ThemePicture
-                light={portrait.studio}
-                dark={portrait.cutout}
-                alt=""
-                widths={[160, 320, 480]}
-                sizes="(max-width: 823px) 80px, (min-width: 1470px) 140px, 9.6vw"
-                loading="eager"
-              />
-            </span>
-          </span>
+          {first}
           <br />
           {rest.join(" ")}
         </h1>
@@ -79,36 +59,3 @@ const [first, ...rest] = siteConfig.name.split(" ");
     <HeroStage />
   </div>
 </section>
-
-<style>
-  /* First line: "Ivan", then the photo. Positioned absolutely inside the padding it
-     reserves, so the line keeps the name's tight 0.95 line height: the pill runs from
-     cap height to just under the baseline, like a word set in the same size. */
-  .hero-line {
-    position: relative;
-    display: inline-block;
-    padding-right: calc(0.2em + 0.94em * 1.5);
-  }
-  .hero-photo {
-    position: absolute;
-    right: 0;
-    bottom: 0.02em;
-    height: 0.94em;
-    aspect-ratio: 1.5;
-    overflow: hidden;
-    border-radius: 999px;
-    /* Shows only behind the dark-theme cut-out (the studio photo is opaque): a tint of
-       the ink, so the pill keeps its shape on the dark page. */
-    background: color-mix(in srgb, var(--ink) 11%, var(--bg));
-  }
-  .hero-photo :global(picture) {
-    display: contents;
-  }
-  .hero-photo :global(img) {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: 50% 16%;
-  }
-</style>
