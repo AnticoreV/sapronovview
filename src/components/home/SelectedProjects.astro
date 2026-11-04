@@ -1,0 +1,83 @@
+---
+/**
+ * "Selected projects": three case-study cards (src/data/home.ts), newest first. Each
+ * card: company · year, title, the kind of work, an overview, "My contribution", the
+ * sourced metric chips (src/data/readouts.ts), the stack and "View case study".
+ */
+import Glyphs from "@components/ui/Glyphs.astro";
+import SectionHeader from "@components/ui/SectionHeader.astro";
+import TechBadge from "@components/ui/TechBadge.astro";
+import { homeCases } from "@data/home";
+import { getReadouts, type Readout, type ReadoutId } from "@data/readouts";
+import type { Project } from "@lib/content";
+import { i18n } from "@/i18n";
+
+interface Props {
+  projects: Project[];
+}
+const { projects } = Astro.props;
+const { locale, t, l } = i18n(Astro);
+const cases = homeCases(locale).filter((c) => projects.some((p) => p.id === c.slug));
+const readouts = getReadouts(locale);
+const readout = (id: ReadoutId): Readout => readouts[id];
+---
+
+{cases.length > 0 && (
+  <section id="projects" class="band section-gap" aria-labelledby="projects-heading">
+    <div class="shell flex flex-col gap-9">
+      <SectionHeader
+        id="projects-heading"
+        title={t("work.title")}
+        href={l("/projects")}
+        linkLabel={t("work.all")}
+      />
+      <ul class="grid grid-cols-[repeat(auto-fit,minmax(min(340px,100%),1fr))] gap-4">
+        {cases.map((c) => (
+          <li class="flex">
+            <article class="card flex w-full flex-col gap-4 p-7">
+              <div class="flex flex-col gap-2">
+                <p class="mono text-[12px] text-ink-muted">{c.meta}</p>
+                <h3 class="display text-heading">{c.title}</h3>
+                <p class="mono text-[12px] font-medium text-accent">{c.disciplines.join(" · ")}</p>
+              </div>
+              <p class="text-ink-muted">{c.overview}</p>
+              <div>
+                <p class="label text-ink-muted">{t("work.contribution")}</p>
+                <ul class="mt-2 flex list-disc flex-col gap-1.5 pl-5 text-[16px] marker:text-line-strong">
+                  {c.contribution.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              </div>
+              <ul class="flex flex-wrap gap-1.5" aria-label={t("project.proof")}>
+                {c.chips.map((id) => (
+                  <li class="chip bg-accent-soft">
+                    <Glyphs
+                      text={readout(id).chip ?? readout(id).value}
+                      spoken={readout(id).chipSpoken}
+                      weight="bold"
+                    />
+                  </li>
+                ))}
+              </ul>
+              <ul class="flex flex-wrap gap-1.5" aria-label={t("project.stack")}>
+                {c.stack.map((tech) => (
+                  <li>
+                    <TechBadge label={tech} />
+                  </li>
+                ))}
+              </ul>
+              <a
+                href={l(`/projects/${c.slug}`)}
+                class="btn btn-secondary btn-sm mt-auto self-start"
+              >
+                {t("work.viewCase")}
+                <span class="sr-only">: {c.title}</span>
+              </a>
+            </article>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}

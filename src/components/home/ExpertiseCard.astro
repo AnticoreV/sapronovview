@@ -1,27 +1,29 @@
 ---
 /**
- * CapabilityCard — one of the four "What I can do" cards with its small isometric
- * clay icon from the artboard. The spotlight card (Automate) sits on accent-soft with
- * an accent border (website.md).
+ * ExpertiseCard: one of the four "What I do" cards with its small isometric clay icon,
+ * a one-line description and the technologies it stands on. The spotlight card
+ * (backend, the primary specialisation) sits on accent-soft with an accent border.
  */
-import type { CapabilityId } from "@data/home";
+import type { ExpertiseId } from "@data/home";
 
 interface Props {
-  id: CapabilityId;
+  id: ExpertiseId;
   title: string;
   text: string;
+  stack: string[];
   spotlight?: boolean;
 }
-const { id, title, text, spotlight = false } = Astro.props;
+const { id, title, text, stack, spotlight = false } = Astro.props;
 ---
 
 <li
   class:list={[
-    "flex flex-col gap-3.5 rounded-md p-7",
-    spotlight ? "border-2 border-accent bg-accent-soft" : "card",
+    "flex flex-col gap-3.5 rounded-md",
+    // The 2px accent border takes 1px more than the card's, so 1px less padding.
+    spotlight ? "border-2 border-accent bg-accent-soft p-[27px]" : "card p-7",
   ]}
 >
-  {id === "build" && (
+  {id === "backend" && (
     <svg width="72" height="64" viewBox="0 0 72 64" aria-hidden="true">
       <path d="M36 30 52 39 36 48 20 39Z" fill="#E9EDF2" />
       <path d="M20 39 36 48v13L20 52Z" fill="#D3D9E1" />
@@ -31,7 +33,7 @@ const { id, title, text, spotlight = false } = Astro.props;
       <path d="M52 21 36 30v13l16-9Z" fill="#2443B8" />
     </svg>
   )}
-  {id === "direct" && (
+  {id === "architecture" && (
     <svg width="72" height="64" viewBox="0 0 72 64" aria-hidden="true">
       <path d="M14 40 36 28 58 40" fill="none" stroke="#A9B1BC" stroke-width="2" />
       <path d="M36 28v-6" stroke="#A9B1BC" stroke-width="2" />
@@ -49,20 +51,21 @@ const { id, title, text, spotlight = false } = Astro.props;
       <path d="M45 45 36 50v8l9-5Z" fill="#C39E34" />
     </svg>
   )}
-  {id === "automate" && (
+  {id === "fullstack" && (
     <svg width="72" height="64" viewBox="0 0 72 64" aria-hidden="true">
-      <ellipse cx="22" cy="10" rx="9" ry="3.2" fill="#C7CDD5" />
-      <ellipse cx="50" cy="10" rx="9" ry="3.2" fill="#C7CDD5" />
-      <path d="M22 10h28" stroke="#A9B1BC" stroke-width="2.4" />
-      <path d="M30 11 36 8 42 11 36 14Z" fill="#EE8597" />
-      <path d="M30 15 26 30M42 15 46 30" stroke="#A9B1BC" stroke-width="1.6" />
-      <path d="M36 26 52 35 36 44 20 35Z" fill="#E9EDF2" />
-      <path d="M20 35 36 44v14L20 49Z" fill="#D3D9E1" />
-      <path d="M52 35 36 44v14l16-9Z" fill="#BAC2CD" />
-      <circle cx="44" cy="49" r="1.8" fill="#59C990" />
+      <path d="M36 38 52 46 36 54 20 46Z" fill="#E9EDF2" />
+      <path d="M20 46 36 54v6L20 52Z" fill="#D3D9E1" />
+      <path d="M52 46 36 54v6l16-8Z" fill="#BAC2CD" />
+      <path d="M36 26 52 34 36 42 20 34Z" fill="#E9EDF2" />
+      <path d="M20 34 36 42v6L20 40Z" fill="#D3D9E1" />
+      <path d="M52 34 36 42v6l16-8Z" fill="#BAC2CD" />
+      <path d="M36 14 52 22 36 30 20 22Z" fill="#3D63FF" />
+      <path d="M20 22 36 30v6L20 28Z" fill="#2F51E0" />
+      <path d="M52 22 36 30v6l16-8Z" fill="#2443B8" />
+      <path d="M30 20.5 36 17.5 42 20.5" fill="none" stroke="#F4CC52" stroke-width="1.6" />
     </svg>
   )}
-  {id === "ship" && (
+  {id === "cloud" && (
     <svg width="72" height="64" viewBox="0 0 72 64" aria-hidden="true">
       <path d="M36 34 66 50 36 66 6 50Z" fill="#E9EDF2" />
       <path d="M36 14 50 22 36 30 22 22Z" fill="#59C990" />
@@ -81,4 +84,12 @@ const { id, title, text, spotlight = false } = Astro.props;
   )}
   <h3 class="display text-card-title">{title}</h3>
   <p class="text-[16px] text-ink-muted">{text}</p>
+  <p
+    class:list={[
+      "mono mt-auto border-t pt-3.5 text-[12px] font-medium",
+      spotlight ? "border-accent/30" : "border-line",
+    ]}
+  >
+    {stack.join(" · ")}
+  </p>
 </li>

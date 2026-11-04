@@ -9,9 +9,9 @@ companyUrl: https://www.ableneo.com
 achievements:
   - "Reduced server load and improved response times for high-traffic applications by introducing Redis caching and a reactive, non-blocking architecture with Spring WebFlux"
   - "Developed user-management services with Spring Data JPA/Hibernate and integrated Keycloak for Single Sign-On (SSO) and Customer Identity and Access Management (CIAM), standardising OAuth2/OIDC across services"
+  - "Integrated Kafka for inter-service communication (including custom connectors) and built observability with Grafana, Prometheus and InfluxDB to monitor production health"
   - "Established automated testing with JUnit and Mockito, raising coverage and reducing production regressions"
   - "Dockerised microservices and deployed them to Kubernetes so each one scales on its own"
-  - "Integrated Kafka for inter-service communication (including custom connectors) and built observability with Grafana, Prometheus and InfluxDB to monitor production health"
 shipped: "Keycloak · Kafka · K8s"
 technologies:
   - Java

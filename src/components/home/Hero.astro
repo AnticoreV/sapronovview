@@ -1,36 +1,55 @@
 ---
 /**
- * Hero from the approved artboard (HeroV6): eyebrow, name in two lines, lede,
- * Email me + What I build, and the live "Blueprint" scene with its legend.
+ * Hero: name, role line, lede, the three ways in (Let's work together → #contact, View
+ * experience → #experience, the CV), four facts at a glance and the companies I've
+ * worked with; the live "Blueprint" scene with its legend on the right.
  */
 import HeroStage from "@components/home/HeroStage.astro";
+import CvLink from "@components/ui/CvLink.astro";
 import { siteConfig, siteCopy } from "@config";
+import { heroFacts } from "@data/home";
 import { i18n } from "@/i18n";
 
 const { locale, t } = i18n(Astro);
 const copy = siteCopy[locale];
+const facts = heroFacts(locale);
 
 const [first, ...rest] = siteConfig.name.split(" ");
 ---
 
-<section id="top" class="band pt-14 pb-6" aria-labelledby="hero-heading">
+<section id="top" class="band pt-14 pb-16" aria-labelledby="hero-heading">
   <div class="shell flex flex-wrap items-center gap-x-10 gap-y-6">
-    <div class="flex flex-[1_1_420px] flex-col gap-6">
-      <p class="meta text-ink-muted">{copy.eyebrow}</p>
-      <h1 id="hero-heading" class="display text-display-xl">
-        {first}
-        <br />
-        {rest.join(" ")}
-      </h1>
-      <p class="max-w-[520px] text-body-l">{copy.lede}</p>
-      <div class="flex flex-wrap items-center gap-3">
-        <a href={`mailto:${siteConfig.email}`} class="btn btn-primary">
-          {t("hero.email")}
-        </a>
-        <a href="#build" class="btn btn-secondary">
-          {t("hero.build")}
-        </a>
+    <div class="flex flex-[1_1_560px] flex-col gap-6">
+      <div class="flex flex-col gap-4">
+        <h1 id="hero-heading" class="display text-display-xl">
+          {first}
+          <br />
+          {rest.join(" ")}
+        </h1>
+        <p class="display text-tagline text-accent">{copy.role}</p>
       </div>
+      <p class="max-w-[560px] text-body-l">{copy.lede}</p>
+      <div class="flex flex-wrap items-center gap-3">
+        <a href="#contact" class="btn btn-primary">
+          {t("hero.work")}
+        </a>
+        <a href="#experience" class="btn btn-secondary">
+          {t("hero.experience")}
+        </a>
+        <CvLink class="link-more px-2" />
+      </div>
+      <dl
+        class="grid max-w-[560px] grid-cols-2 gap-x-6 gap-y-4 border-t border-ink pt-5"
+        aria-label={t("hero.facts")}
+      >
+        {facts.map((f) => (
+          <div>
+            <dt class="mono text-[12px] text-ink-muted">{f.label}</dt>
+            <dd class="mt-0.5 font-semibold">{f.value}</dd>
+          </div>
+        ))}
+      </dl>
+      <p class="label text-ink-muted">{t("proof.workedWith")}</p>
     </div>
     <HeroStage />
   </div>

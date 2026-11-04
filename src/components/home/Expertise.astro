@@ -1,0 +1,27 @@
+---
+/** "What I do": four ExpertiseCards (src/data/home.ts), backend first. */
+import ExpertiseCard from "@components/home/ExpertiseCard.astro";
+import SectionHeader from "@components/ui/SectionHeader.astro";
+import { expertise as expertiseFor } from "@data/home";
+import { i18n } from "@/i18n";
+
+const { locale, t } = i18n(Astro);
+const cards = expertiseFor(locale);
+---
+
+<section id="expertise" class="band section-gap" aria-labelledby="expertise-heading">
+  <div class="shell flex flex-col gap-9">
+    <SectionHeader id="expertise-heading" title={t("expertise.title")} />
+    <ul class="grid grid-cols-[repeat(auto-fit,minmax(min(290px,100%),1fr))] gap-4">
+      {cards.map((c) => (
+        <ExpertiseCard
+          id={c.id}
+          title={c.title}
+          text={c.text}
+          stack={c.stack}
+          spotlight={c.spotlight}
+        />
+      ))}
+    </ul>
+  </div>
+</section>

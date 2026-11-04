@@ -1,0 +1,45 @@
+---
+/**
+ * "About me": the profile card (portrait, based in, role, languages, experience,
+ * status) beside two short paragraphs and, last and small, what I do off duty.
+ * The full story is on /about.
+ */
+import ProfileCard from "@components/profile/ProfileCard.astro";
+import SectionHeader from "@components/ui/SectionHeader.astro";
+import { homeAbout } from "@data/home";
+import { i18n } from "@/i18n";
+
+interface Props {
+  countries: number;
+}
+const { countries } = Astro.props;
+const { locale, t, l } = i18n(Astro);
+const paragraphs = homeAbout(locale);
+const offDuty = t("offduty.line", { countries: t("countries", { n: countries }) });
+---
+
+<section id="about" class="band section-gap" aria-labelledby="about-heading">
+  <div class="shell flex flex-col gap-9">
+    <SectionHeader
+      id="about-heading"
+      title={t("aboutHome.title")}
+      href={l("/about")}
+      linkLabel={t("aboutHome.more")}
+    />
+    <div class="flex flex-wrap items-start gap-x-12 gap-y-8">
+      <ProfileCard class="flex-[3_1_560px]" initial="green" heading={false} />
+      <div class="flex flex-[2_1_360px] flex-col gap-4">
+        {paragraphs.map((p, i) => (
+          <p class:list={[i === 0 && "text-body-l"]}>{p}</p>
+        ))}
+        <div id="off-duty" class="mt-2 flex flex-col gap-1.5 border-t border-line pt-4">
+          <h3 class="label text-ink-muted">{t("offduty.title")}</h3>
+          <p>{offDuty}</p>
+          <a href={l("/hobbies")} class="link-more self-start">
+            {t("offduty.link")}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

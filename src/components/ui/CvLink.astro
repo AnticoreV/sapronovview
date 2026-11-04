@@ -1,0 +1,25 @@
+---
+/**
+ * The CV link: "Download CV" once the PDF exists in public/ (src/lib/cv.ts), otherwise
+ * "CV on request", which opens /contact with the hiring topic. Used in the hero, the
+ * experience section and the contact panel.
+ */
+import { cvPath } from "@lib/cv";
+import { i18n } from "@/i18n";
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+const { t, l } = i18n(Astro);
+---
+
+{cvPath ? (
+  <a href={cvPath} class={className} download>
+    {t("record.cvDownload")}
+  </a>
+) : (
+  <a href={l("/contact?topic=hiring")} class={className}>
+    {t("record.cvRequest")}
+  </a>
+)}

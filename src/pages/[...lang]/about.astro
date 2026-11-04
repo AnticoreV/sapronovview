@@ -7,7 +7,8 @@ import JsonLd from "@components/seo/JsonLd.astro";
 import { shownAll } from "@lib/content";
 import { personSchema } from "@lib/schema";
 import { aboutCopy } from "@data/about";
-import { siteConfig, siteCopy, techStack } from "@config";
+import { siteConfig, siteCopy } from "@config";
+import { stack } from "@data/stack";
 import { i18n, localeParams } from "@/i18n";
 import { localeTags } from "@/i18n/locales";
 
@@ -124,10 +125,10 @@ const profileLd = {
         </h2>
       </div>
       <div class="mt-8 grid gap-8 md:grid-cols-2">
-        {techStack.map((g) => (
+        {stack.map((g) => (
           <div>
-            <h3 class="label font-semibold text-accent">{g.group[locale]}</h3>
-            <p class="mt-2 text-ink-muted">{g.items.join(" · ")}</p>
+            <h3 class="label font-semibold text-accent">{g.label[locale]}</h3>
+            <p class="mt-2 text-ink-muted">{[...g.core, ...g.also].join(" · ")}</p>
           </div>
         ))}
       </div>

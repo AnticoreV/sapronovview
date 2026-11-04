@@ -122,11 +122,8 @@ export const iconSvg = (size: number) =>
 
 /** The card's lede, in two lines (the hero lede, shortened to fit). */
 export const ogLede: Record<Locale, [string, string]> = {
-  en: [
-    "Backend systems and products, AI agents and",
-    "automation, services shipped to production.",
-  ],
-  cs: ["Backendové systémy a produkty, AI agenti", "a automatizace, služby nasazené do produkce."],
+  en: ["Kotlin and Java services on Spring Boot:", "designed, built and run on GCP, AWS and K8s."],
+  cs: ["Služby v Kotlinu a Javě na Spring Bootu:", "návrh, vývoj i provoz na GCP, AWS a K8s."],
 };
 
 const ogSvg = (locale: Locale) => {
@@ -154,7 +151,7 @@ const ogSvg = (locale: Locale) => {
   <rect x="122" y="44" width="${statusWidth.toFixed(0)}" height="36" rx="18" fill="#FFFFFF" stroke="#D4DAE1"/>
   <circle cx="142" cy="62" r="4" fill="#59C990"/>
   ${text(f.mono, status, 156, 67, 13, "#1C7A4A", 0.02)}
-  ${text(f.mono, siteCopy[locale].eyebrow, 64, 132, 15, "#4D5662", 0.06)}
+  ${text(f.mono, siteCopy[locale].role, 64, 132, 15, "#4D5662", 0.06)}
   ${text(f.display, first ?? "", 58, 238, 112, "#10141A", -0.032)}
   ${text(f.display, rest.join(" "), 58, 336, 112, "#10141A", -0.032)}
   ${text(f.body, lede1, 64, 390, 25, "#10141A")}

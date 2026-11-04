@@ -9,7 +9,7 @@ Během tříměsíční freelance zakázky pro CreativeDock jsem od nuly postavi
 
 ## Co jsem postavil
 
-- Služby pro ticketing, rezervace a předplatné s API a kontrakty definovanými předem; architektonická rozhodnutí celé zakázky jsem vedl já.
+- Služby pro ticketing, rezervace a předplatné s GraphQL API (Spring for GraphQL), se schématy a kontrakty definovanými předem; architektonická rozhodnutí celé zakázky jsem vedl já.
 - Integrační testy proti reálným závislostem se SpringMockK a Testcontainers.
 
 ## CI, které stíhá
