@@ -36,6 +36,7 @@
   --clay-mint: #59c990;
   --clay-butter: #f4cc52;
   --clay-rose: #ee8597;
+  --clay-stone: #e9edf2;
   --shadow-pop: 0 12px 32px rgba(16, 20, 26, 0.08);
   --shadow-focus: 0 0 0 2px #eef1f4, 0 0 0 4px #2450ff;
 
@@ -44,6 +45,14 @@
   --content-max: 1328px;
   /* Code blocks (website.md / components.md: code on #10141A in both themes). */
   --code-bg: #10141a;
+
+  /* Surfaces that a palette can paint with a gradient (flat by default): the page
+     behind every band, the contact panel, and the sticky header (with an optional
+     backdrop filter when the page behind it is not flat). */
+  --page-bg: var(--bg);
+  --panel-bg: var(--accent);
+  --header-bg: var(--bg);
+  --header-filter: none;
 }
 
 .dark {
@@ -70,6 +79,7 @@
   --clay-mint: #59c990;
   --clay-butter: #f4cc52;
   --clay-rose: #ee8597;
+  --clay-stone: #e9edf2;
   --shadow-pop: 0 12px 32px rgba(0, 0, 0, 0.4);
   --shadow-focus: 0 0 0 2px #0e1116, 0 0 0 4px #7d9bff;
 }
@@ -225,7 +235,7 @@
   }
 
   body {
-    background: var(--bg);
+    background: var(--page-bg);
     color: var(--ink);
     font-family: var(--font-sans);
     font-size: var(--text-body);
@@ -292,6 +302,48 @@
 /* Components                                                           */
 /* ------------------------------------------------------------------ */
 @layer components {
+  /* Isometric clay icons (What I do, the logo): top face in the clay colour, the left
+     and right faces darker, so a palette change recolours them. */
+  .iso-blue {
+    fill: var(--clay-blue);
+  }
+  .iso-blue-l {
+    fill: oklch(from var(--clay-blue) calc(l - 0.065) c h);
+  }
+  .iso-blue-r {
+    fill: oklch(from var(--clay-blue) calc(l - 0.145) calc(c * 0.8) h);
+  }
+  .iso-stone {
+    fill: var(--clay-stone);
+  }
+  .iso-stone-l {
+    fill: oklch(from var(--clay-stone) calc(l - 0.056) c h);
+  }
+  .iso-stone-r {
+    fill: oklch(from var(--clay-stone) calc(l - 0.13) c h);
+  }
+  .iso-butter {
+    fill: var(--clay-butter);
+  }
+  .iso-butter-l {
+    fill: oklch(from var(--clay-butter) calc(l - 0.07) c h);
+  }
+  .iso-butter-r {
+    fill: oklch(from var(--clay-butter) calc(l - 0.14) calc(c * 0.8) h);
+  }
+  .iso-mint {
+    fill: var(--clay-mint);
+  }
+  .iso-mint-ink {
+    fill: oklch(from var(--clay-mint) calc(l - 0.24) calc(c * 0.75) h);
+  }
+  .iso-wire {
+    stroke: oklch(from var(--clay-stone) calc(l - 0.19) c h);
+  }
+  .iso-butter-wire {
+    stroke: var(--clay-butter);
+  }
+
   /* Layout: full-bleed band with the artboard gutter + 1328px content. */
   .band {
     padding-inline: var(--gutter);
