@@ -2,7 +2,7 @@
 updated: 2026-10-22
 location: "Prague, Czech Republic"
 working:
-  - "Open to backend and AI automation contracts"
+  - "Open to backend, fullstack and AI automation contracts"
   - "[One line on the current client or project]"
 learning:
   - "[Something you are learning, e.g. a new language, framework or flying skill]"

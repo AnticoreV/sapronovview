@@ -1,7 +1,7 @@
 ---
 location: "Praha"
 working:
-  - "Beru zakázky na backend a AI automatizaci"
+  - "Beru zakázky na backend, fullstack i AI automatizaci"
   - "[Jeden řádek o aktuálním klientovi nebo projektu]"
 learning:
   - "[Co se právě učím, např. nový jazyk, framework nebo letecká dovednost]"

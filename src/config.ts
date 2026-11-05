@@ -47,7 +47,7 @@ export const siteConfig = {
     label: "Open to projects",
   },
   /** What you are working on right now (one line). */
-  currentFocus: "Open to backend and AI automation contracts",
+  currentFocus: "Open to backend, fullstack and AI automation contracts",
   /** Experience on the JVM, as stated in the CV (~5 years). */
   experienceSummary: "~5 yrs on the JVM",
   /** Language for <html lang> and Open Graph locale. */
@@ -124,7 +124,7 @@ export const siteCopy: Record<
       "Backend & fullstack software engineer in Prague: Kotlin and Java services on Spring Boot, microservices on GCP, AWS and Kubernetes, and the Angular or React apps on top. Open to contracts.",
     role: "Backend & fullstack software engineer",
     lede: "I build backend services in Kotlin and Java on Spring Boot, design how they fit together, and run them on GCP, AWS and Kubernetes. Recent work includes a platform serving about two million users.",
-    currentFocus: "open to backend and AI automation contracts",
+    currentFocus: "open to backend, fullstack and AI automation contracts",
     experienceSummary: "~5 yrs on the JVM",
     basedIn: "Prague, Czechia",
     languages: [
@@ -139,7 +139,7 @@ export const siteCopy: Record<
       "Backend & fullstack software engineer v Praze: služby v Kotlinu a Javě na Spring Bootu, mikroslužby na GCP, AWS a Kubernetes a aplikace v Angularu nebo Reactu nad nimi. Beru zakázky.",
     role: "Backend & fullstack software engineer",
     lede: "Stavím backendové služby v Kotlinu a Javě na Spring Bootu, navrhuji, jak do sebe zapadají, a provozuji je na GCP, AWS a Kubernetes. Mezi poslední práce patří platforma pro zhruba dva miliony uživatelů.",
-    currentFocus: "beru zakázky na backend a AI automatizaci",
+    currentFocus: "beru zakázky na backend, fullstack i AI automatizaci",
     experienceSummary: "~5 let na JVM",
     basedIn: "Praha, Česko",
     languages: [
