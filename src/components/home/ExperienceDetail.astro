@@ -58,7 +58,7 @@ const { t } = i18n(Astro);
       <ul class="flex flex-wrap gap-1.5" aria-label={t("experience.technologies")}>
         {item.technologies.map((tech) => (
           <li>
-            <TechBadge label={tech} class="bg-surface" />
+            <TechBadge label={tech} />
           </li>
         ))}
       </ul>

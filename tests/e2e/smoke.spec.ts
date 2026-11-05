@@ -359,7 +359,7 @@ test("homepage sections in the restructured order", async ({ page }) => {
   await expect(page.locator("#stack")).toContainText("AI & automation");
   for (const tool of ["Claude Code", "Codex", "AI CLIs", "AI agents", "Automation"])
     await expect(page.locator("#stack li", { hasText: tool }).first()).toBeVisible();
-  await expect(page.locator("#experience ol > li")).toHaveCount(4);
+  await expect(page.locator("#experience ol > li")).toHaveCount(5);
   await expect(page.locator("#experience ol > li").first()).toContainText("CreativeDock");
   const cards = page.locator("#projects article");
   await expect(cards).toHaveCount(3);
