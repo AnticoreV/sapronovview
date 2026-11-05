@@ -303,10 +303,16 @@ client from the track record) and a `detail` sentence. Rules:
   text). The share image and the static map are generated (`src/lib/brand-images.ts`,
   `src/pages/images/`); a static file with the same path would override them. Everything
   else belongs in `src/assets/` so `<Picture>` can resize it and serve AVIF / WebP.
-- **Portraits:** `src/assets/portraits/` — `studio-*` (grey studio background, light theme)
-  and `cutout-*` (background removed, dark theme, on a sunken well); alt text in
-  `src/lib/portraits.ts`. The homepage card uses the green sweater, `/about` starts on the
-  turtleneck.
+- **Portraits:** `src/assets/portraits/{turtleneck,green,black,white}.jpg` are masters
+  (JPEG q95, 4:4:4, sRGB) made from the original PNGs in `Docs/Avatars`; the same studio
+  photo shows in both themes. `ProfileCard` crops each to the 216×270 frame at build (from
+  the top) and serves AVIF q70 / WebP q82 at 1x, 2x and 3x with `layout: "none"`, so the
+  site-wide responsive widths don't apply; a 432×540 JPEG is the `<img>` fallback. To
+  replace a photo, overwrite its master from a lossless original and keep the 4:5-ish
+  framing with the face in the top third. Alt text and switch labels live in
+  `src/lib/portraits.ts`. The homepage card and `/about` open on the turtleneck;
+  `public/images/ivan-sapronov.jpg` (800 px, the structured-data photo) is the same shot.
+  `cutout-green.webp` stays only for the share card.
 
 ## Languages (English + Czech)
 

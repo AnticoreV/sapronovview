@@ -1,17 +1,19 @@
 ---
 /**
  * ProfileCard — "Who I am" in one surface card (approved artboard): a studio
- * portrait beside the heading, the current focus and mono fields. Light theme: the
- * studio portrait; dark theme: the cut-out on a sunken well. With `switcher` (/about)
- * a segmented control flips between the four portraits (pure CSS: radios + :has()).
+ * portrait beside the heading, the current focus and mono fields. The same studio photo
+ * in both themes. It is cropped to the 216×270 frame at build (sharp, from the top) and
+ * served as AVIF (q70) or WebP (q82) at 1x, 2x and 3x, so every screen gets sharp
+ * pixels and nothing is scaled or cropped in the browser. With `switcher` (/about) a
+ * segmented control flips between the four portraits (pure CSS: radios + :has()).
  */
-import ThemePicture from "@components/ui/ThemePicture.astro";
+import { getImage } from "astro:assets";
 import { siteCopy } from "@config";
 import { portraitById, portraits, type Portrait } from "@lib/portraits";
 import { i18n } from "@/i18n";
 
 interface Props {
-  /** Portrait shown first. The homepage uses green (artboard), /about the turtleneck. */
+  /** Portrait shown first (the turtleneck on the homepage and /about). */
   initial?: Portrait["id"];
   switcher?: boolean;
   /** Render "Engineer and founder." as a heading (off on /about, where it is the h1). */
@@ -21,7 +23,7 @@ interface Props {
   class?: string;
 }
 const {
-  initial = "green",
+  initial = "turtleneck",
   switcher = false,
   heading = 2,
   eager = false,
@@ -29,6 +31,37 @@ const {
 } = Astro.props;
 const first = portraitById(initial);
 const list = switcher ? [first, ...portraits.filter((p) => p.id !== first.id)] : [first];
+
+// The frame is 216×270 CSS px (4:5); crop to it at build, from the top (the face).
+const FRAME = { width: 216, height: 270 };
+// layout "none": a fixed frame, so the 1x/2x/3x densities (not the site-wide responsive
+// widths) decide the files.
+const crop = {
+  ...FRAME,
+  densities: [1, 2, 3],
+  fit: "cover" as const,
+  position: "top",
+  layout: "none" as const,
+};
+const shots = await Promise.all(
+  list.map(async (p) => {
+    const [avif, webp, fallback] = await Promise.all([
+      getImage({ src: p.photo, ...crop, format: "avif", quality: 70 }),
+      getImage({ src: p.photo, ...crop, format: "webp", quality: 82 }),
+      getImage({
+        src: p.photo,
+        width: 432,
+        height: 540,
+        fit: "cover",
+        position: "top",
+        layout: "none",
+        format: "jpg",
+        quality: 82,
+      }),
+    ]);
+    return { p, avif, webp, fallback };
+  }),
+);
 const { locale, t } = i18n(Astro);
 const copy = siteCopy[locale];
 const fields = [
@@ -44,16 +77,20 @@ const Heading = heading === 3 ? "h3" : "h2";
   class:list={["profile card flex flex-wrap gap-7 p-7", switcher && "profile--switch", className]}
 >
   <div class="profile__portrait relative shrink-0">
-    {list.map((p, i) => (
+    {shots.map(({ p, avif, webp, fallback }, i) => (
       <div class="profile__shot" data-portrait={p.id} data-default={i === 0 ? "" : undefined}>
-        <ThemePicture
-          light={p.studio}
-          dark={p.cutout}
-          alt={p.alt[locale]}
-          widths={[216, 432]}
-          sizes="216px"
-          loading={eager && i === 0 ? "eager" : "lazy"}
-        />
+        <picture>
+          <source type="image/avif" srcset={avif.srcSet.attribute} />
+          <source type="image/webp" srcset={webp.srcSet.attribute} />
+          <img
+            src={fallback.src}
+            alt={p.alt[locale]}
+            width={FRAME.width}
+            height={FRAME.height}
+            loading={eager && i === 0 ? "eager" : "lazy"}
+            decoding="async"
+          />
+        </picture>
       </div>
     ))}
   </div>
@@ -125,7 +162,6 @@ const Heading = heading === 3 ? "h3" : "h2";
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 50% 12%;
   }
 
   /* Segmented portrait switch (/about). */
