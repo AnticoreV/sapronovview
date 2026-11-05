@@ -88,6 +88,8 @@ const projects = defineCollection({
       /** Marks entries that still contain placeholder text. */
       placeholder: z.boolean().default(false),
       draft: z.boolean().default(false),
+      /** Taken off the site everywhere (dev too), without deleting the file. */
+      hidden: z.boolean().default(false),
     }),
 });
 
@@ -106,6 +108,8 @@ const writing = defineCollection({
       coverAlt: z.string().optional(),
       featured: z.boolean().default(false),
       draft: z.boolean().default(false),
+      /** Taken off the site everywhere (dev too), without deleting the file. */
+      hidden: z.boolean().default(false),
       /** Marks sample articles shipped with the template. */
       placeholder: z.boolean().default(false),
     }),

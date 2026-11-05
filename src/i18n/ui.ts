@@ -143,7 +143,7 @@ const en = {
   "project.more": "More projects",
   "projects.title": "Projects",
   "projects.description":
-    "Ownira, a self-service menu platform, a dynamic form engine and greenfield Kotlin services, each written up as a case study, plus code on GitHub.",
+    "A self-service menu platform, a dynamic form engine and greenfield Kotlin services, each written up as a case study, plus code on GitHub.",
   "projects.intro":
     "My own product and the client systems I built, each written up as a case study.",
   "projects.featured": "Products and featured work",
@@ -256,7 +256,7 @@ const en = {
   // Contact page + form
   "contactPage.title": "Contact",
   "contactPage.description":
-    "Contact {name} about a senior backend or fullstack role, investing in Ownira, or contract work.",
+    "Contact {name} about a senior backend or fullstack role, AI automation or contract work.",
   "contactPage.formLabel": "Contact form",
   "contactPage.intro":
     "Email is the fastest way to reach me. Pick a route above and I'll fill in the subject line for you.",
@@ -440,7 +440,7 @@ const cs: Record<UiKey, string> = {
   "project.more": "Další projekty",
   "projects.title": "Projekty",
   "projects.description":
-    "Ownira, samoobslužná platforma pro správu menu, dynamický formulářový engine a nové služby v Kotlinu, každý jako případová studie, plus kód na GitHubu.",
+    "Samoobslužná platforma pro správu menu, dynamický formulářový engine a nové služby v Kotlinu, každý jako případová studie, plus kód na GitHubu.",
   "projects.intro":
     "Můj vlastní produkt a klientské systémy, které jsem postavil, každý jako případová studie.",
   "projects.featured": "Produkty a vybraná práce",
@@ -552,7 +552,7 @@ const cs: Record<UiKey, string> = {
   // Contact page + form
   "contactPage.title": "Kontakt",
   "contactPage.description":
-    "Napište mi kvůli pozici senior backend nebo fullstack, investici do produktu Ownira nebo zakázce.",
+    "Napište mi kvůli pozici senior backend nebo fullstack, AI automatizaci nebo zakázce.",
   "contactPage.formLabel": "Kontaktní formulář",
   "contactPage.intro":
     "Nejrychleji mě zastihnete e-mailem. Vyberte si výše jednu z možností a předmět se vyplní sám.",

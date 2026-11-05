@@ -44,8 +44,8 @@ export function shownAll<T>(items: readonly T[], text: (item: T) => string = Str
   return hidePlaceholders ? items.filter((i) => !isPlaceholder(text(i))) : [...items];
 }
 
-const visible = (data: { placeholder?: boolean; draft?: boolean }) =>
-  !(isProd && (data.draft || (hidePlaceholders && data.placeholder)));
+const visible = (data: { placeholder?: boolean; draft?: boolean; hidden?: boolean }) =>
+  !data.hidden && !(isProd && (data.draft || (hidePlaceholders && data.placeholder)));
 
 /* Czech versions ------------------------------------------------------------ */
 

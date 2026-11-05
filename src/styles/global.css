@@ -413,6 +413,15 @@
   .iso-mint {
     fill: var(--clay-mint);
   }
+  .iso-mint-l {
+    fill: oklch(from var(--clay-mint) calc(l - 0.065) c h);
+  }
+  .iso-mint-r {
+    fill: oklch(from var(--clay-mint) calc(l - 0.145) calc(c * 0.8) h);
+  }
+  .iso-rose {
+    fill: var(--clay-rose);
+  }
   .iso-mint-ink {
     fill: oklch(from var(--clay-mint) calc(l - 0.24) calc(c * 0.75) h);
   }
@@ -425,6 +434,52 @@
 
   .hero-band {
     background: var(--hero-bg);
+  }
+
+  /* What I do cards: hover lift, accent border, a gradient top bar and the icon tilting up
+     (pointer devices only); reduced motion keeps only the colour changes. */
+  .expertise-card {
+    position: relative;
+    transition:
+      transform var(--duration-base) var(--ease-out),
+      box-shadow var(--duration-base) var(--ease-out),
+      border-color var(--duration-base) var(--ease-out);
+  }
+  .expertise-card::before {
+    content: "";
+    position: absolute;
+    inset: -1px -1px auto;
+    height: 4px;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--ease-out);
+  }
+  .expertise-card.is-spotlight::before {
+    inset: -2px -2px auto;
+  }
+  .expertise-card > svg {
+    transition: transform var(--duration-base) var(--ease-out);
+    transform-origin: 50% 80%;
+  }
+  @media (hover: hover) {
+    .expertise-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-pop);
+      border-color: var(--accent);
+    }
+    .expertise-card:hover::before {
+      opacity: 1;
+    }
+    .expertise-card:hover > svg {
+      transform: translateY(-3px) rotate(-4deg) scale(1.06);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .expertise-card:hover,
+    .expertise-card:hover > svg {
+      transform: none;
+    }
   }
 
   /* Layout: full-bleed band with the artboard gutter + 1328px content. */

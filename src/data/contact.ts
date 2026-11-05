@@ -1,12 +1,12 @@
 /**
- * Contact routes — recruiters, investors (Ownira) and clients, in English and Czech. Used by the
+ * Contact routes — recruiters, AI automation and contract clients, in English and Czech. Used by the
  * accent contact panel on every page, the menu sheet and the topic select on /contact
  * (preselected from `?topic=`; the topic ids are the same in both languages).
  */
 import type { Locale } from "@/i18n/locales";
 import { typoDeep } from "@/i18n/typo";
 
-export type TopicId = "hiring" | "investing" | "partnering" | "other";
+export type TopicId = "hiring" | "automation" | "partnering" | "other";
 
 export type ContactRoute = {
   id: Exclude<TopicId, "other">;
@@ -27,11 +27,11 @@ const routes: Record<Locale, ContactRoute[]> = {
       subject: "Hiring",
     },
     {
-      id: "investing",
-      label: "Investing",
-      title: "Ownira",
-      text: "Write to me for the current stage and plans.",
-      subject: "Investing",
+      id: "automation",
+      label: "AI automation",
+      title: "AI in your team's processes",
+      text: "Agents and automation wired into the tools you use, plus the guidelines that make them stick.",
+      subject: "AI automation",
     },
     {
       id: "partnering",
@@ -50,11 +50,11 @@ const routes: Record<Locale, ContactRoute[]> = {
       subject: "Nábor",
     },
     {
-      id: "investing",
-      label: "Investice",
-      title: "Ownira",
-      text: "Aktuální fázi a plány vám pošlu e-mailem.",
-      subject: "Investice",
+      id: "automation",
+      label: "AI automatizace",
+      title: "AI v procesech vašeho týmu",
+      text: "Agenti a automatizace napojení na nástroje, které používáte, a pravidla, díky kterým se ujmou.",
+      subject: "AI automatizace",
     },
     {
       id: "partnering",

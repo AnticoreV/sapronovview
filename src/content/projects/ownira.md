@@ -1,4 +1,7 @@
 ---
+# Off the site since 2026-11-05 (Ivan). Set hidden: false and drop the /projects/ownira
+# redirects in public/_redirects to bring it back.
+hidden: true
 title: "Ownira"
 description: "A compliance operations inbox for official Czech data-box mail (datová schránka): every message becomes tracked work for accounting and tax practices. In pilot."
 summary: "Tracks official Czech data-box mail for accounting and tax practices. I build the product, the architecture and the full stack."

@@ -4,7 +4,6 @@ const routes = [
   "/",
   "/about",
   "/projects",
-  "/projects/ownira",
   "/projects/self-service-menu-platform",
   "/projects/dynamic-form-engine",
   "/projects/creativedock-greenfield-services",
@@ -71,9 +70,10 @@ test("every page ends with the contact panel and its routes", async ({ page }) =
     panel.getByRole("heading", { name: /Ready to ship\s*your project\./ }),
   ).toBeVisible();
   await expect(panel.locator('a.route[href="/contact?topic=hiring"]')).toBeVisible();
-  await expect(panel.locator('a[href="/contact?topic=investing"]')).toContainText(
-    "Write to me for the current stage and plans.",
+  await expect(panel.locator('a[href="/contact?topic=automation"]')).toContainText(
+    "Agents and automation wired into the tools you use",
   );
+  await expect(panel).not.toContainText("Ownira");
   await expect(panel.locator('a[href="/contact?topic=partnering"]')).toBeVisible();
   await expect(panel.locator('a[href^="mailto:"]').first()).toBeVisible();
 });
@@ -90,14 +90,14 @@ test("footer: © line, nav and operator line, no status indicator", async ({ pag
 test("contact form: topic from ?topic=, field errors, honest not-connected state", async ({
   page,
 }) => {
-  await page.goto("/contact?topic=investing");
-  await expect(page.locator("#cf-topic")).toHaveValue("investing");
+  await page.goto("/contact?topic=automation");
+  await expect(page.locator("#cf-topic")).toHaveValue("automation");
   // The note above the form (the offline state below can carry the same words).
   await expect(
     page.getByRole("note").getByText("Form not connected yet", { exact: true }),
   ).toBeVisible();
   // On /contact the routes (and the CV request) are emails with the subject filled in.
-  await expect(page.locator('#contact a[href*="subject=Investing"]')).toBeVisible();
+  await expect(page.locator('#contact a[href*="subject=AI%20automation"]')).toBeVisible();
   await expect(
     page.locator("#contact").getByRole("link", { name: /^(Download CV|CV on request)$/ }),
   ).toHaveAttribute("href", /^(mailto:.+subject=CV|\/cv\/)/);
@@ -117,7 +117,7 @@ test("contact form: topic from ?topic=, field errors, honest not-connected state
   await expect(offline).toBeVisible();
   await expect(offline.locator("[data-mailto]")).toHaveAttribute(
     "href",
-    /^mailto:.+subject=Investing/,
+    /^mailto:.+subject=AI%20automation/,
   );
   await expect(page.locator('[data-state="success"]')).toBeHidden();
   // The text stays in the form.
@@ -349,7 +349,10 @@ test("homepage sections in the restructured order", async ({ page }) => {
   ]);
   // "My own product" is off by default (siteConfig.homeSections.ownProduct).
   await expect(page.locator("#product")).toHaveCount(0);
-  await expect(page.locator("#expertise li")).toHaveCount(4);
+  await expect(page.locator("#expertise li")).toHaveCount(5);
+  await expect(page.locator("#expertise li").nth(1)).toContainText("AI automation");
+  // No Ownira anywhere on the landing page.
+  await expect(page.locator("body")).not.toContainText("Ownira");
   // Core and "worked with" are separate, named lists in every stack row.
   await expect(page.locator("#stack dt")).toHaveCount(10);
   await expect(page.locator('#stack ul[aria-label="Core"]').first()).toContainText("Kotlin");

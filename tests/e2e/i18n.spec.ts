@@ -5,7 +5,6 @@ const csRoutes = [
   "/cs",
   "/cs/about",
   "/cs/projects",
-  "/cs/projects/ownira",
   "/cs/projects/self-service-menu-platform",
   "/cs/projects/dynamic-form-engine",
   "/cs/projects/creativedock-greenfield-services",
@@ -48,7 +47,7 @@ for (const route of csRoutes) {
 }
 
 test("English pages carry the English operator line", async ({ page }) => {
-  for (const route of ["/", "/projects/ownira", "/no-such-page"]) {
+  for (const route of ["/", "/projects/self-service-menu-platform", "/no-such-page"]) {
     await page.goto(route);
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
     expect(plain(await page.locator("[data-operator]").textContent()), route).toBe(OPERATOR_EN);
@@ -79,22 +78,30 @@ test("Czech pages link within /cs and translate the chrome", async ({ page, isMo
 test("hreflang alternates, canonical and og:locale per language", async ({ page }) => {
   const origin = "https://ivansapronov.com";
   for (const [route, canonical, ogLocale] of [
-    ["/projects/ownira", `${origin}/projects/ownira`, "en_US"],
-    ["/cs/projects/ownira", `${origin}/cs/projects/ownira`, "cs_CZ"],
+    [
+      "/projects/self-service-menu-platform",
+      `${origin}/projects/self-service-menu-platform`,
+      "en_US",
+    ],
+    [
+      "/cs/projects/self-service-menu-platform",
+      `${origin}/cs/projects/self-service-menu-platform`,
+      "cs_CZ",
+    ],
   ] as const) {
     await page.goto(route);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", canonical);
     await expect(page.locator('link[rel="alternate"][hreflang="en"]')).toHaveAttribute(
       "href",
-      `${origin}/projects/ownira`,
+      `${origin}/projects/self-service-menu-platform`,
     );
     await expect(page.locator('link[rel="alternate"][hreflang="cs"]')).toHaveAttribute(
       "href",
-      `${origin}/cs/projects/ownira`,
+      `${origin}/cs/projects/self-service-menu-platform`,
     );
     await expect(page.locator('link[rel="alternate"][hreflang="x-default"]')).toHaveAttribute(
       "href",
-      `${origin}/projects/ownira`,
+      `${origin}/projects/self-service-menu-platform`,
     );
     await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute("content", ogLocale);
   }
@@ -135,21 +142,21 @@ test("language switch: same page in the other language, choice is stored", async
   page,
   isMobile,
 }) => {
-  await page.goto("/projects/ownira");
+  await page.goto("/projects/self-service-menu-platform");
   const cs = page.locator('a[data-lang-choice="cs"]').first();
-  await expect(cs).toHaveAttribute("href", "/cs/projects/ownira");
+  await expect(cs).toHaveAttribute("href", "/cs/projects/self-service-menu-platform");
   await expect(cs).toHaveAttribute("hreflang", "cs");
   await expect(page.locator('a[data-lang-choice="en"]').first()).toHaveAttribute(
     "aria-current",
     "true",
   );
   await switchTo(page, "CS", isMobile);
-  await expect(page).toHaveURL(/\/cs\/projects\/ownira$/);
+  await expect(page).toHaveURL(/\/cs\/projects\/self-service-menu-platform$/);
   await expect(page.locator("html")).toHaveAttribute("lang", "cs");
   expect(await page.evaluate(() => localStorage.getItem("lang"))).toBe("cs");
 
   await switchTo(page, "EN", isMobile);
-  await expect(page).toHaveURL(/\/projects\/ownira$/);
+  await expect(page).toHaveURL(/\/projects\/self-service-menu-platform$/);
   await expect(page).not.toHaveURL(/\/cs\//);
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   expect(await page.evaluate(() => localStorage.getItem("lang"))).toBe("en");
@@ -169,9 +176,9 @@ test("404 in Czech: Czech page under /cs, back link to the Czech home", async ({
 test("Czech contact form: topic from ?topic=, Czech errors and mailto subject", async ({
   page,
 }) => {
-  await page.goto("/cs/contact?topic=investing");
-  await expect(page.getByLabel("Téma")).toHaveValue("investing");
-  await expect(page.getByLabel("Téma").locator("option:checked")).toHaveText("Investice");
+  await page.goto("/cs/contact?topic=automation");
+  await expect(page.getByLabel("Téma")).toHaveValue("automation");
+  await expect(page.getByLabel("Téma").locator("option:checked")).toHaveText("AI automatizace");
   await page.getByRole("button", { name: "Napsat jako e-mail" }).click();
   await expect(page.getByText("Napište, kdo jste. Stačí jméno.")).toBeVisible();
   await page.getByLabel("Jméno").fill("Jana");
@@ -181,7 +188,7 @@ test("Czech contact form: topic from ?topic=, Czech errors and mailto subject", 
   const offline = page.locator('[data-state="offline"]');
   await expect(offline).toBeVisible();
   await expect(offline).toContainText(/formulář zatím není připojený/i);
-  await expect(page.locator("[data-mailto]")).toHaveAttribute("href", /subject=Investice/);
+  await expect(page.locator("[data-mailto]")).toHaveAttribute("href", /subject=AI%20automatizace/);
   // Route cards on /cs/contact are emails with Czech subjects.
   await expect(page.getByRole("link", { name: /Nábor/ }).first()).toHaveAttribute(
     "href",
