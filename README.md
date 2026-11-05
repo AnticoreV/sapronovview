@@ -112,7 +112,7 @@ src/
   components/
     layout/                 ← SiteHeader, Footer, ContactPanel (accent "Ready to ship your project.")
     home/                   ← Hero, HeroStage, Expertise, ExpertiseCard, TechStack, ExperienceTimeline,
-                              SelectedProjects, Venture, AboutMe, Writing
+                              ExperienceDetail, SelectedProjects, Venture, AboutMe, Writing
     profile/                ← ProfileCard (portrait switch on /about)
     projects/               ← ProductModule, ProjectRow, CodeRow, ProjectFilters
     experience/             ← RecordRow, ExperienceItem, MilestoneList
@@ -275,8 +275,13 @@ client from the track record) and a `detail` sentence. Rules:
   readout ids, `ventureIntro`, `homeAbout`), the stack in `src/data/stack.ts`, the role line
   and lede in `siteCopy` (`src/config.ts`). Source of truth is the CV (June 2026): no claim,
   technology or number that the CV doesn't have; the AI & automation tools in the stack
-  were added on request. A stack item is a name or `{ en, cs }` when it needs translating. The Experience timeline shows the four
-  most recent positions with their first three `achievements`, so keep the strongest first.
+  were added on request. A stack item is a name or `{ en, cs }` when it needs translating.
+- **Experience timeline (scroll rail):** every position, newest first, with its first three
+  `achievements` (keep the strongest first) and its `shipped` line. From 1024px a sticky panel
+  follows the position in view (years, company, shipped, "02 / 05") above a rail that fills as
+  you scroll; the other positions dim. Data in `src/lib/timeline.ts`, one position in
+  `ExperienceDetail.astro`; the other prototypes (time axis, career layers, tech metro) live on
+  the local `exp/*` branches.
 - **Experience:** `src/content/experience/*.md`. `shipped` is the track record's SHIPPED cell — a
   shortened form of a real achievement, never a new claim. Milestones (education,
   certifications, talks…) go in `src/content/milestones/*.yaml`.
