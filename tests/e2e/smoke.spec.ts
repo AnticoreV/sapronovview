@@ -413,7 +413,7 @@ test("wide screens use the full width (no text column beside empty space)", asyn
 
 test("about: heading, portrait switch, ProfilePage structured data", async ({ page }) => {
   await page.goto("/about");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Engineer and founder.");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Fullstack engineer in Prague.");
   await page.getByText("Black", { exact: true }).click();
   await expect(page.locator('[data-portrait="black"] img')).toBeVisible();
   await expect(page.locator('[data-portrait="turtleneck"] img')).toBeHidden();
@@ -487,7 +487,7 @@ test.describe("security headers (applied from _headers, as on Cloudflare Pages)"
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading);
     };
     await go('#projects a[href="/projects"]', /\/projects$/, "Projects");
-    await go('footer a[href="/about"]', /\/about$/, "Engineer and founder.");
+    await go('footer a[href="/about"]', /\/about$/, "Fullstack engineer in Prague.");
     // Styles of the swapped page apply (inline <style> under the policy).
     expect(await page.evaluate(() => getComputedStyle(document.body).fontFamily)).toMatch(
       /Schibsted/,

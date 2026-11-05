@@ -91,7 +91,7 @@ const en = {
     "An isometric technical drawing builds itself: three idea sketches, two struck out at a validation gate; the architecture (frontend, backend, services) is drawn stroke by stroke and filled with colour; tests stamp checks; a rose review mark erases one link and redraws it through a queue; dashed CI/CD arrows carry a package to a deploy target where service blocks extrude; a sparkline draws on an observe card; a rose pen-orb flies back along the agent loop and sketches the next idea while the sheet clears.",
   "proof.workedWith": "Worked with NCR Voyix, CreativeDock, CCA Group, Ableneo and Voda Hory",
   "who.label": "Who I am",
-  "who.heading": "Engineer and founder.",
+  "who.heading": "Fullstack engineer in Prague.",
   "who.now": "Now: {focus}.",
   "who.basedIn": "Based in",
   "who.role": "Role",
@@ -181,7 +181,7 @@ const en = {
   // About
   "about.title": "About",
   "about.description":
-    "{name}, a backend and fullstack engineer and founder in Prague: career story, how I work, what I value and the languages I speak.",
+    "{name}, a backend and fullstack engineer in Prague: career story, how I work, what I value and the languages I speak.",
   "about.story": "Career story",
   "about.how": "How I work",
   "about.value": "What I value",
@@ -401,7 +401,7 @@ const cs: Record<UiKey, string> = {
     "Izometrický technický výkres se kreslí sám: tři náčrty nápadů, dva přeškrtnuté u validační brány; architektura (frontend, backend, služby) se kreslí tah po tahu a vyplňuje barvou; testy razítkují fajfky; růžová značka z review smaže jedno propojení a nakreslí ho znovu přes frontu; čárkované šipky CI/CD nesou balíček k cíli nasazení, kde vyrůstají bloky služeb; na kartě monitoringu se kreslí křivka; růžová kulička-pero se vrací po agentní smyčce a načrtne další nápad, zatímco se list vymaže.",
   "proof.workedWith": "Pracoval jsem pro NCR Voyix, CreativeDock, CCA Group, Ableneo a Voda Hory",
   "who.label": "Kdo jsem",
-  "who.heading": "Inženýr a zakladatel.",
+  "who.heading": "Fullstack inženýr v Praze.",
   "who.now": "Teď: {focus}.",
   "who.basedIn": "Lokalita",
   "who.role": "Role",
@@ -491,7 +491,7 @@ const cs: Record<UiKey, string> = {
   // About
   "about.title": "O mně",
   "about.description":
-    "Ivan Sapronov, backend a fullstack engineer a zakladatel v Praze: můj příběh, jak pracuji, na čem mi záleží a jakými jazyky mluvím.",
+    "Ivan Sapronov, backend a fullstack engineer v Praze: můj příběh, jak pracuji, na čem mi záleží a jakými jazyky mluvím.",
   "about.story": "Můj příběh",
   "about.how": "Jak pracuji",
   "about.value": "Na čem mi záleží",
