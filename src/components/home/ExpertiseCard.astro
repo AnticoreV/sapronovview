@@ -2,9 +2,9 @@
 /**
  * ExpertiseCard: one of the five "What I do" cards with its small isometric clay icon,
  * a one-line description and the technologies it stands on. The spotlight card
- * (the lead card, fullstack) sits on accent-soft with an accent border. On
- * hover (pointer devices) the card lifts, takes an accent border and a gradient top bar,
- * and the icon tilts up; reduced motion keeps only the colour change.
+ * (the lead card, fullstack) sits on accent-soft with an accent border. The cards are
+ * not links, so they have no hover state (a lift would promise a click that does
+ * nothing).
  */
 import type { ExpertiseId } from "@data/home";
 
@@ -22,9 +22,9 @@ const { id, title, text, stack, spotlight = false, class: className } = Astro.pr
 
 <li
   class:list={[
-    "hover-card expertise-card flex flex-col gap-3.5 rounded-md",
+    "flex flex-col gap-3.5 rounded-md",
     // The 2px accent border takes 1px more than the card's, so 1px less padding.
-    spotlight ? "is-spotlight border-2 border-accent bg-accent-soft p-[27px]" : "card p-7",
+    spotlight ? "border-2 border-accent bg-accent-soft p-[27px]" : "card p-7",
     className,
   ]}
 >

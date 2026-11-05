@@ -436,7 +436,7 @@
     background: var(--hero-bg);
   }
 
-  /* Hover cards (What I do, Selected projects): on a real pointer the card lifts 4px,
+  /* Hover cards (link cards: Selected projects): on a real pointer the card lifts 4px,
      takes an accent border, a gradient top bar fades in and a shadow layer fades in under
      it. Only transform and opacity animate (compositor work, no repaint per frame): the
      shadow sits on ::after and fades, rather than transitioning box-shadow. Keyboard
@@ -464,9 +464,6 @@
     border-radius: var(--radius-md) var(--radius-md) 0 0;
     background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
   }
-  .hover-card.is-spotlight::before {
-    inset: -2px -2px auto;
-  }
   .hover-card::after {
     z-index: -1;
     inset: 0;
@@ -492,21 +489,10 @@
       transform: translateY(-2px);
     }
   }
-  /* What I do: the icon tilts up as the card lifts. */
-  .expertise-card > svg {
-    transition: transform var(--duration-base) var(--ease-out);
-    transform-origin: 50% 80%;
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .expertise-card:hover > svg {
-      transform: translateY(-3px) rotate(-4deg) scale(1.06);
-    }
-  }
   @media (prefers-reduced-motion: reduce) {
     .hover-card,
     .hover-card:hover,
-    .hover-card:active,
-    .expertise-card:hover > svg {
+    .hover-card:active {
       transform: none;
     }
   }
