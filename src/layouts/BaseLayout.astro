@@ -91,7 +91,7 @@ const { locale, t } = i18n(Astro);
         if (nav && nav.type === "back_forward") return;
         history.scrollRestoration = "manual";
         if (history.state) {
-          const { scrollX, scrollY, ...state } = history.state;
+          const { scrollX: _x, scrollY: _y, ...state } = history.state;
           history.replaceState(state, "");
         }
         // Chrome and Firefox skip the #hash jump on a reload; jump without smooth scroll.
