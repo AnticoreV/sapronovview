@@ -6,7 +6,7 @@ import type { Locale } from "@/i18n/locales";
 import { typoDeep } from "@/i18n/typo";
 
 type AboutCopy = {
-  /** Career story. `{ownira}` becomes the link to the Ownira case study. */
+  /** Career story, one string per paragraph. */
   story: string[];
   philosophy: Array<{ title: string; text: string }>;
   enjoys: string[];
@@ -20,7 +20,7 @@ const copy: Record<Locale, AboutCopy> = {
       "I'm Ivan Sapronov, a backend and fullstack engineer in Prague. I've spent about five years building and scaling enterprise web applications and services, mostly on the JVM (Java, Kotlin, Spring), plus the Angular frontends, cloud infrastructure and identity systems around them.",
       "My first freelance Java project, in 2021, was a CRM with an admin panel and the analytics services behind its React dashboards. Ableneo came next, and the problems got more distributed: Redis caching and reactive services with Spring WebFlux, Keycloak for SSO and CIAM, Kafka with custom connectors, Dockerised services on Kubernetes, and Grafana, Prometheus and InfluxDB to watch it all in production.",
       "At CCA Group I owned both sides of the stack: a dynamic form engine in Angular that cut the time to create a new form type from days to hours, and the Java services behind it. I moved some of those services to Kotlin coroutines, which roughly halved p95 latency under peak load. Then, at NCR Voyix, I designed backend-for-frontend and aggregator services for a system serving around two million users, built a self-service Angular platform for US clients, ran services on GCP with full observability, and started using LLM and agentic tooling to take the routine out of engineering work.",
-      "Most recently I spent three months at CreativeDock building Kotlin/Spring Boot microservices from scratch and fixing the GitLab CI and Argo CD plumbing around them. Right now I'm building {ownira}, which is in pilot.",
+      "Most recently I spent three months at CreativeDock building Kotlin/Spring Boot microservices from scratch and fixing the GitLab CI and Argo CD plumbing around them. Right now I take contract work: backend services, and AI automation built into a team's everyday processes.",
       "The rest of my time goes to things with engines and horizons: I am a pilot in training on ultralight aircraft, I ride motorcycles, and I keep a growing list of countries. Flying rewards preparation and checklists, riding rewards attention, travel rewards curiosity; I try to bring the same traits to a codebase.",
     ],
     philosophy: [
@@ -82,7 +82,7 @@ const copy: Record<Locale, AboutCopy> = {
       "Jsem Ivan Sapronov, backend a fullstack engineer z Prahy. Zhruba pět let stavím a škáluji podnikové webové aplikace a služby, hlavně na JVM (Java, Kotlin, Spring), a k nim frontendy v Angularu, cloudovou infrastrukturu a systémy pro správu identit.",
       "Na volné noze jsem v Javě začal v roce 2021: CRM s administrací a analytické služby pro jeho dashboardy v Reactu. Pak přišlo Ableneo a s ním distribuovanější problémy: cache v Redisu a reaktivní služby se Spring WebFlux, Keycloak pro SSO a CIAM, Kafka s vlastními konektory, služby v Dockeru na Kubernetes a Grafana, Prometheus a InfluxDB, abych to všechno v produkci uhlídal.",
       "V CCA Group jsem měl na starosti obě strany stacku: dynamický formulářový engine v Angularu, který zkrátil vytvoření nového typu formuláře ze dnů na hodiny, a služby v Javě za ním. Část z nich jsem převedl na korutiny v Kotlinu, čímž se latence p95 při špičkové zátěži zhruba snížila na polovinu. Potom jsem v NCR Voyix navrhoval služby backend-for-frontend a agregátory pro systém se zhruba dvěma miliony uživatelů, postavil samoobslužnou platformu v Angularu pro klienty v USA, provozoval služby na GCP s plnou observabilitou a začal používat LLM a agentní nástroje, abych z inženýrské práce odstranil rutinu.",
-      "Naposledy jsem tři měsíce v CreativeDock stavěl mikroslužby v Kotlinu/Spring Bootu od nuly a opravoval kolem nich infrastrukturu GitLab CI a Argo CD. Teď stavím produkt {ownira}, který je v pilotním provozu.",
+      "Naposledy jsem tři měsíce v CreativeDock stavěl mikroslužby v Kotlinu/Spring Bootu od nuly a opravoval kolem nich infrastrukturu GitLab CI a Argo CD. Teď beru zakázky: backendové služby a AI automatizaci zapojenou do každodenních procesů týmu.",
       "Zbytek času patří věcem s motory a obzory: jsem pilot ultralehkých letadel ve výcviku, jezdím na motorce a můj seznam navštívených zemí stále roste. Létání odměňuje přípravu a checklisty, jízda pozornost a cestování zvědavost; stejné vlastnosti se snažím přinášet i do kódu.",
     ],
     philosophy: [

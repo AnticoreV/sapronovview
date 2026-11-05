@@ -1,8 +1,8 @@
 ---
 location: "Praha"
 working:
-  - "Stavím produkt Ownira, teď v pilotním provozu"
-  - "[Jeden řádek o aktuálním milníku Ownira]"
+  - "Beru zakázky na backend a AI automatizaci"
+  - "[Jeden řádek o aktuálním klientovi nebo projektu]"
 learning:
   - "[Co se právě učím, např. nový jazyk, framework nebo letecká dovednost]"
   - "[Další věc]"

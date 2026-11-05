@@ -7,7 +7,7 @@
  * the width instead of leaving the right half of the page empty.
  */
 import SectionHeader from "@components/ui/SectionHeader.astro";
-import { stack } from "@data/stack";
+import { stack, stackItem } from "@data/stack";
 import { i18n } from "@/i18n";
 
 const { locale, t } = i18n(Astro);
@@ -41,13 +41,13 @@ const rows = Math.ceil(stack.length / 2);
           <dd class="flex flex-wrap gap-1.5">
             <ul class="flex flex-wrap gap-1.5" aria-label={t("stack.core")}>
               {g.core.map((item) => (
-                <li class="chip chip-core">{item}</li>
+                <li class="chip chip-core">{stackItem(item, locale)}</li>
               ))}
             </ul>
             {g.also.length > 0 && (
               <ul class="flex flex-wrap gap-1.5" aria-label={t("stack.also")}>
                 {g.also.map((item) => (
-                  <li class="chip chip-also">{item}</li>
+                  <li class="chip chip-also">{stackItem(item, locale)}</li>
                 ))}
               </ul>
             )}

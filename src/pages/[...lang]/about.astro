@@ -8,7 +8,7 @@ import { shownAll } from "@lib/content";
 import { personSchema } from "@lib/schema";
 import { aboutCopy } from "@data/about";
 import { siteConfig, siteCopy } from "@config";
-import { stack } from "@data/stack";
+import { stack, stackItem } from "@data/stack";
 import { i18n, localeParams } from "@/i18n";
 import { localeTags } from "@/i18n/locales";
 
@@ -50,20 +50,9 @@ const profileLd = {
           {t("about.story")}
         </h2>
         <p class="text-body-l">{lead}</p>
-        {paragraphs.map((text) => {
-          const [before, after] = text.split("{ownira}");
-          return after === undefined ? (
-            <p>{text}</p>
-          ) : (
-            <p>
-              {before}
-              <a href={l("/projects/ownira")} class="link-inline font-semibold text-accent">
-                Ownira
-              </a>
-              {after}
-            </p>
-          );
-        })}
+        {paragraphs.map((text) => (
+          <p>{text}</p>
+        ))}
       </div>
     </div>
   </section>
@@ -128,7 +117,9 @@ const profileLd = {
         {stack.map((g) => (
           <div>
             <h3 class="label font-semibold text-accent">{g.label[locale]}</h3>
-            <p class="mt-2 text-ink-muted">{[...g.core, ...g.also].join(" · ")}</p>
+            <p class="mt-2 text-ink-muted">
+              {[...g.core, ...g.also].map((item) => stackItem(item, locale)).join(" · ")}
+            </p>
           </div>
         ))}
       </div>

@@ -2,8 +2,8 @@
 updated: 2026-10-22
 location: "Prague, Czech Republic"
 working:
-  - "Building Ownira, now in pilot"
-  - "[One line on the current Ownira milestone]"
+  - "Open to backend and AI automation contracts"
+  - "[One line on the current client or project]"
 learning:
   - "[Something you are learning, e.g. a new language, framework or flying skill]"
   - "[Another thing]"
@@ -13,7 +13,7 @@ reading:
     note: "[Why you picked it up]"
   - title: "[BOOK TITLE]"
     author: "[AUTHOR]"
-sideProjects: ["ownira"]
+sideProjects: []
 interests:
   - "Ultralight aviation"
   - "Motorcycle touring"

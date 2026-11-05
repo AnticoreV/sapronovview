@@ -143,7 +143,7 @@ const en = {
   "project.more": "More projects",
   "projects.title": "Projects",
   "projects.description":
-    "Ownira, a self-service menu platform, a dynamic form engine and greenfield Kotlin services, each written up as a case study, plus code on GitHub.",
+    "A self-service menu platform, a dynamic form engine and greenfield Kotlin services, each written up as a case study, plus code on GitHub.",
   "projects.intro":
     "My own product and the client systems I built, each written up as a case study.",
   "projects.featured": "Products and featured work",
@@ -164,6 +164,18 @@ const en = {
   "experience.milestones": "Education, credentials & community",
   "experience.present": "Present",
   "experience.technologies": "Technologies",
+  // Homepage timeline variants (exp/* branches)
+  "timeline.select": "Pick a position",
+  "timeline.play": "Play through the years",
+  "timeline.pause": "Pause",
+  "timeline.scrub": "Drag along the years, or use the arrow keys.",
+  "timeline.explode": "Exploded view",
+  "timeline.layers":
+    "Each layer is one position, its thickness how long it lasted. Oldest at the bottom.",
+  "timeline.lines": "Technology lines",
+  "timeline.linesHint": "Pick a line to see where I used it, or a stop for the details.",
+  "timeline.allLines": "All lines",
+  "timeline.usedAt": "Used at",
 
   // About
   "about.title": "About",
@@ -256,7 +268,7 @@ const en = {
   // Contact page + form
   "contactPage.title": "Contact",
   "contactPage.description":
-    "Contact {name} about a senior backend or fullstack role, investing in Ownira, or contract work.",
+    "Contact {name} about a senior backend or fullstack role, AI automation or contract work.",
   "contactPage.formLabel": "Contact form",
   "contactPage.intro":
     "Email is the fastest way to reach me. Pick a route above and I'll fill in the subject line for you.",
@@ -440,7 +452,7 @@ const cs: Record<UiKey, string> = {
   "project.more": "Další projekty",
   "projects.title": "Projekty",
   "projects.description":
-    "Ownira, samoobslužná platforma pro správu menu, dynamický formulářový engine a nové služby v Kotlinu, každý jako případová studie, plus kód na GitHubu.",
+    "Samoobslužná platforma pro správu menu, dynamický formulářový engine a nové služby v Kotlinu, každý jako případová studie, plus kód na GitHubu.",
   "projects.intro":
     "Můj vlastní produkt a klientské systémy, které jsem postavil, každý jako případová studie.",
   "projects.featured": "Produkty a vybraná práce",
@@ -461,6 +473,18 @@ const cs: Record<UiKey, string> = {
   "experience.milestones": "Vzdělání, certifikace a komunita",
   "experience.present": "dosud",
   "experience.technologies": "Technologie",
+  "timeline.select": "Vyberte pozici",
+  "timeline.play": "Přehrát roky",
+  "timeline.pause": "Pozastavit",
+  "timeline.scrub": "Táhněte po letech, nebo použijte šipky.",
+  "timeline.explode": "Rozložený pohled",
+  "timeline.layers":
+    "Každá vrstva je jedna pozice, tloušťka ukazuje, jak dlouho trvala. Nejstarší je dole.",
+  "timeline.lines": "Technologické linky",
+  "timeline.linesHint":
+    "Vyberte linku a uvidíte, kde jsem technologii používal, nebo zastávku pro detail.",
+  "timeline.allLines": "Všechny linky",
+  "timeline.usedAt": "Používal jsem v",
 
   // About
   "about.title": "O mně",
@@ -552,7 +576,7 @@ const cs: Record<UiKey, string> = {
   // Contact page + form
   "contactPage.title": "Kontakt",
   "contactPage.description":
-    "Napište mi kvůli pozici senior backend nebo fullstack, investici do produktu Ownira nebo zakázce.",
+    "Napište mi kvůli pozici senior backend nebo fullstack, AI automatizaci nebo zakázce.",
   "contactPage.formLabel": "Kontaktní formulář",
   "contactPage.intro":
     "Nejrychleji mě zastihnete e-mailem. Vyberte si výše jednu z možností a předmět se vyplní sám.",

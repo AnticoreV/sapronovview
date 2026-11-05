@@ -27,7 +27,7 @@ const heroFactText: Record<Locale, HeroFact[]> = {
 };
 export const heroFacts = (locale: Locale) => heroFactText[locale];
 
-export type ExpertiseId = "backend" | "architecture" | "cloud" | "fullstack";
+export type ExpertiseId = "backend" | "ai" | "architecture" | "cloud" | "fullstack";
 
 type Expertise = {
   id: ExpertiseId;
@@ -39,7 +39,11 @@ type Expertise = {
   spotlight: boolean;
 };
 
-/** "What I do": four expertise cards (icons live in CapabilityCard.astro). */
+/**
+ * "What I do": five expertise cards (icons live in ExpertiseCard.astro). The first two
+ * (backend, AI automation) are the wide row on desktop. AI automation was added at Ivan's
+ * request on 2026-11-05.
+ */
 const expertiseText: Record<Locale, Expertise[]> = {
   en: [
     {
@@ -48,6 +52,13 @@ const expertiseText: Record<Locale, Expertise[]> = {
       text: "Services and APIs on the JVM that hold up under load and stay easy to change.",
       stack: ["Kotlin", "Java", "Spring Boot", "REST", "GraphQL", "PostgreSQL", "Redis"],
       spotlight: true,
+    },
+    {
+      id: "ai",
+      title: "AI automation",
+      text: "Agents and automation wired into a company's processes, plus the culture around them: shared guidelines, reviews and training, so the team keeps using them.",
+      stack: ["Claude Code", "Codex", "AI agents", "MCP", "Workflow automation", "Team playbooks"],
+      spotlight: false,
     },
     {
       // Ivan, 2026-10-22: technical direction only — no team-size or people-management claims.
@@ -79,6 +90,20 @@ const expertiseText: Record<Locale, Expertise[]> = {
       text: "Služby a API na JVM, které vydrží zátěž a dají se snadno měnit.",
       stack: ["Kotlin", "Java", "Spring Boot", "REST", "GraphQL", "PostgreSQL", "Redis"],
       spotlight: true,
+    },
+    {
+      id: "ai",
+      title: "AI automatizace",
+      text: "Agenti a automatizace zapojení do procesů firmy a k tomu kultura kolem nich: společná pravidla, review a školení, aby je tým opravdu používal.",
+      stack: [
+        "Claude Code",
+        "Codex",
+        "AI agenti",
+        "MCP",
+        "Automatizace procesů",
+        "Týmové playbooky",
+      ],
+      spotlight: false,
     },
     {
       id: "architecture",

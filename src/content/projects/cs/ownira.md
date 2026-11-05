@@ -1,4 +1,7 @@
 ---
+# Off the site since 2026-11-05 (Ivan). Set hidden: false and drop the /projects/ownira
+# redirects in public/_redirects to bring it back.
+hidden: true
 description: "Compliance inbox pro úřední zprávy v datové schránce: z každé zprávy se stává sledovaná práce pro účetní a daňové kanceláře. V pilotním provozu."
 summary: "Hlídá úřední zprávy v datové schránce pro účetní a daňové kanceláře. Stavím produkt, architekturu i celý stack."
 tagline: "Každá zpráva z datové schránky má řešitele a termín."

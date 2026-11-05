@@ -1,8 +1,8 @@
 # sapronovview — ivansapronov.com
 
-The personal site of **Ivan Sapronov**, backend & fullstack engineer and founder in Prague:
-what he builds (Ownira, client systems), what he can do, his track record, writing and — as
-an addition — the hobbies.
+The personal site of **Ivan Sapronov**, backend & fullstack engineer in Prague: what he
+builds (client systems, AI automation), what he can do, his track record, writing and, as
+an addition, the hobbies.
 
 Built with [Astro 7](https://astro.build) (static), TypeScript, Tailwind CSS v4 and content
 collections. Design: **v2 · R2-C Runtime** with the hero **V6 · Blueprint** — a calm, light
@@ -100,7 +100,7 @@ src/
     readouts.ts             ← the proof numbers (case studies, project chips, OG card)
     home.ts                 ← hero facts, "What I do" cards, selected projects, own-product line, about
     stack.ts                ← tech stack by category, core vs worked with (homepage, /about)
-    contact.ts              ← contact routes (hiring / investing / contract work) + topics
+    contact.ts              ← contact routes (hiring / AI automation / contract work) + topics
     about.ts                ← career story, philosophy, values, "what I enjoy", facts
     adventures.ts           ← visited / wishlist places + home base (globe and map)
   pages/
@@ -112,7 +112,7 @@ src/
   components/
     layout/                 ← SiteHeader, Footer, ContactPanel (accent "Ready to ship your project.")
     home/                   ← Hero, HeroStage, Expertise, ExpertiseCard, TechStack, ExperienceTimeline,
-                              SelectedProjects, Venture, AboutMe, Writing
+                              ExperienceDetail, SelectedProjects, Venture, AboutMe, Writing
     profile/                ← ProfileCard (portrait switch on /about)
     projects/               ← ProductModule, ProjectRow, CodeRow, ProjectFilters
     experience/             ← RecordRow, ExperienceItem, MilestoneList
@@ -268,13 +268,20 @@ client from the track record) and a `detail` sentence. Rules:
 - **Removed pages:** Apexline was taken off the site (2026-10-23). `/projects/apexline` and the
   older `/projects/apex-line-market-research` forward to `/projects` (Astro `redirects` in
   `astro.config.mjs` + a 301 in `public/_redirects` for Cloudflare Pages).
-- **Homepage:** hero → What I do → Tech stack → Experience → Selected projects → My own
-  product → About me → (Writing) → contact panel. Copy lives in `src/data/home.ts`
+- **Homepage:** hero → What I do → Tech stack → Experience → Selected projects → (My own
+  product) → About me → (Writing) → contact panel. My own product shows only when
+  `siteConfig.homeSections.ownProduct` is `true`; it is `false` by default. Copy lives in `src/data/home.ts`
   (`heroFacts`, `expertise`, `homeCases` with slugs that must exist and chips that are
   readout ids, `ventureIntro`, `homeAbout`), the stack in `src/data/stack.ts`, the role line
   and lede in `siteCopy` (`src/config.ts`). Source of truth is the CV (June 2026): no claim,
-  technology or number that the CV doesn't have. The Experience timeline shows the four
-  most recent positions with their first three `achievements`, so keep the strongest first.
+  technology or number that the CV doesn't have; the AI & automation tools in the stack
+  were added on request. A stack item is a name or `{ en, cs }` when it needs translating.
+- **Experience timeline (scroll rail):** every position, newest first, with its first three
+  `achievements` (keep the strongest first) and its `shipped` line. From 1024px a sticky panel
+  follows the position in view (years, company, shipped, "02 / 05") above a rail that fills as
+  you scroll; the other positions dim. Data in `src/lib/timeline.ts`, one position in
+  `ExperienceDetail.astro`; the other prototypes (time axis, career layers, tech metro) live on
+  the local `exp/*` branches.
 - **Experience:** `src/content/experience/*.md`. `shipped` is the track record's SHIPPED cell — a
   shortened form of a real achievement, never a new claim. Milestones (education,
   certifications, talks…) go in `src/content/milestones/*.yaml`.
@@ -304,7 +311,7 @@ client from the track record) and a `detail` sentence. Rules:
 ## Languages (English + Czech)
 
 English is the default and keeps its URLs (`/about`); Czech lives under `/cs/` for every
-page (`/cs`, `/cs/about`, `/cs/projects/ownira`, …). Astro i18n is configured in
+page (`/cs`, `/cs/about`, `/cs/projects/dynamic-form-engine`, …). Astro i18n is configured in
 `astro.config.mjs` (`defaultLocale: "en"`, `prefixDefaultLocale: false`); every page sits in
 `src/pages/[...lang]/` and is generated once per language (`localeParams()`).
 
@@ -383,9 +390,9 @@ invented):
 | `content/projects/faradey-android.md`        | Case-study page (organization, year, approach / results sections). Listed under "Code on GitHub".                                                                                                                                                                                                                                                      |
 | `content/projects/land-routing-service.md`   | Case-study page (year, problem / approach sections). Listed under "Code on GitHub".                                                                                                                                                                                                                                                                    |
 | `content/projects/paymont-wallet.md`         | Case-study page (year, most body sections). Listed under "Code on GitHub" with both repositories.                                                                                                                                                                                                                                                      |
-| `content/projects/ownira.md`                 | `timeframe` (start year not confirmed). `website` not set — ownira.cz currently shows a parking page; add `website: https://ownira.cz` when it is live (WEB stays text until then).                                                                                                                                                                    |
+| `content/projects/ownira.md`                 | Hidden (`hidden: true`, 301s from `/projects/ownira`). `timeframe` (start year not confirmed). `website` not set — ownira.cz currently shows a parking page; add `website: https://ownira.cz` when it is live (WEB stays text until then).                                                                                                             |
 | `content/hobbies/*` (all 4)                  | Photos, stats (hours, licence, home field, bike, longest trip, riding since, countries / continents, next country, discipline, sessions), favourites, the flying-club link, and the write-ups. While `placeholder: true`, only titles and taglines show.                                                                                               |
-| `content/now/now.md`                         | Current Ownira milestone line, "Learning" (2), "Reading" (2 books)                                                                                                                                                                                                                                                                                     |
+| `content/now/now.md`                         | Current client / project line, "Learning" (2), "Reading" (2 books)                                                                                                                                                                                                                                                                                     |
 | `data/about.ts` → `facts`                    | All 6 facts (flying hours / licence, bike, country count + next, sport, first program, surprising fact) — the Facts section is hidden                                                                                                                                                                                                                  |
 | `data/adventures.ts`                         | Trip notes for 14 visited places, and the Cyprus town (`[Which town?]` — Cyprus shows by country only)                                                                                                                                                                                                                                                 |
 | `content/milestones/`                        | No milestones yet (template only) — the section is hidden                                                                                                                                                                                                                                                                                              |
@@ -397,8 +404,7 @@ invented):
 - `src/data/about.ts` (`story`, both languages): the personal part of the career story (where
   you grew up, first computer, first flight / ride) — there is no placeholder, add real text
   when ready.
-- Czech copy (2026-11-02) awaits Ivan's review, the Ownira tagline in particular
-  („Každá zpráva z datové schránky má řešitele a termín.“ in `src/content/projects/cs/ownira.md`). Anything filled
+- Czech copy (2026-11-02) awaits Ivan's review. Anything filled
   in later in English (trip notes, hobby write-ups, now, facts) needs its Czech version too —
   until then Czech pages fall back to the English text.
 
@@ -437,8 +443,7 @@ habits that make a page read as AI-generated. Rules the copy now follows, in bot
 - Mono labels are sentence case; only the hero drawing legend stays uppercase, because it
   is the key to the uppercase labels inside the drawing.
 
-Changed copy Ivan may want to check: the Ownira tagline ("Data-box mail with an owner and a
-deadline." / „Každá zpráva z datové schránky má řešitele a termín.“), the hero lede (now names
+Changed copy Ivan may want to check: the hero lede (now names
 all four capabilities), the hobby taglines, the /hobbies heading ("What I do off duty") and
 the About values.
 
@@ -453,8 +458,8 @@ and IČO are in the `Person` JSON-LD.
 ## Contact form
 
 `src/components/contact/ContactForm.astro` (on `/contact`): name, email, topic
-(Hiring / Investing / Partnering / Something else; in Czech Nábor / Investice / Spolupráce /
-Něco jiného — preselected from `?topic=`, the same ids in both languages), message and
+(Hiring / AI automation / Contract work / Something else; in Czech Nábor / AI automatizace /
+Zakázka / Něco jiného — preselected from `?topic=`, the same ids in both languages), message and
 a `_gotcha` honeypot. States: field errors (`aria-invalid` + message), submitting (busy,
 disabled), success (`role="status"`, only after the endpoint answers OK), failure
 (`role="alert"`, says it failed, gives the email, keeps the text).
