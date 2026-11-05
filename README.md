@@ -9,6 +9,9 @@ collections. Design: **v2 · R2-C Runtime** with the hero **V6 · Blueprint** �
 Swiss grid around one live isometric drawing of how software gets made (idea → validate →
 architecture → frontend · backend · services → tests → review → CI/CD → deploy → observe →
 agent loop). Every number on the site comes from a position in the CV (`src/data/readouts.ts`).
+Colours: the **Terracotta sunset** palette (chosen 2026-11-05 from four local variants):
+warm paper, terracotta, saffron and raspberry, a sunset sky and contour lines behind the
+hero; dark mode is a deep aubergine with stars instead of black.
 
 ## Contents
 
@@ -145,10 +148,17 @@ config, annunciator, checklist ticking and every aviation label are gone.
   `text-card-title`, `text-route-title`, `text-wordmark`, `text-tagline`). Each token
   carries size, line height, tracking and weight, and components use no inline headline
   sizes, so a type change is an edit to `global.css` (plus the font config for a new face).
-- **Colour means something:** `accent` (deploy blue) = what you can act on (primary buttons,
+- **Colour means something:** `accent` (terracotta) = what you can act on (primary buttons,
   links, focus, the contact panel); `ok-ink` / `ok-soft` = healthy, open, in pilot;
   `caution` = a butter status fill; `error-ink` = errors only. `clay-*` colours live only in
-  the 3D, the capability icons and the hero legend.
+  the 3D, the capability icons (faces shaded with oklch relative colours) and the hero
+  legend. `accent-2` / `accent-3` (saffron, raspberry) only paint gradients and figures.
+- **Backgrounds and decoration** are tokens too, per theme: `--page-bg` and `--panel-bg` are
+  gradient layers over `--bg` and `--accent`, `--hero-bg` paints the hero band (sky, contour
+  lines, stars), `--page-fixed` is a layer fixed to the viewport (paper grain),
+  `--rule-image` colours the section rules, `--btn-primary-bg` the primary button, and
+  `--header-bg` / `--header-filter` make the sticky header translucent. Figures are inline
+  SVG data URIs (the CSP allows `data:` images); text over every gradient stop passes AA.
 - **Theme:** light by default; the header toggle (sun / moon, `aria-pressed`) stores the
   choice in `localStorage` (try/catch); without a stored choice the OS preference wins. The
   inline script in `BaseLayout` applies it before paint (no flash).
@@ -210,6 +220,8 @@ client from the track record) and a `detail` sentence. Rules:
   drawing), holds it 1.6 s, then loops. On stages narrower than 600px (phones) the callout
   labels are drawn 1.8× larger (≈ 9px text at 375 instead of 5) and only IDEA, ARCHITECTURE,
   TESTS, DEPLOY and the AGENT LOOP tag are shown, so nothing collides.
+  The canvas is transparent (`alpha: true`, cleared at alpha 0) and the stage has no fill,
+  so the hero band's sky shows through the drawing; the posters keep that transparency.
 - **Globe** (`src/scripts/globe3d.ts`, port of `3d/d2.html`) — paper globe re-skinned to v2:
   clay-white plate, visited countries in ink, home (Czechia) in accent blue, wishlist
   countries with a dashed accent outline, accent arcs from Prague. Drag to rotate with
