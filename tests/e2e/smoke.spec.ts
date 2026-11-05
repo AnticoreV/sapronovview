@@ -173,7 +173,7 @@ test.describe("dark theme", () => {
     await expect(page.locator("html")).toHaveClass(/\bdark\b/);
     await expect(page.locator("[data-theme-toggle]")).toHaveAttribute("aria-pressed", "true");
     const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-    expect(bg).toBe("rgb(14, 17, 22)");
+    expect(bg).toBe("rgb(21, 17, 13)");
     const poster = page.locator("[data-hero-stage] img");
     await expect(poster).toHaveJSProperty("complete", true);
     expect(await poster.evaluate((img: HTMLImageElement) => img.currentSrc)).toMatch(
@@ -186,7 +186,7 @@ test.describe("dark theme", () => {
     await page.goto("/about");
     await expect(page.locator("html")).not.toHaveClass(/\bdark\b/);
     const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-    expect(bg).toBe("rgb(238, 241, 244)");
+    expect(bg).toBe("rgb(244, 239, 231)");
   });
 });
 

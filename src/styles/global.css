@@ -10,35 +10,36 @@
 /* default follows prefers-color-scheme — see the inline script in      */
 /* BaseLayout).                                                         */
 /* ------------------------------------------------------------------ */
+/* Colour variant: Terracotta paper: warm paper, terracotta accent, sand gradient (branch colors/terracotta). */
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   color-scheme: light;
-  --bg: #eef1f4;
-  --surface: #ffffff;
-  --surface-sunken: #e9edf2;
-  --line: #d4dae1;
-  --line-strong: #7d879a;
-  --ink: #10141a;
-  --ink-muted: #4d5662;
-  --accent: #2450ff;
-  --accent-hover: #1a3fe0;
+  --bg: #f4efe7;
+  --surface: #fffdf9;
+  --surface-sunken: #ece5da;
+  --line: #ddd3c4;
+  --line-strong: #8a7d6b;
+  --ink: #1d1813;
+  --ink-muted: #5a5045;
+  --accent: #a33c16;
+  --accent-hover: #86300f;
   --on-accent: #ffffff;
-  --accent-soft: #e6ebff;
-  --ok-ink: #1c7a4a;
-  --ok-soft: #e4f4ea;
-  --caution: #f4cc52;
+  --accent-soft: #f8e3d6;
+  --ok-ink: #2a7144;
+  --ok-soft: #e3f1e4;
+  --caution: #e9b949;
   --error-ink: #b42318;
-  --focus: #2450ff;
-  --clay-white: #f6f7f8;
-  --clay-grey: #c7cdd5;
-  --clay-blue: #3d63ff;
-  --clay-mint: #59c990;
-  --clay-butter: #f4cc52;
-  --clay-rose: #ee8597;
-  --clay-stone: #e9edf2;
-  --shadow-pop: 0 12px 32px rgba(16, 20, 26, 0.08);
-  --shadow-focus: 0 0 0 2px #eef1f4, 0 0 0 4px #2450ff;
+  --focus: #a33c16;
+  --clay-white: #faf6f0;
+  --clay-grey: #cfc5b6;
+  --clay-blue: #d8693f;
+  --clay-mint: #7fae8a;
+  --clay-butter: #e9b949;
+  --clay-rose: #d48c9b;
+  --clay-stone: #efe7db;
+  --shadow-pop: 0 12px 32px rgba(29, 24, 19, 0.09);
+  --shadow-focus: 0 0 0 2px #f4efe7, 0 0 0 4px #a33c16;
 
   /* Page gutter and content width from the approved artboard. */
   --gutter: clamp(16px, 4vw, 56px);
@@ -49,39 +50,41 @@
   /* Gradient layers a palette can paint over the flat colours (none by default): the
      page behind every band (over --bg), the contact panel (over --accent); and the
      sticky header, with an optional backdrop filter when the page behind it is not flat. */
-  --page-bg: none;
-  --panel-bg: none;
-  --header-bg: var(--bg);
-  --header-filter: none;
+  --page-bg: linear-gradient(180deg, var(--bg) 0, var(--bg) 960px, #efe5d6 62%, #e9d8c2 100%);
+  --panel-bg: linear-gradient(135deg, #b4441b 0%, #9a3414 55%, #7f2a10 100%);
+  --header-bg: color-mix(in srgb, var(--bg) 86%, transparent);
+  --header-filter: saturate(1.2) blur(12px);
 }
 
 .dark {
   color-scheme: dark;
-  --bg: #0e1116;
-  --surface: #171b22;
-  --surface-sunken: #12161c;
-  --line: #2a313b;
-  --line-strong: #6b7686;
-  --ink: #eef1f4;
-  --ink-muted: #a3acb8;
-  --accent: #7d9bff;
-  --accent-hover: #9cb3ff;
-  --on-accent: #0e1116;
-  --accent-soft: #1c2440;
-  --ok-ink: #59c990;
-  --ok-soft: #12301f;
-  --caution: #f4cc52;
+  --bg: #15110d;
+  --surface: #1f1a15;
+  --surface-sunken: #110e0a;
+  --line: #352c24;
+  --line-strong: #86796a;
+  --ink: #f3ece2;
+  --ink-muted: #b5a998;
+  --accent: #f08a5d;
+  --accent-hover: #f6a37f;
+  --on-accent: #15110d;
+  --accent-soft: #3a2317;
+  --ok-ink: #7fc79a;
+  --ok-soft: #16301f;
+  --caution: #e9b949;
   --error-ink: #ff7b72;
-  --focus: #7d9bff;
-  --clay-white: #e3e7ec;
-  --clay-grey: #8c96a4;
-  --clay-blue: #5b7cff;
-  --clay-mint: #59c990;
-  --clay-butter: #f4cc52;
-  --clay-rose: #ee8597;
-  --clay-stone: #e9edf2;
-  --shadow-pop: 0 12px 32px rgba(0, 0, 0, 0.4);
-  --shadow-focus: 0 0 0 2px #0e1116, 0 0 0 4px #7d9bff;
+  --focus: #f08a5d;
+  --clay-white: #e8e0d4;
+  --clay-grey: #8f8373;
+  --clay-blue: #e0764a;
+  --clay-mint: #7fae8a;
+  --clay-butter: #e9b949;
+  --clay-rose: #d695a5;
+  --clay-stone: #e6ddd0;
+  --shadow-pop: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --shadow-focus: 0 0 0 2px #15110d, 0 0 0 4px #f08a5d;
+  --page-bg: linear-gradient(180deg, var(--bg) 0, var(--bg) 960px, #1b1510 62%, #261b13 100%);
+  --panel-bg: linear-gradient(135deg, #f29467 0%, #e07445 100%);
 }
 
 @theme inline {
