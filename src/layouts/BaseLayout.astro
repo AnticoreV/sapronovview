@@ -77,6 +77,40 @@ const { locale, t } = i18n(Astro);
         }
       })();
     </script>
+    {/* Homepage opened or reloaded: the plain address starts at the top, /#expertise at
+        that section. The view-transitions router (and the browser) would otherwise restore
+        the last scroll position on reload, so the saved position is dropped before the
+        router runs and the browser's own restoring is off. Back and forward still return
+        to where you were. */}
+    {Astro.url.pathname.replace(/(index)?\.html$/, "").replace(/\/$/, "") ===
+      (locale === "cs" ? "/cs" : "") && <script is:inline>
+      (() => {
+        // Full page loads only, not when the router swaps this page in.
+        if (document.readyState !== "loading") return;
+        const nav = performance.getEntriesByType("navigation")[0];
+        if (nav && nav.type === "back_forward") return;
+        history.scrollRestoration = "manual";
+        if (history.state) {
+          const { scrollX, scrollY, ...state } = history.state;
+          history.replaceState(state, "");
+        }
+        // Chrome and Firefox skip the #hash jump on a reload; jump without smooth scroll.
+        const id = decodeURIComponent(location.hash.slice(1));
+        if (!id) return;
+        document.addEventListener(
+          "DOMContentLoaded",
+          () => {
+            const target = document.getElementById(id);
+            if (!target) return;
+            const root = document.documentElement;
+            root.style.scrollBehavior = "auto";
+            target.scrollIntoView();
+            root.style.scrollBehavior = "";
+          },
+          { once: true },
+        );
+      })();
+    </script>}
     {/* Language: English pages (no /cs prefix) send a first-time visitor whose browser
         prefers Czech to the same page under /cs — before paint, keeping ?query and #hash.
         A stored choice from the EN | CS switch always wins; Czech pages never redirect;

@@ -261,6 +261,30 @@ test.describe("while no post is published", () => {
   });
 });
 
+test("homepage address: /#section lands on that section, the plain address on the top", async ({
+  page,
+}) => {
+  const scrollY = () => page.evaluate(() => window.scrollY);
+  await page.goto("/#expertise");
+  await expect(page.locator("#expertise-heading")).toBeInViewport();
+
+  await page.goto("/");
+  await page.waitForLoadState("load");
+  expect(await scrollY()).toBe(0);
+
+  // A reload follows the same rule instead of restoring the last scroll position.
+  await page.evaluate(() => window.scrollTo(0, 3000));
+  await page.reload();
+  await page.waitForLoadState("load");
+  expect(await scrollY()).toBe(0);
+
+  await page.goto("/#expertise");
+  await page.evaluate(() => window.scrollTo(0, 3000));
+  await page.reload();
+  await expect(page.locator("#expertise-heading")).toBeInViewport();
+  await expect(page).toHaveURL(/\/#expertise$/);
+});
+
 test("header: availability pill, nav and the menu on phones", async ({ page, isMobile }) => {
   await page.goto("/about");
   const header = page.locator("header").first();
