@@ -59,10 +59,14 @@ export const siteConfig = {
   ogImageCs: "/images/og-default-cs.png",
   /** Stable portrait URL for structured data (public/images/ivan-sapronov.jpg, 800px). */
   personImage: "/images/ivan-sapronov.jpg",
+  /** Optional homepage sections. "My own product" (Ownira) is hidden by default. */
+  homeSections: {
+    ownProduct: false,
+  },
   /** Public profile links. Leave a value empty ("") to hide it. */
   social: {
     github: "https://github.com/AnticoreV",
-    linkedin: "https://www.linkedin.com/in/ivan-sapronov-25b41a231/",
+    linkedin: "https://www.linkedin.com/in/sapronov-ivan",
     twitter: "",
     instagram: "",
     telegram: "",

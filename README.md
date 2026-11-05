@@ -268,12 +268,14 @@ client from the track record) and a `detail` sentence. Rules:
 - **Removed pages:** Apexline was taken off the site (2026-10-23). `/projects/apexline` and the
   older `/projects/apex-line-market-research` forward to `/projects` (Astro `redirects` in
   `astro.config.mjs` + a 301 in `public/_redirects` for Cloudflare Pages).
-- **Homepage:** hero → What I do → Tech stack → Experience → Selected projects → My own
-  product → About me → (Writing) → contact panel. Copy lives in `src/data/home.ts`
+- **Homepage:** hero → What I do → Tech stack → Experience → Selected projects → (My own
+  product) → About me → (Writing) → contact panel. My own product (Ownira) shows only when
+  `siteConfig.homeSections.ownProduct` is `true`; it is `false` by default. Copy lives in `src/data/home.ts`
   (`heroFacts`, `expertise`, `homeCases` with slugs that must exist and chips that are
   readout ids, `ventureIntro`, `homeAbout`), the stack in `src/data/stack.ts`, the role line
   and lede in `siteCopy` (`src/config.ts`). Source of truth is the CV (June 2026): no claim,
-  technology or number that the CV doesn't have. The Experience timeline shows the four
+  technology or number that the CV doesn't have; the AI & automation tools in the stack
+  were added on request. A stack item is a name or `{ en, cs }` when it needs translating. The Experience timeline shows the four
   most recent positions with their first three `achievements`, so keep the strongest first.
 - **Experience:** `src/content/experience/*.md`. `shipped` is the track record's SHIPPED cell — a
   shortened form of a real achievement, never a new claim. Milestones (education,

@@ -345,13 +345,17 @@ test("homepage sections in the restructured order", async ({ page }) => {
     "Tech stack",
     "Experience",
     "Selected projects",
-    "My own product",
     "About me",
   ]);
+  // "My own product" is off by default (siteConfig.homeSections.ownProduct).
+  await expect(page.locator("#product")).toHaveCount(0);
   await expect(page.locator("#expertise li")).toHaveCount(4);
   // Core and "worked with" are separate, named lists in every stack row.
   await expect(page.locator("#stack dt")).toHaveCount(10);
   await expect(page.locator('#stack ul[aria-label="Core"]').first()).toContainText("Kotlin");
+  await expect(page.locator("#stack")).toContainText("AI & automation");
+  for (const tool of ["Claude Code", "Codex", "AI CLIs", "AI agents", "Automation"])
+    await expect(page.locator("#stack li", { hasText: tool }).first()).toBeVisible();
   await expect(page.locator("#experience ol > li")).toHaveCount(4);
   await expect(page.locator("#experience ol > li").first()).toContainText("CreativeDock");
   const cards = page.locator("#projects article");
@@ -365,9 +369,8 @@ test("homepage sections in the restructured order", async ({ page }) => {
   await expect(cards.nth(2)).toContainText("approximately");
   await expect(page.locator("[data-count-to]")).toHaveCount(0);
   await expect(
-    page.locator("#product").getByText("Data-box mail with an owner and a deadline."),
+    page.locator('#contact a[href="https://www.linkedin.com/in/sapronov-ivan"]'),
   ).toBeVisible();
-  await expect(page.locator("#product")).toContainText("A side venture alongside client work");
   await expect(page.locator("#about #off-duty")).toContainText("ULL pilot in training");
 });
 

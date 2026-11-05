@@ -2,8 +2,9 @@
 /**
  * Homepage, restructured 2026-11-04 for recruiters and clients: hero (role, lede, three
  * ways in, facts at a glance, the live "Blueprint") → what I do → tech stack →
- * experience → selected projects → my own product (Ownira, a side venture) → about me
- * (with off duty) → (writing) → contact panel (from BaseLayout).
+ * experience → selected projects → (my own product: Ownira, a side venture, only when
+ * siteConfig.homeSections.ownProduct is on; off by default) → about me (with off duty) →
+ * (writing) → contact panel (from BaseLayout).
  */
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Hero from "@components/home/Hero.astro";
@@ -42,7 +43,7 @@ const products = projects.filter((p) => p.data.tagline);
   <TechStack />
   <ExperienceTimeline positions={positions} />
   <SelectedProjects projects={projects} />
-  <Venture products={products} />
+  {siteConfig.homeSections.ownProduct && <Venture products={products} />}
   <AboutMe countries={visitedCountryCount} />
   <Writing posts={posts.slice(0, 3)} />
 </BaseLayout>

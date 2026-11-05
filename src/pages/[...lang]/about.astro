@@ -8,7 +8,7 @@ import { shownAll } from "@lib/content";
 import { personSchema } from "@lib/schema";
 import { aboutCopy } from "@data/about";
 import { siteConfig, siteCopy } from "@config";
-import { stack } from "@data/stack";
+import { stack, stackItem } from "@data/stack";
 import { i18n, localeParams } from "@/i18n";
 import { localeTags } from "@/i18n/locales";
 
@@ -128,7 +128,9 @@ const profileLd = {
         {stack.map((g) => (
           <div>
             <h3 class="label font-semibold text-accent">{g.label[locale]}</h3>
-            <p class="mt-2 text-ink-muted">{[...g.core, ...g.also].join(" · ")}</p>
+            <p class="mt-2 text-ink-muted">
+              {[...g.core, ...g.also].map((item) => stackItem(item, locale)).join(" · ")}
+            </p>
           </div>
         ))}
       </div>

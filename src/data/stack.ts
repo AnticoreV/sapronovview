@@ -1,7 +1,8 @@
 /**
  * Tech stack, grouped by category, in English and Czech. Shown on the homepage ("Tech
  * stack") and on /about. Source: "Skills & Technologies" in the CV (Kotlin and Fullstack
- * variants, June 2026); nothing here that the CV doesn't list.
+ * variants, June 2026); the AI & automation tools (Claude Code, Codex, AI CLIs, agents,
+ * automation) were added at Ivan's request on 2026-11-05.
  *
  * `core` is the everyday stack: named in the CV summary or used in production in more
  * than one position. `also` is what I've worked with. No percentages, no ratings.
@@ -9,12 +10,18 @@
 import type { Locale } from "@/i18n/locales";
 import { czTypo } from "@/i18n/typo";
 
+/** A technology name, or a word that needs translating ({ en, cs }). */
+export type StackItem = string | Record<Locale, string>;
+
 export type StackGroup = {
   id: string;
   label: Record<Locale, string>;
-  core: readonly string[];
-  also: readonly string[];
+  core: readonly StackItem[];
+  also: readonly StackItem[];
 };
+
+export const stackItem = (item: StackItem, locale: Locale) =>
+  typeof item === "string" ? item : item[locale];
 
 export const stack: readonly StackGroup[] = [
   {
@@ -73,8 +80,17 @@ export const stack: readonly StackGroup[] = [
   },
   {
     id: "ai",
-    label: { en: "AI tooling", cs: "AI nástroje" },
-    core: ["LLMs", "Agentic workflows", "MCP"],
+    label: { en: "AI & automation", cs: czTypo("AI a automatizace") },
+    core: [
+      "Claude Code",
+      "Codex",
+      "AI CLIs",
+      { en: "AI agents", cs: "AI agenti" },
+      "Agentic workflows",
+      "MCP",
+      "LLMs",
+      { en: "Automation", cs: "Automatizace" },
+    ],
     also: [],
   },
 ];
