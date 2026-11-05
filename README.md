@@ -268,7 +268,7 @@ client from the track record) and a `detail` sentence. Rules:
 - **Removed pages:** Apexline was taken off the site (2026-10-23). `/projects/apexline` and the
   older `/projects/apex-line-market-research` forward to `/projects` (Astro `redirects` in
   `astro.config.mjs` + a 301 in `public/_redirects` for Cloudflare Pages).
-- **Homepage:** hero → What I do → Tech stack → Experience → Selected projects → (My own
+- **Homepage:** hero → What I do → Tech stack → Experience → Shipped work → (My own
   product) → About me → (Writing) → contact panel. My own product shows only when
   `siteConfig.homeSections.ownProduct` is `true`; it is `false` by default. Copy lives in `src/data/home.ts`
   (`heroFacts`, `expertise`, `homeCases` with slugs that must exist and chips that are

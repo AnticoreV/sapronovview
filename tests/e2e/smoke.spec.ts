@@ -345,7 +345,7 @@ test("homepage sections in the restructured order", async ({ page }) => {
     "What I do",
     "Tech stack",
     "Experience",
-    "Selected projects",
+    "Shipped work",
     "About me",
   ]);
   // "My own product" is off by default (siteConfig.homeSections.ownProduct).

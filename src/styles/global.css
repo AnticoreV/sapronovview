@@ -436,7 +436,7 @@
     background: var(--hero-bg);
   }
 
-  /* Hover cards (link cards: Selected projects): on a real pointer the card lifts 4px,
+  /* Hover cards (link cards: Shipped work): on a real pointer the card lifts 4px,
      takes an accent border, a gradient top bar fades in and a shadow layer fades in under
      it. Only transform and opacity animate (compositor work, no repaint per frame): the
      shadow sits on ::after and fades, rather than transitioning box-shadow. Keyboard
