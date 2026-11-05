@@ -164,6 +164,18 @@ const en = {
   "experience.milestones": "Education, credentials & community",
   "experience.present": "Present",
   "experience.technologies": "Technologies",
+  // Homepage timeline variants (exp/* branches)
+  "timeline.select": "Pick a position",
+  "timeline.play": "Play through the years",
+  "timeline.pause": "Pause",
+  "timeline.scrub": "Drag along the years, or use the arrow keys.",
+  "timeline.explode": "Exploded view",
+  "timeline.layers":
+    "Each layer is one position, its thickness how long it lasted. Oldest at the bottom.",
+  "timeline.lines": "Technology lines",
+  "timeline.linesHint": "Pick a line to see where I used it, or a stop for the details.",
+  "timeline.allLines": "All lines",
+  "timeline.usedAt": "Used at",
 
   // About
   "about.title": "About",
@@ -461,6 +473,18 @@ const cs: Record<UiKey, string> = {
   "experience.milestones": "Vzdělání, certifikace a komunita",
   "experience.present": "dosud",
   "experience.technologies": "Technologie",
+  "timeline.select": "Vyberte pozici",
+  "timeline.play": "Přehrát roky",
+  "timeline.pause": "Pozastavit",
+  "timeline.scrub": "Táhněte po letech, nebo použijte šipky.",
+  "timeline.explode": "Rozložený pohled",
+  "timeline.layers":
+    "Každá vrstva je jedna pozice, tloušťka ukazuje, jak dlouho trvala. Nejstarší je dole.",
+  "timeline.lines": "Technologické linky",
+  "timeline.linesHint":
+    "Vyberte linku a uvidíte, kde jsem technologii používal, nebo zastávku pro detail.",
+  "timeline.allLines": "Všechny linky",
+  "timeline.usedAt": "Používal jsem v",
 
   // About
   "about.title": "O mně",
