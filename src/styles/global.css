@@ -51,6 +51,17 @@
      sticky header, with an optional backdrop filter when the page behind it is not flat. */
   --page-bg: none;
   --panel-bg: none;
+  /* Decoration hooks (base-2): two more accents for gradients and figures, a layer
+     fixed to the viewport behind everything (textures, rails), the hero band's own
+     background (it shows through the transparent 3D canvas), section rules and the
+     primary button. All flat by default. */
+  --accent-2: var(--accent);
+  --accent-3: var(--accent);
+  --page-fixed: none;
+  --hero-bg: none;
+  --rule-image: none;
+  --btn-primary-bg: var(--accent);
+  --btn-primary-hover: var(--accent-hover);
   --header-bg: var(--bg);
   --header-filter: none;
 }
@@ -235,6 +246,7 @@
   }
 
   body {
+    isolation: isolate;
     background: var(--page-bg) var(--bg);
     color: var(--ink);
     font-family: var(--font-sans);
@@ -243,6 +255,15 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--page-fixed);
   }
 
   ::selection {
@@ -344,6 +365,10 @@
     stroke: var(--clay-butter);
   }
 
+  .hero-band {
+    background: var(--hero-bg);
+  }
+
   /* Layout: full-bleed band with the artboard gutter + 1328px content. */
   .band {
     padding-inline: var(--gutter);
@@ -431,6 +456,7 @@
     gap: 16px;
     padding-top: 20px;
     border-top: 1px solid var(--ink);
+    border-image: var(--rule-image);
   }
 
   /* Buttons: radius-sm. Primary: accent fill. Secondary: surface with a 1px line border.
@@ -456,11 +482,11 @@
       color var(--duration-fast) var(--ease-out);
   }
   .btn-primary {
-    background: var(--accent);
+    background: var(--btn-primary-bg);
     color: var(--on-accent);
   }
   .btn-primary:hover {
-    background: var(--accent-hover);
+    background: var(--btn-primary-hover);
     color: var(--on-accent);
   }
   .btn-primary:focus-visible {

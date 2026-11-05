@@ -1377,7 +1377,7 @@ export async function mountHero(
   const renderer = new WebGLRenderer({
     canvas,
     antialias: true,
-    alpha: false,
+    alpha: true,
     powerPreference: mobile ? "low-power" : "default",
     preserveDrawingBuffer: Boolean(capture),
   });
@@ -1411,7 +1411,7 @@ export async function mountHero(
   frameCamera();
 
   let dark = isDark();
-  renderer.setClearColor(PALETTES[dark ? "dark" : "light"].bg, 1);
+  renderer.setClearColor(PALETTES[dark ? "dark" : "light"].bg, 0); // transparent: the hero band shows through
   let built = await buildScene(renderer, camera, dark, font, { ...size }, labels);
 
   /* ------------------------------------------------------------ state */
@@ -1480,7 +1480,7 @@ export async function mountHero(
     rebuilding = true;
     sleep();
     const old = built;
-    renderer.setClearColor(PALETTES[dark ? "dark" : "light"].bg, 1);
+    renderer.setClearColor(PALETTES[dark ? "dark" : "light"].bg, 0); // transparent: the hero band shows through
     built = await buildScene(renderer, camera, dark, font, { ...size }, labels);
     old.dispose();
     rebuilding = false;
