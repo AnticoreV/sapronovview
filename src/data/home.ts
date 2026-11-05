@@ -14,13 +14,13 @@ type HeroFact = { label: string; value: string };
 const heroFactText: Record<Locale, HeroFact[]> = {
   en: [
     { label: "Experience", value: "~5 years" },
-    { label: "Specialisation", value: "Backend & microservices" },
+    { label: "Specialisation", value: "Fullstack & AI automation" },
     { label: "Location", value: "Prague, Czech Republic" },
     { label: "Collaboration", value: "Contract or freelance, remote" },
   ],
   cs: typoDeep([
     { label: "Praxe", value: "~5 let" },
-    { label: "Specializace", value: "Backend a mikroslužby" },
+    { label: "Specializace", value: "Fullstack a AI automatizace" },
     { label: "Lokalita", value: "Praha, Česko" },
     { label: "Spolupráce", value: "Na IČO, i na dálku" },
   ]),
