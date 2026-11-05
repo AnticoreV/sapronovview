@@ -359,6 +359,11 @@ test("homepage sections in the restructured order", async ({ page }) => {
   await expect(page.locator("#stack dt")).toHaveCount(10);
   await expect(page.locator('#stack ul[aria-label="Core"]').first()).toContainText("Kotlin");
   await expect(page.locator("#stack")).toContainText("AI & automation");
+  // Hover tips come from the experience entries; items no position lists get none.
+  const chip = (name: string) =>
+    page.locator("#stack li.chip", { hasText: new RegExp(`^${name}$`) });
+  await expect(chip("Kotlin")).toHaveAttribute("data-tip", "Used at CreativeDock, CCA Group");
+  await expect(chip("Terraform")).not.toHaveAttribute("data-tip", /.+/);
   for (const tool of ["Claude Code", "Codex", "AI CLIs", "AI agents", "Automation"])
     await expect(page.locator("#stack li", { hasText: tool }).first()).toBeVisible();
   await expect(page.locator("#experience ol > li")).toHaveCount(5);
@@ -510,4 +515,12 @@ test.describe("security headers (applied from _headers, as on Cloudflare Pages)"
     expect(await page.evaluate(() => (window as unknown as { __csp: string[] }).__csp)).toEqual([]);
     expect(consoleCsp).toEqual([]);
   });
+});
+
+test("selected projects: the whole card opens its case study", async ({ page, isMobile }) => {
+  await page.goto("/");
+  const card = page.locator("#projects article").nth(1);
+  await card.scrollIntoViewIfNeeded();
+  await card.click({ position: { x: 160, y: isMobile ? 220 : 260 } });
+  await expect(page).toHaveURL(/\/projects\/self-service-menu-platform$/);
 });

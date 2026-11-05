@@ -5,13 +5,31 @@
  * the split reads without percentages or ratings. Screen readers get two named lists.
  * From 1100px the categories run down two columns (five rows each), so the chips fill
  * the width instead of leaving the right half of the page empty.
+ *
+ * Hover (a real pointer only) is informational, not a fake button: the row under the
+ * pointer gets an accent bar, and a chip that a position lists shows where I used it
+ * ("Used at CreativeDock, CCA Group", from the experience entries). The same facts are
+ * in the Experience section, so nothing depends on hovering. CSS only.
  */
 import SectionHeader from "@components/ui/SectionHeader.astro";
-import { stack, stackItem } from "@data/stack";
+import { stack, stackItem, stackUsage, type StackItem } from "@data/stack";
+import { shortCompany, type Position } from "@lib/content";
 import { i18n } from "@/i18n";
 
+interface Props {
+  positions: Position[];
+}
+const { positions } = Astro.props;
 const { locale, t } = i18n(Astro);
 const rows = Math.ceil(stack.length / 2);
+const jobs = positions.map((p) => ({
+  company: shortCompany(p.data.company),
+  technologies: p.data.technologies,
+}));
+const usedAt = (item: StackItem) => {
+  const where = [...new Set(stackUsage(item, jobs).map((j) => j.company))];
+  return where.length ? `${t("timeline.usedAt")} ${where.join(", ")}` : undefined;
+};
 ---
 
 <section id="stack" class="band section-gap" aria-labelledby="stack-heading">
@@ -36,18 +54,28 @@ const rows = Math.ceil(stack.length / 2);
       style={`--stack-rows: ${rows}`}
     >
       {stack.map((g) => (
-        <div class="grid content-start gap-x-6 gap-y-2.5 border-b border-line py-4 sm:grid-cols-[160px_1fr]">
+        <div class="stack-row grid content-start gap-x-6 gap-y-2.5 border-b border-line py-4 sm:grid-cols-[160px_1fr]">
           <dt class="pt-1 font-semibold">{g.label[locale]}</dt>
           <dd class="flex flex-wrap gap-1.5">
             <ul class="flex flex-wrap gap-1.5" aria-label={t("stack.core")}>
               {g.core.map((item) => (
-                <li class="chip chip-core">{stackItem(item, locale)}</li>
+                <li
+                  class:list={["chip chip-core", usedAt(item) && "has-tip"]}
+                  data-tip={usedAt(item)}
+                >
+                  {stackItem(item, locale)}
+                </li>
               ))}
             </ul>
             {g.also.length > 0 && (
               <ul class="flex flex-wrap gap-1.5" aria-label={t("stack.also")}>
                 {g.also.map((item) => (
-                  <li class="chip chip-also">{stackItem(item, locale)}</li>
+                  <li
+                    class:list={["chip chip-also", usedAt(item) && "has-tip"]}
+                    data-tip={usedAt(item)}
+                  >
+                    {stackItem(item, locale)}
+                  </li>
                 ))}
               </ul>
             )}
@@ -55,6 +83,7 @@ const rows = Math.ceil(stack.length / 2);
         </div>
       ))}
     </dl>
+    <p class="stack-hint text-[14px] text-ink-muted">{t("stack.hint")}</p>
   </div>
 </section>
 
@@ -69,5 +98,95 @@ const rows = Math.ceil(stack.length / 2);
     font-weight: 500;
     outline: 1px dashed var(--line-strong);
     outline-offset: -1px;
+  }
+
+  /* Tooltips may reach past the shell on the outer chips: clip, never scroll sideways. */
+  #stack {
+    overflow-x: clip;
+  }
+  .stack-row {
+    position: relative;
+  }
+  /* Row under the pointer: a 2px accent bar grows in on the left (transform only). */
+  .stack-row::before {
+    content: "";
+    position: absolute;
+    left: -14px;
+    top: 14px;
+    bottom: 14px;
+    width: 2px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, var(--accent), var(--accent-3));
+    transform: scaleY(0);
+    transform-origin: 50% 0;
+    transition: transform var(--duration-base) var(--ease-out);
+  }
+  .stack-row dt {
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+  .chip {
+    position: relative;
+    transition:
+      color var(--duration-fast) var(--ease-out),
+      background-color var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out);
+  }
+  /* "Used at …": shown above the chip, fades and rises 4px (opacity + transform). */
+  .has-tip::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    z-index: 5;
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: var(--ink);
+    color: var(--bg);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.3;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, 4px);
+    transition:
+      opacity var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
+  }
+  .stack-hint {
+    display: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .stack-hint {
+      display: block;
+    }
+    .stack-row:hover::before {
+      transform: scaleY(1);
+    }
+    .stack-row:hover dt {
+      color: var(--accent);
+    }
+    .has-tip {
+      cursor: help;
+    }
+    .chip-core.has-tip:hover {
+      box-shadow: inset 0 0 0 1.5px var(--accent);
+      color: var(--accent);
+    }
+    .chip-also.has-tip:hover {
+      color: var(--accent);
+      outline-color: var(--accent);
+    }
+    .has-tip:hover::after {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .stack-row::before,
+    .has-tip::after {
+      transition: none;
+    }
   }
 </style>

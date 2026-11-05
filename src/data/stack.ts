@@ -94,3 +94,37 @@ export const stack: readonly StackGroup[] = [
     also: [],
   },
 ];
+
+/**
+ * Where a stack item was used, from the positions' `technologies` (newest first): the
+ * item (or each of its " / " parts) must appear as whole words in a position's
+ * technology ("Kotlin" matches "Kotlin Coroutines", "AWS" matches "AWS S3"). A few names
+ * that the CV writes differently are mapped below. Items no position lists get nothing,
+ * so the hover tip never claims more than the CV says.
+ */
+const usageAliases: Record<string, string[]> = {
+  "Spring Boot": ["Spring"],
+  LLMs: ["LLM tooling"],
+  "Agentic workflows": ["LLM tooling"],
+};
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const containsWords = (haystack: string, needle: string) =>
+  new RegExp(`(^|[^a-z0-9])${escapeRe(needle.toLowerCase())}($|[^a-z0-9])`).test(
+    haystack.toLowerCase(),
+  );
+
+export function stackUsage<P extends { company: string; technologies: readonly string[] }>(
+  item: StackItem,
+  positions: readonly P[],
+): P[] {
+  const name = typeof item === "string" ? item : item.en;
+  const parts = name.split(" / ").map((x) => x.trim());
+  const exact = usageAliases[name] ?? [];
+  return positions.filter((p) =>
+    p.technologies.some(
+      (tech) =>
+        parts.some((part) => containsWords(tech, part)) ||
+        exact.some((alias) => tech.toLowerCase() === alias.toLowerCase()),
+    ),
+  );
+}

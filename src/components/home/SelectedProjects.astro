@@ -2,8 +2,11 @@
 /**
  * "Selected projects": three case-study cards (src/data/home.ts), newest first. Each
  * card: company · year, title, the kind of work, an overview, "My contribution", the
- * sourced metric chips (src/data/readouts.ts), the stack and "View case study".
+ * sourced metric chips (src/data/readouts.ts), the stack and "View case study". The
+ * whole card opens the case study (the link stretches over it), so its hover state (lift,
+ * accent border and top bar, accent title, the arrow moving on) promises a real click.
  */
+import Arrow from "@components/ui/Arrow.astro";
 import Glyphs from "@components/ui/Glyphs.astro";
 import SectionHeader from "@components/ui/SectionHeader.astro";
 import TechBadge from "@components/ui/TechBadge.astro";
@@ -34,7 +37,7 @@ const readout = (id: ReadoutId): Readout => readouts[id];
       <ul class="grid grid-cols-[repeat(auto-fit,minmax(min(340px,100%),1fr))] gap-4">
         {cases.map((c) => (
           <li class="flex">
-            <article class="card flex w-full flex-col gap-4 p-7">
+            <article class="hover-card case-card card flex w-full flex-col gap-4 p-7">
               <div class="flex flex-col gap-2">
                 <p class="mono text-[12px] text-ink-muted">{c.meta}</p>
                 <h3 class="display text-heading">{c.title}</h3>
@@ -69,10 +72,11 @@ const readout = (id: ReadoutId): Readout => readouts[id];
               </ul>
               <a
                 href={l(`/projects/${c.slug}`)}
-                class="btn btn-secondary btn-sm mt-auto self-start"
+                class="case-link btn btn-secondary btn-sm mt-auto self-start"
               >
                 {t("work.viewCase")}
                 <span class="sr-only">: {c.title}</span>
+                <Arrow class="case-arrow" />
               </a>
             </article>
           </li>
@@ -81,3 +85,39 @@ const readout = (id: ReadoutId): Readout => readouts[id];
     </div>
   </section>
 )}
+
+<style>
+  /* The case-study link covers the card, so the whole card is the click target. */
+  .case-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: var(--radius-md);
+  }
+  .case-card h3 {
+    transition: color var(--duration-base) var(--ease-out);
+  }
+  .case-card :global(.case-arrow) {
+    transition: transform var(--duration-base) var(--ease-out);
+  }
+  .case-card:has(:focus-visible) h3 {
+    color: var(--accent);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .case-card:hover h3 {
+      color: var(--accent);
+    }
+    .case-card:hover :global(.case-arrow) {
+      transform: translateX(4px);
+    }
+    .case-card:hover .case-link {
+      border-color: var(--accent);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .case-card:hover :global(.case-arrow) {
+      transform: none;
+    }
+  }
+</style>

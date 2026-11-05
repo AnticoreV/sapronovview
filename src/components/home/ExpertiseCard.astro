@@ -22,7 +22,7 @@ const { id, title, text, stack, spotlight = false, class: className } = Astro.pr
 
 <li
   class:list={[
-    "expertise-card flex flex-col gap-3.5 rounded-md",
+    "hover-card expertise-card flex flex-col gap-3.5 rounded-md",
     // The 2px accent border takes 1px more than the card's, so 1px less padding.
     spotlight ? "is-spotlight border-2 border-accent bg-accent-soft p-[27px]" : "card p-7",
     className,
