@@ -116,7 +116,7 @@ test("Czech home: Czech hero poster, facts, chips and WebSite language", async (
   expect(srcset).not.toMatch(/blueprint-light\.[^-]/);
   await expect(page.locator("[data-hero-stage]")).toHaveAttribute("data-labels", /NÁPAD/);
   const facts = page.locator('#top dl[aria-label="Ve zkratce"]');
-  await expect(facts).toContainText("Backend a mikroslužby");
+  await expect(facts).toContainText(/Fullstack a\s+AI automatizace/);
   await expect(facts).toContainText("Na IČO, i na dálku");
   await expect(page.locator("main h2").first()).toHaveText("Co dělám");
   await expect(page.locator("#projects")).toContainText("~2 mil. uživatelů");

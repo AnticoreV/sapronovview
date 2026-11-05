@@ -14,13 +14,13 @@ type HeroFact = { label: string; value: string };
 const heroFactText: Record<Locale, HeroFact[]> = {
   en: [
     { label: "Experience", value: "~5 years" },
-    { label: "Specialisation", value: "Backend & microservices" },
+    { label: "Specialisation", value: "Fullstack & AI automation" },
     { label: "Location", value: "Prague, Czech Republic" },
     { label: "Collaboration", value: "Contract or freelance, remote" },
   ],
   cs: typoDeep([
     { label: "Praxe", value: "~5 let" },
-    { label: "Specializace", value: "Backend a mikroslužby" },
+    { label: "Specializace", value: "Fullstack a AI automatizace" },
     { label: "Lokalita", value: "Praha, Česko" },
     { label: "Spolupráce", value: "Na IČO, i na dálku" },
   ]),
@@ -35,22 +35,23 @@ type Expertise = {
   text: string;
   /** Technologies (or, for architecture, patterns) shown under the text. */
   stack: string[];
-  /** The primary specialisation: one card on accent-soft. */
+  /** The lead card (fullstack): accent-soft with an accent border. */
   spotlight: boolean;
 };
 
 /**
  * "What I do": five expertise cards (icons live in ExpertiseCard.astro). The first two
- * (backend, AI automation) are the wide row on desktop. AI automation was added at Ivan's
- * request on 2026-11-05.
+ * (fullstack, the spotlight, and AI automation) are the wide row on desktop; backend,
+ * architecture and cloud sit below. Order and the AI automation card are Ivan's
+ * (2026-11-05).
  */
 const expertiseText: Record<Locale, Expertise[]> = {
   en: [
     {
-      id: "backend",
-      title: "Backend development",
-      text: "Services and APIs on the JVM that hold up under load and stay easy to change.",
-      stack: ["Kotlin", "Java", "Spring Boot", "REST", "GraphQL", "PostgreSQL", "Redis"],
+      id: "fullstack",
+      title: "Fullstack development",
+      text: "Both sides of a web product: the Kotlin or Java services, the Angular or React app on top, and the typed API contract between them.",
+      stack: ["Angular", "React", "TypeScript", "Kotlin", "Java", "Spring Boot", "REST", "GraphQL"],
       spotlight: true,
     },
     {
@@ -58,6 +59,13 @@ const expertiseText: Record<Locale, Expertise[]> = {
       title: "AI automation",
       text: "Agents and automation wired into a company's processes, plus the culture around them: shared guidelines, reviews and training, so the team keeps using them.",
       stack: ["Claude Code", "Codex", "AI agents", "MCP", "Workflow automation", "Team playbooks"],
+      spotlight: false,
+    },
+    {
+      id: "backend",
+      title: "Backend development",
+      text: "Services and APIs on the JVM that hold up under load and stay easy to change.",
+      stack: ["Kotlin", "Java", "Spring Boot", "REST", "GraphQL", "PostgreSQL", "Redis"],
       spotlight: false,
     },
     {
@@ -75,20 +83,13 @@ const expertiseText: Record<Locale, Expertise[]> = {
       stack: ["GCP", "AWS", "Docker", "Kubernetes", "Argo CD", "Terraform", "GitLab CI"],
       spotlight: false,
     },
-    {
-      id: "fullstack",
-      title: "Fullstack development",
-      text: "The web app on top of the services: typed component libraries, dynamic forms and self-service tools.",
-      stack: ["Angular", "React", "TypeScript", "RxJS", "NgRx"],
-      spotlight: false,
-    },
   ],
   cs: typoDeep([
     {
-      id: "backend",
-      title: "Vývoj backendu",
-      text: "Služby a API na JVM, které vydrží zátěž a dají se snadno měnit.",
-      stack: ["Kotlin", "Java", "Spring Boot", "REST", "GraphQL", "PostgreSQL", "Redis"],
+      id: "fullstack",
+      title: "Fullstack vývoj",
+      text: "Obě strany webového produktu: služby v Kotlinu nebo Javě, aplikace v Angularu nebo Reactu nad nimi a typovaný API kontrakt mezi nimi.",
+      stack: ["Angular", "React", "TypeScript", "Kotlin", "Java", "Spring Boot", "REST", "GraphQL"],
       spotlight: true,
     },
     {
@@ -106,6 +107,13 @@ const expertiseText: Record<Locale, Expertise[]> = {
       spotlight: false,
     },
     {
+      id: "backend",
+      title: "Vývoj backendu",
+      text: "Služby a API na JVM, které vydrží zátěž a dají se snadno měnit.",
+      stack: ["Kotlin", "Java", "Spring Boot", "REST", "GraphQL", "PostgreSQL", "Redis"],
+      spotlight: false,
+    },
+    {
       id: "architecture",
       title: "Softwarová architektura",
       text: "Hranice služeb, API kontrakty a rozhodnutí za nimi, pro nové služby i velké stávající systémy.",
@@ -117,13 +125,6 @@ const expertiseText: Record<Locale, Expertise[]> = {
       title: "Cloud a infrastruktura",
       text: "Dostat služby do produkce a mít je pod dohledem: pipeline, clustery, metriky a alerty.",
       stack: ["GCP", "AWS", "Docker", "Kubernetes", "Argo CD", "Terraform", "GitLab CI"],
-      spotlight: false,
-    },
-    {
-      id: "fullstack",
-      title: "Fullstack vývoj",
-      text: "Webová aplikace nad službami: typované knihovny komponent, dynamické formuláře a samoobslužné nástroje.",
-      stack: ["Angular", "React", "TypeScript", "RxJS", "NgRx"],
       spotlight: false,
     },
   ]),
