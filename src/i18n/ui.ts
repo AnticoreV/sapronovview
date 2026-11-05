@@ -228,9 +228,9 @@ const en = {
   "adventures.legendHome": "Home",
   "adventures.legendVisited": "Visited",
   "adventures.legendWishlist": "Want to visit",
-  "adventures.legendRoute": "Route from Prague",
+  "adventures.legendPoint": "A place: click it for details",
   "adventures.globeAlt":
-    "Globe centred on Europe: {n} visited countries in ink, home in the Czech Republic highlighted in blue, routes from Prague to every visited place, wishlist countries outlined.",
+    "Globe centred on Europe: {n} visited countries in ink with a point for every place, home in the Czech Republic highlighted, wishlist countries outlined with a ring for each place.",
   "adventures.mapCaption":
     "World map: {n} visited countries in ink, home in the Czech Republic highlighted, wishlist countries outlined. Use the country list to pick a place.",
 
@@ -537,9 +537,9 @@ const cs: Record<UiKey, string> = {
   "adventures.legendHome": "Domov",
   "adventures.legendVisited": "Navštíveno",
   "adventures.legendWishlist": "Chci navštívit",
-  "adventures.legendRoute": "Trasa z Prahy",
+  "adventures.legendPoint": "Místo: klikněte pro detail",
   "adventures.globeAlt":
-    "Glóbus se středem v Evropě: navštívené země ({n}) černě, domov v Česku zvýrazněný modře, trasy z Prahy do všech navštívených míst, země ze seznamu přání obtažené.",
+    "Glóbus se středem v Evropě: navštívené země ({n}) černě s bodem pro každé místo, domov v Česku zvýrazněný, země ze seznamu přání obtažené a s kroužkem pro každé místo.",
   "adventures.mapCaption":
     "Mapa světa: navštívené země ({n}) černě, domov v Česku zvýrazněný, země ze seznamu přání obtažené. Místo vyberete v seznamu zemí.",
 

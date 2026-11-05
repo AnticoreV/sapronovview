@@ -2,12 +2,16 @@
  * Adventures paper globe — port of claude-design-system/3d/d2.html (three r184),
  * travel mode, driven by src/data/adventures.ts and world-atlas countries-110m.
  *
- * Re-skinned to design system v2: a clay-white paper plate, visited countries in ink,
- * home (Czechia) in accent blue, wishlist countries with a dashed accent outline,
- * accent arcs from Prague to every visited place. Light / dark follow `.dark`.
- * Drag to rotate (with inertia), hover for the country name, click a country
- * with places to open its card. The country list beside the globe is the
- * keyboard / screen-reader equivalent; selecting there turns the globe.
+ * Terracotta palette: a clay-white paper plate, visited countries in ink, home
+ * (Czechia) in accent with a ring on Prague, wishlist countries with a dashed accent
+ * outline. Every place is a point on the surface (no routes): a filled saffron dot for
+ * a visited place, an accent ring for a wishlist one, each on a paper-coloured halo so
+ * it reads on ink countries. Points are hit-tested in screen space (14 px with a mouse,
+ * 22 px on touch, front hemisphere only): hover enlarges the point and names it,
+ * click opens its card; elsewhere hover names the country and a click on a country with
+ * places opens the country. Light / dark follow `.dark`. Drag to rotate (with
+ * inertia). The list beside the globe is the keyboard / screen-reader equivalent;
+ * selecting there turns the globe.
  *
  * Loaded lazily by src/components/adventures/GlobeStage.astro — never under
  * reduced motion or without WebGL (the d3-geo SVG map is shown instead).
@@ -21,14 +25,13 @@ import {
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
+  CircleGeometry,
   PerspectiveCamera,
-  QuadraticBezierCurve3,
   Raycaster,
   RingGeometry,
   Scene,
   SphereGeometry,
   SRGBColorSpace,
-  TubeGeometry,
   Vector2,
   Vector3,
   WebGLRenderer,
@@ -53,6 +56,10 @@ export type GlobeHandle = {
 export type GlobeOptions = {
   /** A country with places was clicked (ISO alpha-2). */
   onPick?: (countryCode: string) => void;
+  /** A place's point was clicked (adventure id). */
+  onPickPlace?: (id: string) => void;
+  /** Point labels in the page language ("Mnichov · Německo"), by adventure id. */
+  placeLabels?: Record<string, string>;
   /** Hovered country name (or null) and pointer position inside the stage. */
   onHover?: (name: string | null, x: number, y: number) => void;
   onFirstFrame?: () => void;
@@ -71,35 +78,42 @@ type Palette = {
   border: string;
   visited: string;
   home: string;
-  route: string;
+  /** Wishlist outline and wishlist points. */
+  wish: string;
+  /** Visited points. */
   dot: string;
+  /** The disc under every point. */
+  halo: string;
   ambient: number;
   key: number;
 };
 
-/** v2 tokens: paper = clay-white, land = surface, lines = line / line-strong, ink, accent. */
+/** Terracotta tokens: paper = clay-white, land = surface, lines = line / line-strong, ink,
+ * accent (home, wishlist), accent-2 (visited points). */
 const PALETTES: Record<"light" | "dark", Palette> = {
   light: {
-    paper: "#f6f7f8",
-    graticule: "#d4dae1",
-    land: "#ffffff",
-    border: "#4d5662",
-    visited: "#10141a",
-    home: "#2450ff",
-    route: "#2450ff",
-    dot: "#10141a",
+    paper: "#fff8f1",
+    graticule: "#e6d5c4",
+    land: "#fffaf5",
+    border: "#8f7865",
+    visited: "#23140f",
+    home: "#ad3c1c",
+    wish: "#ad3c1c",
+    dot: "#e8862e",
+    halo: "#fffaf5",
     ambient: 2.2,
     key: 1.2,
   },
   dark: {
-    paper: "#171b22",
-    graticule: "#2a313b",
-    land: "#212833",
-    border: "#6b7686",
-    visited: "#eef1f4",
-    home: "#7d9bff",
-    route: "#7d9bff",
-    dot: "#eef1f4",
+    paper: "#2a1a21",
+    graticule: "#40292f",
+    land: "#3a242c",
+    border: "#8f7176",
+    visited: "#fbeee6",
+    home: "#ff9a6b",
+    wish: "#ff9a6b",
+    dot: "#ffc15e",
+    halo: "#1f1218",
     ambient: 1.6,
     key: 1.0,
   },
@@ -244,7 +258,7 @@ export async function mountGlobe(
       g.fill("evenodd");
       const wish = wishlist.has(id);
       g.setLineDash(wish ? [9 * px, 6 * px] : []);
-      g.strokeStyle = wish ? C.route : C.border;
+      g.strokeStyle = wish ? C.wish : C.border;
       g.lineWidth = (wish ? 2.6 : 1.3) * px;
       g.stroke();
     }
@@ -291,25 +305,34 @@ export async function mountGlobe(
   const sphere = new Mesh(new SphereGeometry(1, mobile ? 96 : 128, mobile ? 72 : 96), sphereMat);
   globe.add(sphere);
 
-  const arcMat = new MeshBasicMaterial({ color: C.route });
-  const dotMat = new MeshBasicMaterial({ color: C.dot });
+  const dotMat = new MeshBasicMaterial({ color: C.dot, side: DoubleSide });
+  const wishMat = new MeshBasicMaterial({ color: C.wish, side: DoubleSide });
+  const haloMat = new MeshBasicMaterial({ color: C.halo, side: DoubleSide });
   const homeMat = new MeshBasicMaterial({ color: C.home, side: DoubleSide });
   const pulseMat = new MeshBasicMaterial({ color: C.home, side: DoubleSide, transparent: true });
 
-  const prague = [home.coordinates.lng, home.coordinates.lat] as const;
-  const a = toVec(prague[0], prague[1], 1.003);
-  for (const place of adventures.filter((p) => p.status === "visited")) {
-    const b = toVec(place.coordinates.lng, place.coordinates.lat, 1.003);
-    const mid = a.clone().add(b).multiplyScalar(0.5);
-    mid.normalize().multiplyScalar(1 + a.distanceTo(b) * 0.45);
-    const tube = new Mesh(
-      new TubeGeometry(new QuadraticBezierCurve3(a, mid, b), 64, 0.0042, 6),
-      arcMat,
+  /* Points: a flat disc group on the surface, facing out; hover scales the group. */
+  const haloGeo = new CircleGeometry(0.03, 32);
+  const dotGeo = new CircleGeometry(0.019, 32);
+  const wishGeo = new RingGeometry(0.012, 0.021, 32);
+  type Point = { id: string; label: string; group: Group };
+  const points: Point[] = adventures.map((place) => {
+    const group = new Group();
+    const { lng, lat } = place.coordinates;
+    group.position.copy(toVec(lng, lat, 1.004));
+    group.lookAt(toVec(lng, lat, 2));
+    const halo = new Mesh(haloGeo, haloMat);
+    const mark = new Mesh(
+      place.status === "visited" ? dotGeo : wishGeo,
+      place.status === "visited" ? dotMat : wishMat,
     );
-    const dot = new Mesh(new SphereGeometry(0.011, 12, 8), dotMat);
-    dot.position.copy(b);
-    globe.add(tube, dot);
-  }
+    mark.position.z = 0.0015;
+    group.add(halo, mark);
+    globe.add(group);
+    const fallback = place.city ? `${place.city} · ${place.country}` : place.country;
+    return { id: place.id, label: options.placeLabels?.[place.id] ?? fallback, group };
+  });
+  const prague = [home.coordinates.lng, home.coordinates.lat] as const;
   const ring = new Mesh(new RingGeometry(0.028, 0.036, 48), homeMat);
   ring.position.copy(toVec(prague[0], prague[1], 1.006));
   ring.lookAt(toVec(prague[0], prague[1], 2));
@@ -334,8 +357,9 @@ export async function mountGlobe(
     sphereMat.needsUpdate = true;
     mapTexture.dispose();
     mapTexture = next;
-    arcMat.color.set(C.route);
     dotMat.color.set(C.dot);
+    wishMat.color.set(C.wish);
+    haloMat.color.set(C.halo);
     homeMat.color.set(C.home);
     pulseMat.color.set(C.home);
     ambient.intensity = C.ambient;
@@ -415,6 +439,35 @@ export async function mountGlobe(
     return countryAt(first.uv.x, first.uv.y);
   };
 
+  /** The front-facing point nearest the pointer, within `radius` CSS px. */
+  const spot = new Vector3();
+  const toCam = new Vector3();
+  const pointAt = (clientX: number, clientY: number, radius: number) => {
+    const r = canvas.getBoundingClientRect();
+    globe.updateMatrixWorld();
+    let best: Point | null = null;
+    let bestD = radius;
+    for (const pt of points) {
+      pt.group.getWorldPosition(spot);
+      toCam.copy(camera.position).sub(spot);
+      if (spot.dot(toCam) <= 0.05) continue; // far side of the globe
+      spot.project(camera);
+      const x = r.left + ((spot.x + 1) / 2) * r.width;
+      const y = r.top + ((1 - spot.y) / 2) * r.height;
+      const d = Math.hypot(x - clientX, y - clientY);
+      if (d < bestD) [best, bestD] = [pt, d];
+    }
+    return best;
+  };
+  let hovered: Point | null = null;
+  const setHovered = (pt: Point | null) => {
+    if (pt === hovered) return;
+    hovered?.group.scale.setScalar(1);
+    hovered = pt;
+    hovered?.group.scale.setScalar(1.6);
+    renderer.render(scene, camera);
+  };
+
   let downX = 0;
   let downY = 0;
   let lastX = 0;
@@ -443,12 +496,20 @@ export async function mountGlobe(
       rotY += velY;
       rotX = Math.max(-1.2, Math.min(1.2, rotX + velX));
       options.onHover?.(null, 0, 0);
+      setHovered(null);
       wake();
       return;
     }
     if (e.pointerType !== "mouse") return;
-    const f = hit(e.clientX, e.clientY);
     const r = stage.getBoundingClientRect();
+    const pt = pointAt(e.clientX, e.clientY, 14);
+    setHovered(pt);
+    if (pt) {
+      options.onHover?.(pt.label, e.clientX - r.left, e.clientY - r.top);
+      canvas.style.cursor = "pointer";
+      return;
+    }
+    const f = hit(e.clientX, e.clientY);
     const alpha = f ? alphaByNumeric.get(String(f.id)) : undefined;
     const localName = f && options.names?.[f.id === undefined ? f.properties.name : String(f.id)];
     const name = f ? (localName ?? (alpha && nameByCode.get(alpha)) ?? f.properties.name) : null;
@@ -461,13 +522,22 @@ export async function mountGlobe(
     if (canvas.hasPointerCapture(e.pointerId)) canvas.releasePointerCapture(e.pointerId);
     if (moved < 5) {
       velX = velY = 0;
+      const pt = pointAt(e.clientX, e.clientY, e.pointerType === "mouse" ? 14 : 22);
+      if (pt) {
+        options.onPickPlace?.(pt.id);
+        wake();
+        return;
+      }
       const f = hit(e.clientX, e.clientY);
       const alpha = f ? alphaByNumeric.get(String(f.id)) : undefined;
       if (alpha && withPlaces.has(alpha)) options.onPick?.(alpha);
     }
     wake();
   };
-  const onLeave = () => options.onHover?.(null, 0, 0);
+  const onLeave = () => {
+    options.onHover?.(null, 0, 0);
+    setHovered(null);
+  };
 
   const io = new IntersectionObserver((entries) => {
     visible = entries.some((en) => en.isIntersecting);

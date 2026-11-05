@@ -222,11 +222,15 @@ client from the track record) and a `detail` sentence. Rules:
   TESTS, DEPLOY and the AGENT LOOP tag are shown, so nothing collides.
   The canvas is transparent (`alpha: true`, cleared at alpha 0) and the stage has no fill,
   so the hero band's sky shows through the drawing; the posters keep that transparency.
-- **Globe** (`src/scripts/globe3d.ts`, port of `3d/d2.html`) — paper globe re-skinned to v2:
-  clay-white plate, visited countries in ink, home (Czechia) in accent blue, wishlist
-  countries with a dashed accent outline, accent arcs from Prague. Drag to rotate with
-  inertia; hover shows the country name; clicking a country with places opens its card; the
-  country list is the keyboard / screen-reader equivalent.
+- **Globe** (`src/scripts/globe3d.ts`, port of `3d/d2.html`) in the terracotta palette:
+  clay-white plate, visited countries in ink, home (Czechia) in accent with a ring on
+  Prague, wishlist countries with a dashed accent outline. No routes: every place is a
+  point (a saffron dot for visited, an accent ring for wishlist, each on a paper halo).
+  Points are hit-tested in screen space (14 px mouse, 22 px touch, front side only):
+  hover enlarges the point and names it ("Munich · Germany", in the page language), click
+  opens its card; elsewhere hover names the country and a click on a country with places
+  opens the country. Drag to rotate with inertia; the country list is the keyboard /
+  screen-reader equivalent.
 - **Loading rules** (`HeroStage.astro`, `GlobeStage.astro`): the poster is the LCP image and
   the fallback. `three@0.184.0` is imported dynamically, only on `/` and `/adventures`, only
   when the stage is visible — on idle on desktop with a mouse, on the first scroll / touch /
@@ -397,10 +401,7 @@ invented):
 | `content/projects/land-routing-service.md`   | Case-study page (year, problem / approach sections). Listed under "Code on GitHub".                                                                                                                                                                                                                                                                    |
 | `content/projects/paymont-wallet.md`         | Case-study page (year, most body sections). Listed under "Code on GitHub" with both repositories.                                                                                                                                                                                                                                                      |
 | `content/projects/ownira.md`                 | Hidden (`hidden: true`, 301s from `/projects/ownira`). `timeframe` (start year not confirmed). `website` not set — ownira.cz currently shows a parking page; add `website: https://ownira.cz` when it is live (WEB stays text until then).                                                                                                             |
-| `content/hobbies/*` (all 4)                  | Photos, stats (hours, licence, home field, bike, longest trip, riding since, countries / continents, next country, discipline, sessions), favourites, the flying-club link, and the write-ups. While `placeholder: true`, only titles and taglines show.                                                                                               |
 | `content/now/now.md`                         | Current client / project line, "Learning" (2), "Reading" (2 books)                                                                                                                                                                                                                                                                                     |
-| `data/about.ts` → `facts`                    | All 6 facts (flying hours / licence, bike, country count + next, sport, first program, surprising fact) — the Facts section is hidden                                                                                                                                                                                                                  |
-| `data/adventures.ts`                         | Trip notes for 14 visited places, and the Cyprus town (`[Which town?]` — Cyprus shows by country only)                                                                                                                                                                                                                                                 |
 | `content/milestones/`                        | No milestones yet (template only) — the section is hidden                                                                                                                                                                                                                                                                                              |
 | CV                                           | `public/cv/ivan-sapronov-cv.pdf` missing → "CV on request" links to `/contact?topic=hiring`                                                                                                                                                                                                                                                            |
 | Contact form                                 | `PUBLIC_FORM_ACTION` (Formspree endpoint) not set → honest "not connected yet" state. **Connect it only after** the `/contact` privacy note is a full GDPR Art. 13 text: controller and contact, purpose, legal basis, retention period, Formspree as processor in the US (EU–US DPF / SCCs), the visitor's rights, and the right to complain to ÚOOÚ. |

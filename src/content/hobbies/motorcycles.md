@@ -3,33 +3,21 @@ title: "Motorcycles"
 tagline: "Motorcycle touring, preferably on roads I haven't ridden yet."
 category: motorcycles
 icon: "Bike"
-images:
-  - alt: "Motorcycle parked on a mountain pass"
-    caption: "[Add your photo: /public/images/hobbies/moto-1.jpg]"
-  - alt: "Riding through a forest road"
-    caption: "[Add your photo]"
-  - alt: "Garage, maintenance day"
-    caption: "[Add your photo]"
-favorites:
-  - "[Current bike — make & model]"
-  - "[Favourite road or pass]"
-  - "[Piece of gear you would not ride without]"
-stats:
-  - label: "Current bike"
-    value: "[MODEL]"
-  - label: "Longest trip"
-    value: "[N km]"
-  - label: "Riding since"
-    value: "[YEAR]"
 relatedProjects: ["land-routing-service"]
 links: []
 featured: true
 order: 2
-placeholder: true
+images: []
+favorites: []
+stats:
+  - label: "Current bike"
+    value: "BMW S 1000 R (2025)"
+  - label: "Previous bike"
+    value: "Yamaha MT-03 (660)"
+  - label: "Ridden so far"
+    value: "~15,000 km"
 ---
 
 Riding is how I reset. A motorcycle removes every distraction that isn't the road, and the road has a way of putting problems in perspective.
 
-[Describe what you ride, the kind of riding you enjoy — touring, mountain passes, gravel — and a memorable trip.]
-
-I also enjoy the mechanical side: valve checks, chain maintenance and the occasional weekend spent chasing an electrical gremlin. It's the same debugging loop as software, just with more grease.
+These days I ride a 2025 BMW S 1000 R; before it I had a Yamaha MT-03 (660). Between the two I've covered about 15,000 km.

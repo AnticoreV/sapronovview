@@ -8,7 +8,7 @@ import ThemePicture from "@components/ui/ThemePicture.astro";
 import posterLight from "@/assets/globe/globe-light.png";
 import posterDark from "@/assets/globe/globe-dark.png";
 import isoCountries from "i18n-iso-countries";
-import { adventures } from "@data/adventures";
+import { adventures, localizedAdventures } from "@data/adventures";
 import { i18n } from "@/i18n";
 
 const { locale, t } = i18n(Astro);
@@ -27,6 +27,10 @@ if (locale !== "en") {
   );
   Object.assign(names, { "N. Cyprus": "Severní Kypr", Somaliland: "Somaliland", Kosovo: "Kosovo" });
 }
+// Point labels in the page language: "Munich · Germany", or the country alone without a city.
+const placeLabels = Object.fromEntries(
+  localizedAdventures(locale).map((a) => [a.id, a.city ? `${a.city} · ${a.country}` : a.country]),
+);
 const sizes = "(min-width: 1100px) 720px, 92vw";
 const widths = [360, 540, 720, 1080, 1440];
 ---
@@ -35,6 +39,7 @@ const widths = [360, 540, 720, 1080, 1440];
   class="globe-stage relative mx-auto aspect-square w-full max-w-[720px]"
   data-globe-stage
   data-names={names ? JSON.stringify(names) : undefined}
+  data-place-labels={JSON.stringify(placeLabels)}
 >
   <span class="globe-poster">
     <ThemePicture
@@ -151,11 +156,20 @@ const widths = [360, 540, 720, 1080, 1440];
       } catch {
         names = undefined;
       }
+      let placeLabels: Record<string, string> | undefined;
+      try {
+        placeLabels = stage.dataset.placeLabels ? JSON.parse(stage.dataset.placeLabels) : undefined;
+      } catch {
+        placeLabels = undefined;
+      }
       handle = await mountGlobe(canvas, {
         capture,
         names,
+        placeLabels,
         onPick: (country) =>
           section?.dispatchEvent(new CustomEvent("adventure:pick", { detail: { country } })),
+        onPickPlace: (id) =>
+          section?.dispatchEvent(new CustomEvent("adventure:pick", { detail: { id } })),
         onHover: (name, x, y) => {
           if (!tip) return;
           tip.hidden = !name;

@@ -65,7 +65,6 @@ export const adventures: AdventureLocation[] = [
     city: "Munich",
     coordinates: { lat: 48.1351, lng: 11.582 },
     status: "visited",
-    description: "[Add a short note about this trip]",
   },
   {
     id: "berlin",
@@ -74,7 +73,6 @@ export const adventures: AdventureLocation[] = [
     city: "Berlin",
     coordinates: { lat: 52.52, lng: 13.405 },
     status: "visited",
-    description: "[Add a short note about this trip]",
   },
   {
     id: "stockholm",
@@ -83,7 +81,6 @@ export const adventures: AdventureLocation[] = [
     city: "Stockholm",
     coordinates: { lat: 59.3293, lng: 18.0686 },
     status: "visited",
-    description: "[Add a short note about this trip]",
   },
   {
     id: "wroclaw",
@@ -92,7 +89,6 @@ export const adventures: AdventureLocation[] = [
     city: "Wrocław",
     coordinates: { lat: 51.1079, lng: 17.0385 },
     status: "visited",
-    description: "[Add a short note about this trip]",
   },
   {
     id: "gdansk",
@@ -101,7 +97,6 @@ export const adventures: AdventureLocation[] = [
     city: "Gdańsk",
     coordinates: { lat: 54.352, lng: 18.6466 },
     status: "visited",
-    description: "[Add a short note about this trip]",
   },
   {
     id: "warsaw",
@@ -110,7 +105,6 @@ export const adventures: AdventureLocation[] = [
     city: "Warsaw",
     coordinates: { lat: 52.2297, lng: 21.0122 },
     status: "visited",
-    description: "[Add a short note about this trip]",
   },
   {
     id: "soelden",
@@ -119,7 +113,7 @@ export const adventures: AdventureLocation[] = [
     city: "Sölden",
     coordinates: { lat: 46.9655, lng: 11.0079 },
     status: "visited",
-    description: "Skiing in the Ötztal Alps.",
+    description: "Snowboarding in the Ötztal Alps.",
   },
   {
     id: "madrid",
@@ -128,16 +122,13 @@ export const adventures: AdventureLocation[] = [
     city: "Madrid",
     coordinates: { lat: 40.4168, lng: -3.7038 },
     status: "visited",
-    description: "[Add a short note about this trip]",
   },
   {
     id: "cyprus",
     country: "Cyprus",
     countryCode: "CY",
-    city: "[Which town?]",
     coordinates: { lat: 34.9, lng: 33.2 },
     status: "visited",
-    description: "[Add a short note about this trip]",
   },
   {
     id: "istanbul",
@@ -146,7 +137,6 @@ export const adventures: AdventureLocation[] = [
     city: "Istanbul",
     coordinates: { lat: 41.0082, lng: 28.9784 },
     status: "visited",
-    description: "[Add a short note about this trip]",
   },
   {
     id: "zakynthos",
@@ -155,7 +145,6 @@ export const adventures: AdventureLocation[] = [
     city: "Zakynthos",
     coordinates: { lat: 37.787, lng: 20.8999 },
     status: "visited",
-    description: "[Add a short note about this trip]",
   },
   {
     id: "venice",
@@ -164,7 +153,6 @@ export const adventures: AdventureLocation[] = [
     city: "Venice",
     coordinates: { lat: 45.4408, lng: 12.3155 },
     status: "visited",
-    description: "[Add a short note about this trip]",
   },
   {
     id: "rome",
@@ -173,7 +161,6 @@ export const adventures: AdventureLocation[] = [
     city: "Rome",
     coordinates: { lat: 41.9028, lng: 12.4964 },
     status: "visited",
-    description: "[Add a short note about this trip]",
   },
   {
     id: "giza",
@@ -182,7 +169,6 @@ export const adventures: AdventureLocation[] = [
     city: "Giza",
     coordinates: { lat: 29.9773, lng: 31.1325 },
     status: "visited",
-    description: "[Add a short note about this trip]",
   },
   {
     id: "skopje",
@@ -191,7 +177,6 @@ export const adventures: AdventureLocation[] = [
     city: "Skopje",
     coordinates: { lat: 41.9981, lng: 21.4254 },
     status: "visited",
-    description: "[Add a short note about this trip]",
   },
 
   /* --------------------------------------------------------------- Wishlist */
@@ -294,21 +279,15 @@ export const priorityLabels: Record<
  * field keeps the English text; `[…]` placeholders are hidden in production as in English.
  */
 const czech: Record<string, Partial<Pick<AdventureLocation, "city" | "description" | "reason">>> = {
-  munich: { city: "Mnichov", description: "[Doplňte krátkou poznámku o cestě]" },
-  berlin: { city: "Berlín", description: "[Doplňte krátkou poznámku o cestě]" },
-  stockholm: { description: "[Doplňte krátkou poznámku o cestě]" },
-  wroclaw: { city: "Vratislav", description: "[Doplňte krátkou poznámku o cestě]" },
-  gdansk: { city: "Gdaňsk", description: "[Doplňte krátkou poznámku o cestě]" },
-  warsaw: { city: "Varšava", description: "[Doplňte krátkou poznámku o cestě]" },
-  soelden: { description: "Lyžování v Ötztalských Alpách." },
-  madrid: { description: "[Doplňte krátkou poznámku o cestě]" },
-  cyprus: { city: "[Které město?]", description: "[Doplňte krátkou poznámku o cestě]" },
-  istanbul: { description: "[Doplňte krátkou poznámku o cestě]" },
-  zakynthos: { description: "[Doplňte krátkou poznámku o cestě]" },
-  venice: { city: "Benátky", description: "[Doplňte krátkou poznámku o cestě]" },
-  rome: { city: "Řím", description: "[Doplňte krátkou poznámku o cestě]" },
-  giza: { city: "Gíza", description: "[Doplňte krátkou poznámku o cestě]" },
-  skopje: { description: "[Doplňte krátkou poznámku o cestě]" },
+  munich: { city: "Mnichov" },
+  berlin: { city: "Berlín" },
+  wroclaw: { city: "Vratislav" },
+  gdansk: { city: "Gdaňsk" },
+  warsaw: { city: "Varšava" },
+  soelden: { description: "Snowboarding v Ötztalských Alpách." },
+  venice: { city: "Benátky" },
+  rome: { city: "Řím" },
+  giza: { city: "Gíza" },
   tokyo: {
     city: "Tokio",
     reason: "Velikost města, jídlo a vlaky, které odjíždějí na vteřinu přesně.",

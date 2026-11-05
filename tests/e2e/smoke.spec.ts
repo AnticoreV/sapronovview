@@ -524,3 +524,14 @@ test("selected projects: the whole card opens its case study", async ({ page, is
   await card.click({ position: { x: 160, y: isMobile ? 220 : 260 } });
   await expect(page).toHaveURL(/\/projects\/self-service-menu-platform$/);
 });
+
+test("hobbies and about facts: real content, no placeholders", async ({ page }) => {
+  await page.goto("/hobbies");
+  await expect(page.locator("article[aria-labelledby$='-title']")).toHaveCount(4);
+  await expect(page.locator("main")).toContainText("BMW S 1000 R (2025)");
+  await expect(page.locator("main")).toContainText("Letňany Aero Club");
+  await expect(page.locator("main")).not.toContainText(/\[[A-Z][^\]]*\]/);
+  await page.goto("/about");
+  await expect(page.locator("main")).toContainText("15 hours so far, as a student pilot");
+  await expect(page.locator("main")).toContainText("D-grade via ferrata");
+});
