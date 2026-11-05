@@ -46,11 +46,11 @@
   /* Code blocks (website.md / components.md: code on #10141A in both themes). */
   --code-bg: #10141a;
 
-  /* Surfaces that a palette can paint with a gradient (flat by default): the page
-     behind every band, the contact panel, and the sticky header (with an optional
-     backdrop filter when the page behind it is not flat). */
-  --page-bg: var(--bg);
-  --panel-bg: var(--accent);
+  /* Gradient layers a palette can paint over the flat colours (none by default): the
+     page behind every band (over --bg), the contact panel (over --accent); and the
+     sticky header, with an optional backdrop filter when the page behind it is not flat. */
+  --page-bg: none;
+  --panel-bg: none;
   --header-bg: var(--bg);
   --header-filter: none;
 }
@@ -235,7 +235,7 @@
   }
 
   body {
-    background: var(--page-bg);
+    background: var(--page-bg) var(--bg);
     color: var(--ink);
     font-family: var(--font-sans);
     font-size: var(--text-body);
