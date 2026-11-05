@@ -77,6 +77,74 @@ const { locale, t } = i18n(Astro);
         }
       })();
     </script>
+    {/* Homepage sections without #hash URLs: the address bar never keeps #expertise and
+        friends, so a copied, shared or reopened link starts at the top. Opened with a hash
+        from elsewhere (typed, pasted, another site), the hash is dropped before the browser
+        jumps; from one of my pages (a link opened in a new tab) it still lands on the
+        section. Links within the homepage scroll and move focus without a hash; the header
+        nav from a subpage lands on the section, then the hash is dropped. Runs before the
+        language redirect, so /#expertise → /cs, not /cs#expertise. */}
+    <script is:inline>
+      (() => {
+        const isHome = (path) => /^\/(cs\/?)?$/.test(path.replace(/(index)?\.html$/, ""));
+        const clean = () =>
+          history.replaceState(history.state, "", location.pathname + location.search);
+        if (location.hash && isHome(location.pathname)) {
+          const id = decodeURIComponent(location.hash.slice(1));
+          let fromMyPages = false;
+          try {
+            fromMyPages = new URL(document.referrer).origin === location.origin;
+          } catch {
+            /* no referrer */
+          }
+          clean();
+          if (fromMyPages)
+            document.addEventListener(
+              "DOMContentLoaded",
+              () => document.getElementById(id)?.scrollIntoView(),
+              {
+                once: true,
+              },
+            );
+        }
+        if (window.__sectionLinks) return;
+        window.__sectionLinks = true;
+        document.addEventListener(
+          "click",
+          (ev) => {
+            if (
+              ev.defaultPrevented ||
+              ev.button !== 0 ||
+              ev.metaKey ||
+              ev.ctrlKey ||
+              ev.shiftKey ||
+              ev.altKey
+            )
+              return;
+            const link = ev.target instanceof Element ? ev.target.closest("a[href]") : null;
+            if (!link || (link.target && link.target !== "_self") || link.hasAttribute("download"))
+              return;
+            const url = new URL(link.href);
+            if (!url.hash || url.origin !== location.origin || url.pathname !== location.pathname)
+              return;
+            if (url.search !== location.search || !isHome(location.pathname)) return;
+            const target = document.getElementById(decodeURIComponent(url.hash.slice(1)));
+            if (!target || target.id === "main") return; // the skip link keeps its native jump
+            ev.preventDefault();
+            // After the other click handlers (the phone menu closes and hands focus back).
+            requestAnimationFrame(() => {
+              target.scrollIntoView(); // smooth unless reduced motion; honours scroll-padding-top
+              if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+              target.focus({ preventScroll: true }); // Tab continues inside the section
+            });
+          },
+          true,
+        );
+        document.addEventListener("astro:after-swap", () => {
+          if (location.hash && isHome(location.pathname)) clean();
+        });
+      })();
+    </script>
     {/* Language: English pages (no /cs prefix) send a first-time visitor whose browser
         prefers Czech to the same page under /cs — before paint, keeping ?query and #hash.
         A stored choice from the EN | CS switch always wins; Czech pages never redirect;

@@ -261,6 +261,29 @@ test.describe("while no post is published", () => {
   });
 });
 
+test("homepage sections: no #hash in the URL, a shared /#section link starts at the top", async ({
+  page,
+  isMobile,
+}) => {
+  await page.goto("/#expertise");
+  await expect(page).toHaveURL(/\/$/);
+  await page.waitForLoadState("load");
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+
+  // Links within the homepage scroll to the section and leave the URL alone.
+  await page.locator("#top").getByRole("link", { name: "View experience" }).click();
+  await expect(page.locator("#experience-heading")).toBeInViewport();
+  await expect(page).toHaveURL(/\/$/);
+
+  // From a subpage the header nav lands on the section, then drops the hash.
+  if (isMobile) return;
+  await page.goto("/about");
+  const nav = page.locator("header").first().getByRole("navigation", { name: "Main" });
+  await nav.getByRole("link", { name: "Expertise" }).click();
+  await expect(page.locator("#expertise-heading")).toBeInViewport();
+  await expect(page).toHaveURL(/\/$/);
+});
+
 test("header: availability pill, nav and the menu on phones", async ({ page, isMobile }) => {
   await page.goto("/about");
   const header = page.locator("header").first();
