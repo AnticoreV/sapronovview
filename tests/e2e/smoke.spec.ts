@@ -128,7 +128,8 @@ test("hero copy: role line, CV lede, three ways in, no founder", async ({ page }
   await page.goto("/");
   const hero = page.locator("#top");
   await expect(hero.locator("h1 + p")).toHaveText("Backend & fullstack software engineer");
-  await expect(hero).toContainText("Kotlin and Java on Spring Boot");
+  await expect(hero).toContainText("Kotlin and Java services on Spring Boot");
+  await expect(hero).toContainText("Angular or React apps");
   await expect(hero).not.toContainText(/founder/i);
   await expect(hero.getByRole("link", { name: "Let's work together" })).toHaveAttribute(
     "href",
@@ -350,6 +351,7 @@ test("homepage sections in the restructured order", async ({ page }) => {
   // "My own product" is off by default (siteConfig.homeSections.ownProduct).
   await expect(page.locator("#product")).toHaveCount(0);
   await expect(page.locator("#expertise li")).toHaveCount(5);
+  await expect(page.locator("#expertise li").nth(0)).toContainText("Fullstack development");
   await expect(page.locator("#expertise li").nth(1)).toContainText("AI automation");
   // No Ownira anywhere on the landing page.
   await expect(page.locator("body")).not.toContainText("Ownira");

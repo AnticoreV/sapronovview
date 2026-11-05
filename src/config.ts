@@ -123,7 +123,7 @@ export const siteCopy: Record<
     description:
       "Backend & fullstack software engineer in Prague: Kotlin and Java services on Spring Boot, microservices on GCP, AWS and Kubernetes, and the Angular or React apps on top. Open to contracts.",
     role: "Backend & fullstack software engineer",
-    lede: "I build backend services in Kotlin and Java on Spring Boot, design how they fit together, and run them on GCP, AWS and Kubernetes. Recent work includes a platform serving about two million users.",
+    lede: "I build web products end to end: Kotlin and Java services on Spring Boot, the Angular or React apps on top of them, and the GCP, AWS and Kubernetes setups they run on. Recent work includes a platform serving about two million users.",
     currentFocus: "open to backend, fullstack and AI automation contracts",
     experienceSummary: "~5 yrs on the JVM",
     basedIn: "Prague, Czechia",
@@ -138,7 +138,7 @@ export const siteCopy: Record<
     description:
       "Backend & fullstack software engineer v Praze: služby v Kotlinu a Javě na Spring Bootu, mikroslužby na GCP, AWS a Kubernetes a aplikace v Angularu nebo Reactu nad nimi. Beru zakázky.",
     role: "Backend & fullstack software engineer",
-    lede: "Stavím backendové služby v Kotlinu a Javě na Spring Bootu, navrhuji, jak do sebe zapadají, a provozuji je na GCP, AWS a Kubernetes. Mezi poslední práce patří platforma pro zhruba dva miliony uživatelů.",
+    lede: "Stavím webové produkty od začátku do konce: služby v Kotlinu a Javě na Spring Bootu, aplikace v Angularu nebo Reactu nad nimi i jejich provoz na GCP, AWS a Kubernetes. Mezi poslední práce patří platforma pro zhruba dva miliony uživatelů.",
     currentFocus: "beru zakázky na backend, fullstack i AI automatizaci",
     experienceSummary: "~5 let na JVM",
     basedIn: "Praha, Česko",
