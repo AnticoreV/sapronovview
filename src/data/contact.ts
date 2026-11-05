@@ -1,5 +1,5 @@
 /**
- * Contact routes — the three audiences the site is for, in English and Czech. Used by the
+ * Contact routes — recruiters, investors (Ownira) and clients, in English and Czech. Used by the
  * accent contact panel on every page, the menu sheet and the topic select on /contact
  * (preselected from `?topic=`; the topic ids are the same in both languages).
  */
@@ -35,10 +35,10 @@ const routes: Record<Locale, ContactRoute[]> = {
     },
     {
       id: "partnering",
-      label: "Partnering",
-      title: "Build or automate something together",
-      text: "I take contracts for backend services and AI automation.",
-      subject: "Partnership",
+      label: "Contract work",
+      title: "Backend or fullstack contract",
+      text: "Services, APIs, architecture and deployment, remote or in Prague.",
+      subject: "Contract",
     },
   ],
   cs: [
@@ -58,10 +58,10 @@ const routes: Record<Locale, ContactRoute[]> = {
     },
     {
       id: "partnering",
-      label: "Spolupráce",
-      title: "Postavit nebo zautomatizovat něco společně",
-      text: "Beru zakázky na backendové služby a AI automatizaci.",
-      subject: "Spolupráce",
+      label: "Zakázka",
+      title: "Zakázka na backend nebo fullstack",
+      text: "Služby, API, architektura i nasazení, na dálku nebo v Praze.",
+      subject: "Zakázka",
     },
   ],
 };

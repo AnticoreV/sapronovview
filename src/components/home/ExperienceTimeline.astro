@@ -1,0 +1,99 @@
+---
+/**
+ * "Experience": the four most recent positions as a vertical timeline (dates and type
+ * on the left; role, company and the three strongest achievements in the middle; the
+ * position's technologies beside them from 1200px, under them below that), the CV link,
+ * and "Full experience" for every position.
+ */
+import CvLink from "@components/ui/CvLink.astro";
+import SectionHeader from "@components/ui/SectionHeader.astro";
+import TechBadge from "@components/ui/TechBadge.astro";
+import { employmentLabels, shortCompany, shown, shownAll, type Position } from "@lib/content";
+import { formatMonthYear } from "@lib/utils";
+import { i18n } from "@/i18n";
+
+interface Props {
+  positions: Position[];
+}
+const { positions } = Astro.props;
+const { locale, t, l } = i18n(Astro);
+// Same date style as /experience: unspaced dash in English, spaced in Czech.
+const dash = locale === "cs" ? " – " : "–";
+const items = positions.slice(0, 4).map(({ id, data }) => ({
+  id,
+  role: data.role,
+  company: shortCompany(data.company),
+  location: shown(data.location),
+  type: employmentLabels[locale][data.employmentType],
+  range: `${formatMonthYear(data.startDate, locale)}${dash}${
+    data.endDate ? formatMonthYear(data.endDate, locale) : t("experience.present")
+  }`,
+  achievements: shownAll(data.achievements).slice(0, 3),
+  technologies: data.technologies,
+}));
+---
+
+<section id="experience" class="band section-gap" aria-labelledby="experience-heading">
+  <div class="shell flex flex-col gap-9">
+    <SectionHeader id="experience-heading" title={t("experience.title")}>
+      <CvLink slot="action" class="btn btn-secondary min-h-12 px-[22px]" />
+    </SectionHeader>
+    <ol class="flex flex-col">
+      {items.map((p) => (
+        <li class="grid gap-x-10 gap-y-2 md:grid-cols-[180px_1fr]">
+          <p class="mono pt-1 text-[14px]">
+            <span class="block font-medium text-accent">{p.range}</span>
+            <span class="mt-1 block text-[12px] text-ink-muted">{p.type}</span>
+          </p>
+          <div class="timeline-entry relative grid gap-x-12 gap-y-5 border-l border-line pb-10 pl-7 min-[1200px]:grid-cols-[minmax(0,1fr)_280px]">
+            <div class="min-w-0">
+              <h3 class="display text-heading">{p.role}</h3>
+              <p class="mt-1 text-ink-muted">
+                <span class="font-semibold text-ink">{p.company}</span>
+                {p.location && <span> · {p.location}</span>}
+              </p>
+              <ul class="mt-4 flex max-w-[68ch] list-disc flex-col gap-2 pl-5 marker:text-line-strong">
+                {p.achievements.map((a) => (
+                  <li>{a}</li>
+                ))}
+              </ul>
+            </div>
+            {p.technologies.length > 0 && (
+              <div class="flex flex-col gap-2.5 min-[1200px]:pt-1.5">
+                <p class="label text-ink-muted" aria-hidden="true">
+                  {t("experience.technologies")}
+                </p>
+                <ul class="flex flex-wrap gap-1.5" aria-label={t("experience.technologies")}>
+                  {p.technologies.map((tech) => (
+                    <li>
+                      <TechBadge label={tech} class="bg-surface" />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </li>
+      ))}
+    </ol>
+    <p>
+      <a href={l("/experience")} class="link-more">
+        {t("record.full")}
+      </a>
+    </p>
+  </div>
+</section>
+
+<style>
+  /* The timeline mark: a small accent square on the rule, level with the role. */
+  .timeline-entry::before {
+    content: "";
+    position: absolute;
+    top: 0.55em;
+    left: -5px;
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
+    background: var(--accent);
+  }
+</style>

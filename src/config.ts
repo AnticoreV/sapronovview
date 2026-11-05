@@ -18,15 +18,10 @@ export const siteConfig = {
   /** Full name, used in the header, hero, footer and structured data. */
   name: "Ivan Sapronov",
   /** Short professional title, used in <title>, Open Graph and JSON-LD. */
-  title: "Backend & Fullstack Engineer · Founder",
-  /** Meta description (from the approved hero lede). */
+  title: "Backend & Fullstack Software Engineer",
+  /** Meta description (the CV summary, shortened). */
   description:
-    "Backend & fullstack engineer and founder in Prague. I build backend systems and products, design their architecture, set up AI agents and automation, and ship services to production.",
-  /** Hero copy, approved with design v2 (R2-C Runtime + V6 Blueprint hero, 2026-10-23). */
-  hero: {
-    eyebrow: "Backend & fullstack engineer, founder, Prague",
-    lede: "I build backend systems and products, design their architecture, set up AI agents and automation, and ship services to production.",
-  },
+    "Backend & fullstack software engineer in Prague: Kotlin and Java services on Spring Boot, microservices on GCP, AWS and Kubernetes, and the Angular or React apps on top. Open to contracts.",
   /** Where you are based. */
   location: "Prague, Czech Republic",
   city: "Prague",
@@ -52,7 +47,7 @@ export const siteConfig = {
     label: "Open to projects",
   },
   /** What you are working on right now (one line). */
-  currentFocus: "Building Ownira (in pilot)",
+  currentFocus: "Open to contracts, building Ownira on the side",
   /** Experience on the JVM, as stated in the CV (~5 years). */
   experienceSummary: "~5 yrs on the JVM",
   /** Language for <html lang> and Open Graph locale. */
@@ -110,7 +105,8 @@ export const siteCopy: Record<
   {
     title: string;
     description: string;
-    eyebrow: string;
+    /** Role line under the name in the hero (and the share card's top line). */
+    role: string;
     lede: string;
     currentFocus: string;
     experienceSummary: string;
@@ -119,12 +115,12 @@ export const siteCopy: Record<
   }
 > = {
   en: {
-    title: "Backend & Fullstack Engineer · Founder",
+    title: "Backend & Fullstack Software Engineer",
     description:
-      "Backend & fullstack engineer and founder in Prague. I build backend systems and products, design their architecture, set up AI agents and automation, and ship services to production.",
-    eyebrow: "Backend & fullstack engineer, founder, Prague",
-    lede: "I build backend systems and products, design their architecture, set up AI agents and automation, and ship services to production.",
-    currentFocus: "building Ownira (in pilot)",
+      "Backend & fullstack software engineer in Prague: Kotlin and Java services on Spring Boot, microservices on GCP, AWS and Kubernetes, and the Angular or React apps on top. Open to contracts.",
+    role: "Backend & fullstack software engineer",
+    lede: "I build backend services in Kotlin and Java on Spring Boot, design how they fit together, and run them on GCP, AWS and Kubernetes. Recent work includes a platform serving about two million users.",
+    currentFocus: "open to contracts, building Ownira on the side",
     experienceSummary: "~5 yrs on the JVM",
     basedIn: "Prague, Czechia",
     languages: [
@@ -134,12 +130,12 @@ export const siteCopy: Record<
     ],
   },
   cs: {
-    title: "Backend & Fullstack Engineer · zakladatel",
+    title: "Backend & Fullstack Software Engineer",
     description:
-      "Backend & fullstack engineer a zakladatel v Praze. Stavím backendové systémy a produkty, navrhuji jejich architekturu, nastavuji AI agenty a automatizace a nasazuji služby do produkce.",
-    eyebrow: "Backend & fullstack engineer, zakladatel, Praha",
-    lede: "Stavím backendové systémy a produkty, navrhuji jejich architekturu, nastavuji AI agenty a automatizace a nasazuji služby do produkce.",
-    currentFocus: "stavím produkt Ownira (v pilotním provozu)",
+      "Backend & fullstack software engineer v Praze: služby v Kotlinu a Javě na Spring Bootu, mikroslužby na GCP, AWS a Kubernetes a aplikace v Angularu nebo Reactu nad nimi. Beru zakázky.",
+    role: "Backend & fullstack software engineer",
+    lede: "Stavím backendové služby v Kotlinu a Javě na Spring Bootu, navrhuji, jak do sebe zapadají, a provozuji je na GCP, AWS a Kubernetes. Mezi poslední práce patří platforma pro zhruba dva miliony uživatelů.",
+    currentFocus: "beru zakázky a vedle toho stavím produkt Ownira",
     experienceSummary: "~5 let na JVM",
     basedIn: "Praha, Česko",
     languages: [
@@ -154,16 +150,16 @@ siteCopy.cs = typoDeep(siteCopy.cs);
 export type NavItem = { key: UiKey; href: string; match?: string };
 
 /**
- * Header navigation (approved artboard): Products · Capabilities · Cases · Experience ·
- * About. `match` marks the active page. Writing is not in the header; it joins the
- * mobile sheet once a post is published (see SiteHeader.astro).
+ * Header navigation: Expertise · Experience · Projects · About, each a homepage section
+ * (the Contact button sits beside them). `match` marks the active page on the matching
+ * subpage. Writing is not in the header; it joins the mobile sheet once a post is
+ * published (see SiteHeader.astro).
  */
 export const primaryNav: NavItem[] = [
-  { key: "nav.products", href: "/#build" },
-  { key: "nav.capabilities", href: "/#capabilities" },
-  { key: "nav.cases", href: "/projects", match: "/projects" },
-  { key: "nav.experience", href: "/experience", match: "/experience" },
-  { key: "nav.about", href: "/about", match: "/about" },
+  { key: "nav.expertise", href: "/#expertise" },
+  { key: "nav.experience", href: "/#experience", match: "/experience" },
+  { key: "nav.projects", href: "/#projects", match: "/projects" },
+  { key: "nav.about", href: "/#about", match: "/about" },
 ];
 
 /** Footer links (approved artboard): Projects · About · Experience · Hobbies · RSS · Sitemap. */
@@ -192,58 +188,3 @@ export const navigation: NavItem[] = [
 /** Navigation with Writing (and the RSS feed) removed while there is nothing to read. */
 export const withWriting = (items: NavItem[], hasPosts: boolean) =>
   hasPosts ? items : items.filter((i) => !i.href.startsWith("/writing") && i.href !== "/rss.xml");
-
-/**
- * Technologies you use most often, grouped so the list reads as a system
- * rather than a keyword dump. Shown on the About page.
- */
-export const techStack = [
-  {
-    group: { en: "Languages & backend", cs: "Jazyky a backend" },
-    items: [
-      "Java",
-      "Kotlin",
-      "TypeScript",
-      "Spring Boot",
-      "Spring WebFlux",
-      "Spring Security",
-      "JPA / Hibernate",
-      "Kotlin Coroutines",
-      "REST & GraphQL",
-      "OpenAPI",
-    ],
-  },
-  {
-    group: { en: "Frontend", cs: "Frontend" },
-    items: ["Angular", "RxJS", "NgRx", "React", "Astro", "Tailwind CSS"],
-  },
-  {
-    group: { en: "Cloud & infrastructure", cs: "Cloud a infrastruktura" },
-    items: [
-      "GCP",
-      "AWS (S3, SQS, CloudWatch)",
-      "Docker",
-      "Kubernetes",
-      "Argo CD",
-      "Terraform",
-      "Helm",
-      "GitHub Actions",
-      "GitLab CI",
-    ],
-  },
-  {
-    group: { en: "Data, auth & observability", cs: "Data, autentizace a observabilita" },
-    items: [
-      "PostgreSQL",
-      "Redis",
-      "Kafka",
-      "ElasticSearch",
-      "Flyway",
-      "Keycloak",
-      "OAuth2 / OIDC",
-      "Testcontainers",
-      "Grafana & Prometheus",
-      "LLMs & MCP",
-    ],
-  },
-] as const;

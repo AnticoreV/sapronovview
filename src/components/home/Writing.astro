@@ -1,20 +1,14 @@
 ---
-/**
- * "Off duty": hobbies as one line (an addition, not the subject) and a "Hobbies & map"
- * link. While a post is published, the Writing rows render above it (same style as the
- * cases).
- */
+/** "Writing": the latest posts as rows (same style as the case rows), once one is published. */
 import type { Post } from "@lib/content";
 import SectionHeader from "@components/ui/SectionHeader.astro";
 import { i18n } from "@/i18n";
 
 interface Props {
   posts: Post[];
-  countries: number;
 }
-const { posts, countries } = Astro.props;
+const { posts } = Astro.props;
 const { locale, t, l } = i18n(Astro);
-const offDuty = t("offduty.line", { countries: t("countries", { n: countries }) });
 ---
 
 {posts.length > 0 && (
@@ -46,20 +40,6 @@ const offDuty = t("offduty.line", { countries: t("countries", { n: countries }) 
     </div>
   </section>
 )}
-
-<section id="off-duty" class="band section-gap" aria-labelledby="off-duty-heading">
-  <div class="shell card flex flex-wrap items-center justify-between gap-x-8 gap-y-4 px-7 py-6">
-    <div class="flex flex-wrap items-baseline gap-x-5 gap-y-2">
-      <h2 id="off-duty-heading" class="label text-ink-muted">
-        {t("offduty.title")}
-      </h2>
-      <p class="text-[18px]">{offDuty}</p>
-    </div>
-    <a href={l("/hobbies")} class="link-more">
-      {t("offduty.link")}
-    </a>
-  </div>
-</section>
 
 <style>
   .post:hover {

@@ -152,7 +152,9 @@ const isCurrent = (href: string) =>
 
 <style>
   .site-header {
-    background: var(--bg);
+    background: var(--header-bg);
+    -webkit-backdrop-filter: var(--header-filter);
+    backdrop-filter: var(--header-filter);
     border-bottom: 1px solid transparent;
     transition: border-color var(--duration-base) var(--ease-out);
   }

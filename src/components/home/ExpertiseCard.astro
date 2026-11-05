@@ -1,0 +1,95 @@
+---
+/**
+ * ExpertiseCard: one of the four "What I do" cards with its small isometric clay icon,
+ * a one-line description and the technologies it stands on. The spotlight card
+ * (backend, the primary specialisation) sits on accent-soft with an accent border.
+ */
+import type { ExpertiseId } from "@data/home";
+
+interface Props {
+  id: ExpertiseId;
+  title: string;
+  text: string;
+  stack: string[];
+  spotlight?: boolean;
+}
+const { id, title, text, stack, spotlight = false } = Astro.props;
+---
+
+<li
+  class:list={[
+    "flex flex-col gap-3.5 rounded-md",
+    // The 2px accent border takes 1px more than the card's, so 1px less padding.
+    spotlight ? "border-2 border-accent bg-accent-soft p-[27px]" : "card p-7",
+  ]}
+>
+  {id === "backend" && (
+    <svg width="72" height="64" viewBox="0 0 72 64" aria-hidden="true">
+      <path d="M36 30 52 39 36 48 20 39Z" class="iso-stone" />
+      <path d="M20 39 36 48v13L20 52Z" class="iso-stone-l" />
+      <path d="M52 39 36 48v13l16-9Z" class="iso-stone-r" />
+      <path d="M36 12 52 21 36 30 20 21Z" class="iso-blue" />
+      <path d="M20 21 36 30v13L20 34Z" class="iso-blue-l" />
+      <path d="M52 21 36 30v13l16-9Z" class="iso-blue-r" />
+    </svg>
+  )}
+  {id === "architecture" && (
+    <svg width="72" height="64" viewBox="0 0 72 64" aria-hidden="true">
+      <path d="M14 40 36 28 58 40" fill="none" class="iso-wire" stroke-width="2" />
+      <path d="M36 28v-6" class="iso-wire" stroke-width="2" />
+      <path d="M36 8 46 13.5 36 19 26 13.5Z" class="iso-blue" />
+      <path d="M26 13.5 36 19v8l-10-5.5Z" class="iso-blue-l" />
+      <path d="M46 13.5 36 19v8l10-5.5Z" class="iso-blue-r" />
+      <path d="M14 36 23 41 14 46 5 41Z" class="iso-stone" />
+      <path d="M5 41 14 46v8l-9-5Z" class="iso-stone-l" />
+      <path d="M23 41 14 46v8l9-5Z" class="iso-stone-r" />
+      <path d="M58 36 67 41 58 46 49 41Z" class="iso-stone" />
+      <path d="M49 41 58 46v8l-9-5Z" class="iso-stone-l" />
+      <path d="M67 41 58 46v8l9-5Z" class="iso-stone-r" />
+      <path d="M36 40 45 45 36 50 27 45Z" class="iso-butter" />
+      <path d="M27 45 36 50v8l-9-5Z" class="iso-butter-l" />
+      <path d="M45 45 36 50v8l9-5Z" class="iso-butter-r" />
+    </svg>
+  )}
+  {id === "fullstack" && (
+    <svg width="72" height="64" viewBox="0 0 72 64" aria-hidden="true">
+      <path d="M36 38 52 46 36 54 20 46Z" class="iso-stone" />
+      <path d="M20 46 36 54v6L20 52Z" class="iso-stone-l" />
+      <path d="M52 46 36 54v6l16-8Z" class="iso-stone-r" />
+      <path d="M36 26 52 34 36 42 20 34Z" class="iso-stone" />
+      <path d="M20 34 36 42v6L20 40Z" class="iso-stone-l" />
+      <path d="M52 34 36 42v6l16-8Z" class="iso-stone-r" />
+      <path d="M36 14 52 22 36 30 20 22Z" class="iso-blue" />
+      <path d="M20 22 36 30v6L20 28Z" class="iso-blue-l" />
+      <path d="M52 22 36 30v6l16-8Z" class="iso-blue-r" />
+      <path d="M30 20.5 36 17.5 42 20.5" fill="none" class="iso-butter-wire" stroke-width="1.6" />
+    </svg>
+  )}
+  {id === "cloud" && (
+    <svg width="72" height="64" viewBox="0 0 72 64" aria-hidden="true">
+      <path d="M36 34 66 50 36 66 6 50Z" class="iso-stone" />
+      <path d="M36 14 50 22 36 30 22 22Z" class="iso-mint" />
+      <path d="M22 22 36 30v14L22 36Z" class="iso-stone-l" />
+      <path d="M50 22 36 30v14l14-8Z" class="iso-stone-r" />
+      <circle cx="43" cy="35" r="1.8" class="iso-mint-ink" />
+      <path
+        d="M56 30v-14M51 21l5-5 5 5"
+        fill="none"
+        stroke="var(--accent)"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  )}
+  <h3 class="display text-card-title">{title}</h3>
+  <p class="text-[16px] text-ink-muted">{text}</p>
+  <p
+    class:list={[
+      "mono mt-auto border-t pt-3.5 text-[12px] font-medium",
+      spotlight ? "border-accent/30" : "border-line",
+    ]}
+  >
+    {stack.join(" · ")}
+  </p>
+</li>

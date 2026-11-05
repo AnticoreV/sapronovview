@@ -117,38 +117,38 @@ type Palette = {
 /** Palettes from r4v6.html (the approved renders); bg = the page `--bg` token. */
 const PALETTES: Record<"light" | "dark", Palette> = {
   light: {
-    bg: "#EEF1F4",
-    ink: "#10141A",
-    faint: "#7D879A",
-    label: "#4D5662",
-    grid: "#DDE2E8",
-    gridMajor: "#CDD4DC",
-    blue: "#3D63FF",
-    mint: "#59C990",
-    butter: "#F4CC52",
-    rose: "#EE8597",
-    paper: "#FFFFFF",
+    bg: "#FBF3EA",
+    ink: "#23140F",
+    faint: "#8F7865",
+    label: "#634A40",
+    grid: "#EEE1D3",
+    gridMajor: "#DFCEBC",
+    blue: "#E06B3F",
+    mint: "#5FA893",
+    butter: "#F0B941",
+    rose: "#D9708C",
+    paper: "#FFFAF5",
     white: "#FFFFFF",
-    shadow: "#1B2A44",
-    fillShade: "#10141A",
-    tagLine: "#D4DAE1",
+    shadow: "#452418",
+    fillShade: "#23140F",
+    tagLine: "#E6D5C4",
   },
   dark: {
-    bg: "#0E1116",
-    ink: "#EEF1F4",
-    faint: "#8C96A4",
-    label: "#A3ACB8",
-    grid: "#1D232C",
-    gridMajor: "#252D38",
-    blue: "#4F72FF",
-    mint: "#59C990",
-    butter: "#F4CC52",
-    rose: "#EE8597",
-    paper: "#171B22",
-    white: "#EEF1F4",
+    bg: "#1F1218",
+    ink: "#FBEEE6",
+    faint: "#9C8185",
+    label: "#CDB0A8",
+    grid: "#311F25",
+    gridMajor: "#3B262C",
+    blue: "#F07C4F",
+    mint: "#6FBFA6",
+    butter: "#FFC15E",
+    rose: "#FF7AA2",
+    paper: "#2A1A21",
+    white: "#FBEEE6",
     shadow: "#000000",
-    fillShade: "#05070A",
-    tagLine: "#2A313B",
+    fillShade: "#0C070A",
+    tagLine: "#40292F",
   },
 };
 
@@ -1377,7 +1377,7 @@ export async function mountHero(
   const renderer = new WebGLRenderer({
     canvas,
     antialias: true,
-    alpha: false,
+    alpha: true,
     powerPreference: mobile ? "low-power" : "default",
     preserveDrawingBuffer: Boolean(capture),
   });
@@ -1411,7 +1411,7 @@ export async function mountHero(
   frameCamera();
 
   let dark = isDark();
-  renderer.setClearColor(PALETTES[dark ? "dark" : "light"].bg, 1);
+  renderer.setClearColor(PALETTES[dark ? "dark" : "light"].bg, 0); // transparent: the hero band shows through
   let built = await buildScene(renderer, camera, dark, font, { ...size }, labels);
 
   /* ------------------------------------------------------------ state */
@@ -1480,7 +1480,7 @@ export async function mountHero(
     rebuilding = true;
     sleep();
     const old = built;
-    renderer.setClearColor(PALETTES[dark ? "dark" : "light"].bg, 1);
+    renderer.setClearColor(PALETTES[dark ? "dark" : "light"].bg, 0); // transparent: the hero band shows through
     built = await buildScene(renderer, camera, dark, font, { ...size }, labels);
     old.dispose();
     rebuilding = false;

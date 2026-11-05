@@ -70,7 +70,7 @@ test("every page ends with the contact panel and its routes", async ({ page }) =
   await expect(
     panel.getByRole("heading", { name: /Ready to ship\s*your project\./ }),
   ).toBeVisible();
-  await expect(panel.locator('a[href="/contact?topic=hiring"]')).toBeVisible();
+  await expect(panel.locator('a.route[href="/contact?topic=hiring"]')).toBeVisible();
   await expect(panel.locator('a[href="/contact?topic=investing"]')).toContainText(
     "Write to me for the current stage and plans.",
   );
@@ -96,8 +96,11 @@ test("contact form: topic from ?topic=, field errors, honest not-connected state
   await expect(
     page.getByRole("note").getByText("Form not connected yet", { exact: true }),
   ).toBeVisible();
-  // On /contact the routes are emails with the subject filled in.
+  // On /contact the routes (and the CV request) are emails with the subject filled in.
   await expect(page.locator('#contact a[href*="subject=Investing"]')).toBeVisible();
+  await expect(
+    page.locator("#contact").getByRole("link", { name: /^(Download CV|CV on request)$/ }),
+  ).toHaveAttribute("href", /^(mailto:.+subject=CV|\/cv\/)/);
 
   const submit = page.locator("[data-contact-form] button[type=submit]");
   await submit.click();
@@ -121,14 +124,21 @@ test("contact form: topic from ?topic=, field errors, honest not-connected state
   await expect(page.locator("#cf-message")).toHaveValue(/smoke test/);
 });
 
-test("hero copy: plain eyebrow, lede names the four capabilities", async ({ page }) => {
+test("hero copy: role line, CV lede, three ways in, no founder", async ({ page }) => {
   await page.goto("/");
   const hero = page.locator("#top");
-  await expect(hero.locator("p").first()).toHaveText(
-    "Backend & fullstack engineer, founder, Prague",
+  await expect(hero.locator("h1 + p")).toHaveText("Backend & fullstack software engineer");
+  await expect(hero).toContainText("Kotlin and Java on Spring Boot");
+  await expect(hero).not.toContainText(/founder/i);
+  await expect(hero.getByRole("link", { name: "Let's work together" })).toHaveAttribute(
+    "href",
+    "#contact",
   );
-  await expect(hero).toContainText("design their architecture");
-  await expect(hero).not.toContainText("Every number on this page is real");
+  await expect(hero.getByRole("link", { name: "View experience" })).toHaveAttribute(
+    "href",
+    "#experience",
+  );
+  await expect(hero.getByRole("link", { name: /^(Download CV|CV on request)$/ })).toBeVisible();
 });
 
 test("without a stored choice the theme follows OS changes live", async ({ page }) => {
@@ -163,7 +173,7 @@ test.describe("dark theme", () => {
     await expect(page.locator("html")).toHaveClass(/\bdark\b/);
     await expect(page.locator("[data-theme-toggle]")).toHaveAttribute("aria-pressed", "true");
     const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-    expect(bg).toBe("rgb(14, 17, 22)");
+    expect(bg).toBe("rgb(31, 18, 24)");
     const poster = page.locator("[data-hero-stage] img");
     await expect(poster).toHaveJSProperty("complete", true);
     expect(await poster.evaluate((img: HTMLImageElement) => img.currentSrc)).toMatch(
@@ -176,7 +186,7 @@ test.describe("dark theme", () => {
     await page.goto("/about");
     await expect(page.locator("html")).not.toHaveClass(/\bdark\b/);
     const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-    expect(bg).toBe("rgb(238, 241, 244)");
+    expect(bg).toBe("rgb(251, 243, 234)");
   });
 });
 
@@ -208,7 +218,7 @@ test.describe("reduced motion", () => {
     await page.waitForTimeout(1500);
     expect(await threeRequests(page)).toEqual([]);
     // Sections are simply there (no reveal state).
-    await expect(page.locator("#capabilities")).toHaveCSS("opacity", "1");
+    await expect(page.locator("#expertise")).toHaveCSS("opacity", "1");
     await expect(page.locator("[data-reveal]")).toHaveCount(0);
   });
 
@@ -251,6 +261,30 @@ test.describe("while no post is published", () => {
   });
 });
 
+test("homepage address: /#section lands on that section, the plain address on the top", async ({
+  page,
+}) => {
+  const scrollY = () => page.evaluate(() => window.scrollY);
+  await page.goto("/#expertise");
+  await expect(page.locator("#expertise-heading")).toBeInViewport();
+
+  await page.goto("/");
+  await page.waitForLoadState("load");
+  expect(await scrollY()).toBe(0);
+
+  // A reload follows the same rule instead of restoring the last scroll position.
+  await page.evaluate(() => window.scrollTo(0, 3000));
+  await page.reload();
+  await page.waitForLoadState("load");
+  expect(await scrollY()).toBe(0);
+
+  await page.goto("/#expertise");
+  await page.evaluate(() => window.scrollTo(0, 3000));
+  await page.reload();
+  await expect(page.locator("#expertise-heading")).toBeInViewport();
+  await expect(page).toHaveURL(/\/#expertise$/);
+});
+
 test("header: availability pill, nav and the menu on phones", async ({ page, isMobile }) => {
   await page.goto("/about");
   const header = page.locator("header").first();
@@ -267,18 +301,23 @@ test("header: availability pill, nav and the menu on phones", async ({ page, isM
     await expect(header.getByText(/open to projects/i)).toBeVisible();
     const nav = header.getByRole("navigation", { name: "Main" });
     await expect(nav.getByRole("link")).toHaveText([
-      "Products",
-      "Capabilities",
-      "Cases",
+      "Expertise",
       "Experience",
+      "Projects",
       "About",
     ]);
+    await expect(nav.getByRole("link", { name: "Expertise" })).toHaveAttribute(
+      "href",
+      "/#expertise",
+    );
     await expect(nav.getByRole("link", { name: "About" })).toHaveAttribute("aria-current", "page");
     await expect(header.getByRole("link", { name: "Contact" })).toHaveAttribute("href", "/contact");
   }
 });
 
-test("hero: V6 blueprint poster, legend and the four sourced proof numbers", async ({ page }) => {
+test("hero: V6 blueprint poster, legend, facts at a glance and who I worked with", async ({
+  page,
+}) => {
   await page.goto("/");
   const legend = page.locator(".hero-media figcaption");
   await expect(legend).toContainText("DRAWN");
@@ -290,37 +329,73 @@ test("hero: V6 blueprint poster, legend and the four sourced proof numbers", asy
     "aria-label",
     /isometric technical drawing builds itself/,
   );
-  const numbers = page.getByRole("list", { name: "Proof numbers" }).locator("li");
-  await expect(numbers).toHaveCount(4);
-  // Caption and source sit on two lines (no " · " join).
-  await expect(numbers.nth(1)).toContainText("p95 latency, roughly halved");
-  await expect(numbers.nth(1)).toContainText("CCA Group");
-  // Static numbers: no count-up attributes.
-  await expect(page.locator("[data-count-to]")).toHaveCount(0);
-  // "≈ ½": ≈ is an inline SVG glyph; screen readers get "approximately half".
-  await expect(numbers.nth(1)).toContainText("½");
-  await expect(numbers.nth(1).locator("svg.glyph-approx")).toHaveCount(1);
-  await expect(numbers.nth(1)).toContainText("approximately half");
-  for (let i = 0; i < 4; i++) await expect(numbers.nth(i)).toBeVisible();
+  const facts = page.locator('#top dl[aria-label="At a glance"] > div');
+  await expect(facts).toHaveCount(4);
+  await expect(facts.nth(0)).toContainText("~5 years");
+  await expect(facts.nth(2)).toContainText("Prague, Czech Republic");
+  for (let i = 0; i < 4; i++) await expect(facts.nth(i)).toBeVisible();
   // Company names joined with commas.
   await expect(page.getByText(/^worked with ncr voyix, creativedock/i)).toBeVisible();
 });
 
-test("homepage sections in the approved order", async ({ page }) => {
+test("homepage sections in the restructured order", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("main h2")).toHaveText([
-    "Engineer and founder.",
-    "What I'm building",
-    "What I can do",
-    "Proof in production",
-    "Track record",
-    "Off duty",
+    "What I do",
+    "Tech stack",
+    "Experience",
+    "Selected projects",
+    "My own product",
+    "About me",
   ]);
+  await expect(page.locator("#expertise li")).toHaveCount(4);
+  // Core and "worked with" are separate, named lists in every stack row.
+  await expect(page.locator("#stack dt")).toHaveCount(10);
+  await expect(page.locator('#stack ul[aria-label="Core"]').first()).toContainText("Kotlin");
+  await expect(page.locator("#experience ol > li")).toHaveCount(4);
+  await expect(page.locator("#experience ol > li").first()).toContainText("CreativeDock");
+  const cards = page.locator("#projects article");
+  await expect(cards).toHaveCount(3);
+  await expect(cards.nth(0).getByRole("link", { name: /View case study/ })).toHaveAttribute(
+    "href",
+    "/projects/creativedock-greenfield-services",
+  );
+  // Sourced chips: "≈" is an inline SVG glyph that screen readers hear as "approximately".
+  await expect(cards.nth(2).locator("svg.glyph-approx")).toHaveCount(1);
+  await expect(cards.nth(2)).toContainText("approximately");
+  await expect(page.locator("[data-count-to]")).toHaveCount(0);
   await expect(
-    page.locator("#build").getByText("Data-box mail with an owner and a deadline."),
+    page.locator("#product").getByText("Data-box mail with an owner and a deadline."),
   ).toBeVisible();
-  await expect(page.locator("#capabilities li")).toHaveCount(4);
-  await expect(page.locator("#work li")).toHaveCount(3);
+  await expect(page.locator("#product")).toContainText("A side venture alongside client work");
+  await expect(page.locator("#about #off-duty")).toContainText("ULL pilot in training");
+});
+
+test("wide screens use the full width (no text column beside empty space)", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "desktop layout");
+  // A 13" MacBook window (1470) and a narrower desktop window (1180): scene beside the text.
+  for (const width of [1180, 1470]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const text = (await page.locator("#hero-heading").boundingBox())!;
+    const stage = (await page.locator(".hero-media").boundingBox())!;
+    expect(stage.x, `hero at ${width}`).toBeGreaterThan(text.x + 400);
+    expect(stage.y, `hero at ${width}`).toBeLessThan(text.y + text.height);
+  }
+  // Tech stack: ten categories in two columns of five.
+  const rows = page.locator("#stack dl > div");
+  const first = (await rows.nth(0).boundingBox())!;
+  const sixth = (await rows.nth(5).boundingBox())!;
+  expect(sixth.x).toBeGreaterThan(first.x + 500);
+  expect(Math.abs(sixth.y - first.y)).toBeLessThan(2);
+  // Timeline: each position's technologies sit to the right of its achievements.
+  const entry = page.locator("#experience ol > li").first();
+  const bullets = (await entry.locator("ul").first().boundingBox())!;
+  const tech = (await entry.locator('ul[aria-label="Technologies"]').boundingBox())!;
+  expect(tech.x).toBeGreaterThan(bullets.x + bullets.width);
 });
 
 test("about: heading, portrait switch, ProfilePage structured data", async ({ page }) => {
@@ -398,7 +473,7 @@ test.describe("security headers (applied from _headers, as on Cloudflare Pages)"
       await page.waitForURL(url);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading);
     };
-    await go('#work a[href="/projects"]', /\/projects$/, "Projects");
+    await go('#projects a[href="/projects"]', /\/projects$/, "Projects");
     await go('footer a[href="/about"]', /\/about$/, "Engineer and founder.");
     // Styles of the swapped page apply (inline <style> under the policy).
     expect(await page.evaluate(() => getComputedStyle(document.body).fontFamily)).toMatch(

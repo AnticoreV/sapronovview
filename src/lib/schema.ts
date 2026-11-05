@@ -8,7 +8,7 @@ export function personSchema(site: URL) {
     name: siteConfig.name,
     givenName: siteConfig.name.split(" ")[0],
     familyName: siteConfig.name.split(" ").slice(1).join(" "),
-    jobTitle: "Backend & Fullstack Engineer",
+    jobTitle: "Backend & Fullstack Software Engineer",
     description: siteConfig.description,
     url: site.origin,
     email: `mailto:${siteConfig.email}`,

@@ -8,6 +8,7 @@ category: professional
 technologies:
   - Kotlin
   - Spring Boot
+  - GraphQL
   - SpringMockK
   - Testcontainers
   - GitLab CI
@@ -28,7 +29,7 @@ In a three-month freelance engagement at CreativeDock I built three Kotlin/Sprin
 
 ## What I built
 
-- Ticketing, booking and subscription services, with their APIs and contracts defined up front; I led the architecture decisions for the engagement.
+- Ticketing, booking and subscription services with GraphQL APIs (Spring for GraphQL), their schemas and contracts defined up front; I led the architecture decisions for the engagement.
 - Integration tests against real dependencies with SpringMockK and Testcontainers.
 
 ## CI that keeps up

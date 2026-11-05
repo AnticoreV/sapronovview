@@ -44,10 +44,10 @@ const labelKeys = [
 const labels = Object.fromEntries(labelKeys.map((k) => [k, t(`hero3d.${k}`)])) as HeroLabels;
 // The artboard's description of the drawing (screens/HeroV6.dc.html).
 const description = t("hero.description");
-// Measured: beside the name (≥ 1270px viewport) the stage is ≤ 800px wide (797 at 1440);
-// below that it takes the full width. Below 600px phones get their own render (larger,
+// Measured (2026-11-04 hero): beside the text column (≥ 1130px viewport) the stage is
+// 560–728px wide (728 at 1440 and up); below that it takes the full width. Below 600px phones get their own render (larger,
 // fewer callout labels — see hero3d.ts), 375 / 750 / 1125 wide.
-const sizes = "(min-width: 1270px) 800px, 100vw";
+const sizes = "(min-width: 1130px) 728px, 100vw";
 const widths = [480, 640, 800, 1200, 1594];
 // HeroLegend, exactly as the V6 artboard: an ink line for DRAWN, clay dots for the rest.
 const legend = [
@@ -60,7 +60,7 @@ const legend = [
 
 <figure class="hero-media m-0 flex min-w-0 flex-[999_1_640px] flex-col gap-2.5">
   <div
-    class="hero-stage relative aspect-[16/10] w-full overflow-hidden rounded-md bg-bg"
+    class="hero-stage relative aspect-[16/10] w-full overflow-hidden rounded-md"
     data-hero-stage
     data-labels={JSON.stringify(labels)}
     role="img"

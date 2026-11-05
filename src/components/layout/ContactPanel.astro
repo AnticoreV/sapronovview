@@ -1,14 +1,15 @@
 ---
 /**
  * The accent contact panel that closes every page (approved artboard): "Ready to
- * ship your project.", three route columns (Hiring / Investing / Partnering) set
- * directly on the accent fill between thin on-accent rules, the email as a button,
- * Copy, LinkedIn and GitHub. Inside a page the routes open /contact with the topic
+ * ship your project.", one line on what I take on, three route columns (Hiring /
+ * Investing / Contract work) set directly on the accent fill between thin on-accent
+ * rules, the email as a button, Copy, LinkedIn, GitHub and the CV. Inside a page the routes open /contact with the topic
  * preselected; on /contact itself (`level={1}`) they are emails with the subject
  * filled in.
  */
 import ContactRoute from "@components/contact/ContactRoute.astro";
 import CopyEmail from "@components/ui/CopyEmail.astro";
+import CvLink from "@components/ui/CvLink.astro";
 import { siteConfig } from "@config";
 import { contactRoutes, mailtoFor, type ContactRoute as Route } from "@data/contact";
 import { i18n } from "@/i18n";
@@ -30,7 +31,7 @@ const routeHref = (route: Route) =>
   class:list={["band pb-14", level === 1 && "pt-6"]}
   aria-labelledby="contact-heading"
 >
-  <div class="contact-panel shell flex flex-col gap-10 rounded-lg bg-accent p-[clamp(20px,5vw,72px)] text-on-accent">
+  <div class="contact-panel shell flex flex-col gap-10 rounded-lg p-[clamp(20px,5vw,72px)] text-on-accent">
     <div class="flex flex-col gap-3.5">
       <span class="label">{t("contact.eyebrow")}</span>
       <Heading id="contact-heading" class="display text-display-panel">
@@ -38,6 +39,7 @@ const routeHref = (route: Route) =>
         <br />
         {t("contact.title2")}
       </Heading>
+      <p class="max-w-[620px] text-body-l">{t("contact.intro")}</p>
     </div>
     <ul class="routes grid lg:grid-cols-3">
       {routes.map((route) => (
@@ -72,6 +74,10 @@ const routeHref = (route: Route) =>
           GitHub
         </a>
       )}
+      <CvLink
+        class="link-inline inline-flex min-h-11 items-center underline-offset-[6px]"
+        mailto={level === 1}
+      />
     </div>
   </div>
 </section>
@@ -79,6 +85,7 @@ const routeHref = (route: Route) =>
 <style>
   /* Focus rings switch to the on-accent colour on the accent fill. */
   .contact-panel {
+    background: var(--panel-bg) var(--accent);
     --focus: var(--on-accent);
     --rule-on-accent: color-mix(in srgb, var(--on-accent) 30%, transparent);
   }

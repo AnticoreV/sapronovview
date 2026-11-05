@@ -9,6 +9,9 @@ collections. Design: **v2 · R2-C Runtime** with the hero **V6 · Blueprint** �
 Swiss grid around one live isometric drawing of how software gets made (idea → validate →
 architecture → frontend · backend · services → tests → review → CI/CD → deploy → observe →
 agent loop). Every number on the site comes from a position in the CV (`src/data/readouts.ts`).
+Colours: the **Terracotta sunset** palette (chosen 2026-11-05 from four local variants):
+warm paper, terracotta, saffron and raspberry, a sunset sky and contour lines behind the
+hero; dark mode is a deep aubergine with stars instead of black.
 
 ## Contents
 
@@ -94,9 +97,10 @@ src/
     typo.ts                 ← Czech typography (nbsp after one-letter words)
     index.ts                ← i18n(Astro) → { locale, t, l } for .astro files
   data/                     ← each file holds { en, cs } texts
-    readouts.ts             ← the proof numbers (homepage, case studies, chips, OG card)
-    home.ts                 ← capabilities, contents list, homepage case rows
-    contact.ts              ← contact routes (hiring / investing / partnering) + topics
+    readouts.ts             ← the proof numbers (case studies, project chips, OG card)
+    home.ts                 ← hero facts, "What I do" cards, selected projects, own-product line, about
+    stack.ts                ← tech stack by category, core vs worked with (homepage, /about)
+    contact.ts              ← contact routes (hiring / investing / contract work) + topics
     about.ts                ← career story, philosophy, values, "what I enjoy", facts
     adventures.ts           ← visited / wishlist places + home base (globe and map)
   pages/
@@ -107,15 +111,15 @@ src/
     globe3d.ts              ← adventures paper globe (three.js, lazy)
   components/
     layout/                 ← SiteHeader, Footer, ContactPanel (accent "Ready to ship your project.")
-    home/                   ← Hero, HeroStage, Proof, WhoIAm, Products, Capabilities, CapabilityCard,
-                              Cases, TrackRecord, OffDuty
-    profile/                ← ProfileCard (portrait switch on /about), ContentsList
+    home/                   ← Hero, HeroStage, Expertise, ExpertiseCard, TechStack, ExperienceTimeline,
+                              SelectedProjects, Venture, AboutMe, Writing
+    profile/                ← ProfileCard (portrait switch on /about)
     projects/               ← ProductModule, ProjectRow, CodeRow, ProjectFilters
     experience/             ← RecordRow, ExperienceItem, MilestoneList
     contact/                ← ContactRoute, ContactForm
     adventures/             ← GlobeStage, AdventureMap (SVG fallback), AdventureDetails, MapLegend
     ui/                     ← StatusPill, StatusBadge, ThemeToggle, ProofNumber, SectionHeader,
-                              ThemePicture, LogoMark, CopyEmail, …
+                              ThemePicture, LogoMark, CopyEmail, CvLink, …
   layouts/                  ← BaseLayout, ProjectLayout + ArticleLayout (Sheets)
   assets/                   ← portraits, hero + globe posters (optimised by <Picture>)
   lib/                      ← content queries, CV check, placeholder helpers, schema, OG image
@@ -126,10 +130,11 @@ tests/e2e/                  ← Playwright: smoke.spec.ts (English site), i18n.s
 ```
 
 Component names follow `components.md`: SiteHeader (was HeaderStrip), StatusPill
-(Annunciator), ProfileCard (CrewCard), ContentsList (Checklist), ProductModule
-(InstrumentModule), CapabilityCard (SystemToggle), ProofNumber (Readout), RecordRow
-(LogbookRow), Sheet (Kneeboard: `.sheet` + `.prose-sheet`), ContactPanel (the v1 night
-contact block). The v1 instrument panel (`panel3d.ts`, `PanelStage.astro`), callsign / base
+(Annunciator), ProfileCard (CrewCard), ProductModule (InstrumentModule), ExpertiseCard
+(CapabilityCard until the 2026-11-04 restructure, SystemToggle before that), ProofNumber
+(Readout), RecordRow (LogbookRow), Sheet (Kneeboard: `.sheet` + `.prose-sheet`),
+ContactPanel (the v1 night contact block). The homepage contents list (ContentsList, was
+Checklist) was removed in the restructure; the header nav covers it. The v1 instrument panel (`panel3d.ts`, `PanelStage.astro`), callsign / base
 config, annunciator, checklist ticking and every aviation label are gone.
 
 ## Design system in code
@@ -143,10 +148,17 @@ config, annunciator, checklist ticking and every aviation label are gone.
   `text-card-title`, `text-route-title`, `text-wordmark`, `text-tagline`). Each token
   carries size, line height, tracking and weight, and components use no inline headline
   sizes, so a type change is an edit to `global.css` (plus the font config for a new face).
-- **Colour means something:** `accent` (deploy blue) = what you can act on (primary buttons,
+- **Colour means something:** `accent` (terracotta) = what you can act on (primary buttons,
   links, focus, the contact panel); `ok-ink` / `ok-soft` = healthy, open, in pilot;
   `caution` = a butter status fill; `error-ink` = errors only. `clay-*` colours live only in
-  the 3D, the capability icons and the hero legend.
+  the 3D, the capability icons (faces shaded with oklch relative colours) and the hero
+  legend. `accent-2` / `accent-3` (saffron, raspberry) only paint gradients and figures.
+- **Backgrounds and decoration** are tokens too, per theme: `--page-bg` and `--panel-bg` are
+  gradient layers over `--bg` and `--accent`, `--hero-bg` paints the hero band (sky, contour
+  lines, stars), `--page-fixed` is a layer fixed to the viewport (paper grain),
+  `--rule-image` colours the section rules, `--btn-primary-bg` the primary button, and
+  `--header-bg` / `--header-filter` make the sticky header translucent. Figures are inline
+  SVG data URIs (the CSP allows `data:` images); text over every gradient stop passes AA.
 - **Theme:** light by default; the header toggle (sun / moon, `aria-pressed`) stores the
   choice in `localStorage` (try/catch); without a stored choice the OS preference wins. The
   inline script in `BaseLayout` applies it before paint (no flash).
@@ -182,9 +194,9 @@ config, annunciator, checklist ticking and every aviation label are gone.
 
 ## Proof numbers
 
-`src/data/readouts.ts` is the single source for every number: the four ProofNumbers under
-the hero, the ProofNumbers on case studies, the metric chips on the homepage case rows
-(`chip`) and the OG card. Each readout has a `value`, a `label`, a `source` (the employer /
+`src/data/readouts.ts` is the single source for every number: the ProofNumbers on case
+studies, the metric chips on the homepage project cards (`chip`) and the three numbers on
+the OG card (`heroReadoutIds`). Each readout has a `value`, a `label`, a `source` (the employer /
 client from the track record) and a `detail` sentence. Rules:
 
 - Only numbers that are in `src/content/experience/` — never a new one.
@@ -208,6 +220,8 @@ client from the track record) and a `detail` sentence. Rules:
   drawing), holds it 1.6 s, then loops. On stages narrower than 600px (phones) the callout
   labels are drawn 1.8× larger (≈ 9px text at 375 instead of 5) and only IDEA, ARCHITECTURE,
   TESTS, DEPLOY and the AGENT LOOP tag are shown, so nothing collides.
+  The canvas is transparent (`alpha: true`, cleared at alpha 0) and the stage has no fill,
+  so the hero band's sky shows through the drawing; the posters keep that transparency.
 - **Globe** (`src/scripts/globe3d.ts`, port of `3d/d2.html`) — paper globe re-skinned to v2:
   clay-white plate, visited countries in ink, home (Czechia) in accent blue, wishlist
   countries with a dashed accent outline, accent arcs from Prague. Drag to rotate with
@@ -247,26 +261,32 @@ client from the track record) and a `detail` sentence. Rules:
   `availability.status` (`open` / `limited` / `closed`) drives the header StatusPill and the
   profile card. The production URL is `site` in `astro.config.mjs` (`https://ivansapronov.com`).
 - **Projects:** `src/content/projects/*.md` (copy `_template.md`; filename = URL). Products set
-  `tagline` + `summary` (+ optional `facts`, e.g. FOR · MY ROLE) and appear under "What I'm
-  building"; statuses include `pilot` and `validating`. `featured: true` client work appears as
+  `tagline` + `summary` (+ optional `facts`, e.g. FOR · MY ROLE) and appear under "My own
+  product"; statuses include `pilot` and `validating`. `featured: true` client work appears as
   ProductModules on `/projects`. Entries still marked `placeholder: true` that have a `github`
   URL are listed under "Code on GitHub" as compact rows (no case-study page).
 - **Removed pages:** Apexline was taken off the site (2026-10-23). `/projects/apexline` and the
   older `/projects/apex-line-market-research` forward to `/projects` (Astro `redirects` in
   `astro.config.mjs` + a 301 in `public/_redirects` for Cloudflare Pages).
-- **Homepage case rows:** `homeCases` in `src/data/home.ts` (slugs must exist; chips are
-  readout ids).
+- **Homepage:** hero → What I do → Tech stack → Experience → Selected projects → My own
+  product → About me → (Writing) → contact panel. Copy lives in `src/data/home.ts`
+  (`heroFacts`, `expertise`, `homeCases` with slugs that must exist and chips that are
+  readout ids, `ventureIntro`, `homeAbout`), the stack in `src/data/stack.ts`, the role line
+  and lede in `siteCopy` (`src/config.ts`). Source of truth is the CV (June 2026): no claim,
+  technology or number that the CV doesn't have. The Experience timeline shows the four
+  most recent positions with their first three `achievements`, so keep the strongest first.
 - **Experience:** `src/content/experience/*.md`. `shipped` is the track record's SHIPPED cell — a
   shortened form of a real achievement, never a new claim. Milestones (education,
   certifications, talks…) go in `src/content/milestones/*.yaml`.
-- **CV download:** drop the PDF at `public/cv/ivan-sapronov-cv.pdf`; the homepage and
-  `/experience` then show "Download CV" instead of "CV on request" (`src/lib/cv.ts`).
+- **CV download:** drop the PDF at `public/cv/ivan-sapronov-cv.pdf`; the hero, the homepage
+  Experience section, the contact panel and `/experience` then show "Download CV" instead of
+  "CV on request" (`src/lib/cv.ts`, `CvLink.astro`).
 - **Writing:** `src/content/writing/*.md|mdx`, tags → `/writing/tags/<tag>`, RSS at `/rss.xml`.
   While no post is published (all are drafts / placeholders), the site hides writing
   automatically: Writing stays out of the menu sheet and the footer, the RSS links
-  disappear, the homepage shows only the Off-duty strip, and `/writing` is `noindex` and out
-  of the sitemap. Publish one post and it all comes back (the homepage then shows the posts
-  as rows above Off duty).
+  disappear, the homepage shows no Writing section, and `/writing` is `noindex` and out of
+  the sitemap. Publish one post and it all comes back (the homepage then shows the latest
+  posts as rows after About me).
 - **Hobbies / Now / About:** `src/content/hobbies/*.md`, `src/content/now/now.md`,
   `src/pages/[...lang]/about.astro` + `src/data/about.ts`. Aviation appears only as hobby content
   (`/hobbies`, `/adventures`, the off-duty line and the personal paragraph on `/about`).
@@ -310,9 +330,10 @@ page (`/cs`, `/cs/about`, `/cs/projects/ownira`, …). Astro i18n is configured 
 | What                                                                                       | File                                                               |
 | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
 | Interface strings (nav, buttons, labels, headings, form, errors, 404, legend, 3D callouts) | `src/i18n/ui.ts` (`cs` object; keys must match `en`, type-checked) |
-| Hero eyebrow / lede, title, meta description, profile fields, languages                    | `siteCopy.cs` in `src/config.ts`                                   |
+| Hero role line / lede, title, meta description, profile fields, languages                  | `siteCopy.cs` in `src/config.ts`                                   |
 | Proof numbers (labels, values, spoken forms, chips)                                        | `texts.cs` in `src/data/readouts.ts`                               |
-| Capabilities, contents list, homepage case rows                                            | `src/data/home.ts`                                                 |
+| Hero facts, "What I do", selected projects, own-product line, about                        | `src/data/home.ts`                                                 |
+| Tech stack category names                                                                  | `label.cs` in `src/data/stack.ts`                                  |
 | Career story, philosophy, values, "what I enjoy", facts                                    | `src/data/about.ts`                                                |
 | Contact routes, topics, mailto subjects                                                    | `src/data/contact.ts`                                              |
 | City names, trip notes, wishlist reasons (country names come from `Intl.DisplayNames`)     | `czech` in `src/data/adventures.ts`                                |

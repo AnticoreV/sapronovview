@@ -60,7 +60,8 @@ const jsonLd = {
   noindex={data.draft}
 >
   <article class="band section-gap pt-8">
-    <div class="shell">
+    <!-- Same width as the sheet below, so the breadcrumb starts where the sheet does. -->
+    <div class="mx-auto max-w-[848px]">
       <Breadcrumbs
         items={[{ label: t("writing.title"), href: "/writing" }, { label: data.title }]}
       />

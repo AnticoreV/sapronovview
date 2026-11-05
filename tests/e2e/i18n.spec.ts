@@ -65,13 +65,7 @@ test("Czech pages link within /cs and translate the chrome", async ({ page, isMo
   );
   if (!isMobile) {
     const nav = page.getByRole("navigation", { name: "Hlavní navigace" });
-    await expect(nav.getByRole("link")).toHaveText([
-      "Produkty",
-      "Dovednosti",
-      "Projekty",
-      "Zkušenosti",
-      "O mně",
-    ]);
+    await expect(nav.getByRole("link")).toHaveText(["Zaměření", "Zkušenosti", "Projekty", "O mně"]);
     await expect(nav.getByRole("link", { name: "O mně" })).toHaveAttribute("aria-current", "page");
   }
   // Internal links never leave the Czech site (files like /rss.xml aside).
@@ -106,7 +100,7 @@ test("hreflang alternates, canonical and og:locale per language", async ({ page 
   }
 });
 
-test("Czech home: Czech hero poster, readouts and WebSite language", async ({ page }) => {
+test("Czech home: Czech hero poster, facts, chips and WebSite language", async ({ page }) => {
   await page.goto("/cs");
   const srcset = await page
     .locator(".hero-poster picture")
@@ -114,9 +108,11 @@ test("Czech home: Czech hero poster, readouts and WebSite language", async ({ pa
   expect(srcset).toContain("-cs");
   expect(srcset).not.toMatch(/blueprint-light\.[^-]/);
   await expect(page.locator("[data-hero-stage]")).toHaveAttribute("data-labels", /NÁPAD/);
-  const proof = page.getByRole("list", { name: "Čísla" });
-  await expect(proof).toContainText("Obsloužených uživatelů");
-  await expect(proof).toContainText("přibližně polovina");
+  const facts = page.locator('#top dl[aria-label="Ve zkratce"]');
+  await expect(facts).toContainText("Backend a mikroslužby");
+  await expect(facts).toContainText("Na IČO, i na dálku");
+  await expect(page.locator("main h2").first()).toHaveText("Co dělám");
+  await expect(page.locator("#projects")).toContainText("~2 mil. uživatelů");
   const ld = await page
     .locator('script[type="application/ld+json"]')
     .evaluateAll((s) => s.map((x) => JSON.parse(x.textContent ?? "{}")));
