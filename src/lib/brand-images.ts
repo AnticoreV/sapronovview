@@ -1,7 +1,7 @@
 /**
  * Build-time generated brand images (Open Graph card and touch icon) in the site's
  * Terracotta sunset palette: warm paper ground with the hero's sunset glow, ink type,
- * a terracotta-saffron-raspberry rule, the terracotta cube mark.
+ * a terracotta-saffron-raspberry rule, the stacked-layers mark (as in the header).
  *
  * Text is set in the site's own typefaces — Newsreader for the name and numbers,
  * Schibsted Grotesk for the lede, IBM Plex Mono for labels — converted to vector paths
@@ -60,7 +60,12 @@ const C = {
   accent3: "#b8365f",
   okInk: "#2a7144",
   okDot: "#5fa893",
-  cube: ["#E06B3F", "#C15C36", "#9D4B2C"] as const,
+  /** Stacked-layers mark, top to bottom: [top face, left side, right side] per slab. */
+  layers: [
+    ["#e06b3f", "#c15c36", "#9d4b2c"],
+    ["#f0b941", "#d6a33a", "#b0862f"],
+    ["#d9708c", "#bf6179", "#9c4f63"],
+  ] as const,
 };
 
 const escape = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -124,19 +129,22 @@ function text(
   return `<g fill="${fill}">${glyphs.join("")}</g>${fallbacks.join("")}`;
 }
 
-/** The 3-face isometric cube mark from the approved artboard, `scale` × its 26px box. */
-const cube = (x: number, y: number, scale: number) =>
-  `<g transform="translate(${x} ${y}) scale(${scale})">
-    <path d="M13 2 23 7.5 13 13 3 7.5Z" fill="${C.cube[0]}"/>
-    <path d="M3 7.5 13 13v11L3 18.5Z" fill="${C.cube[1]}"/>
-    <path d="M23 7.5 13 13v11l10-5.5Z" fill="${C.cube[2]}"/>
-  </g>`;
+/**
+ * The stacked-layers mark from the header (src/components/ui/LogoMark.astro): three
+ * isometric slabs (front end, back end, infrastructure), `scale` × its 26px box.
+ */
+const slab = (cy: number, [top, left, right]: readonly [string, string, string]) =>
+  `<path d="M13 ${cy - 4.5} 22 ${cy} 13 ${cy + 4.5} 4 ${cy}Z" fill="${top}"/>` +
+  `<path d="M4 ${cy} 13 ${cy + 4.5}v2.4L4 ${cy + 2.4}Z" fill="${left}"/>` +
+  `<path d="M22 ${cy} 13 ${cy + 4.5}v2.4l9-4.5Z" fill="${right}"/>`;
+const mark = (x: number, y: number, scale: number) =>
+  `<g transform="translate(${x} ${y}) scale(${scale})">${slab(17.5, C.layers[2])}${slab(12.5, C.layers[1])}${slab(7.5, C.layers[0])}</g>`;
 
-/** Touch icon: the cube on the warm paper ground. */
+/** Touch icon: the layers mark on the warm paper ground. */
 export const iconSvg = (size: number) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="${size}" height="${size}">
   <rect width="64" height="64" fill="${C.bg}"/>
-  ${cube(9, 8, 1.8)}
+  ${mark(9, 8, 1.8)}
 </svg>`;
 
 /** The card's lede, in two lines (the hero lede, shortened to fit). */
@@ -193,7 +201,7 @@ const ogSvg = (locale: Locale) => {
   <rect width="1200" height="630" fill="${C.bg}"/>
   <rect width="1200" height="630" fill="url(#glow)"/>
   <rect width="1200" height="630" fill="url(#glowSoft)"/>
-  ${cube(64, 42, 1.6)}
+  ${mark(64, 42, 1.6)}
   <rect x="122" y="44" width="${statusWidth.toFixed(0)}" height="36" rx="18" fill="${C.surface}" stroke="${C.line}"/>
   <circle cx="142" cy="62" r="4" fill="${C.okDot}"/>
   ${text(f.mono, status, 156, 67, 13, C.okInk, 0.02)}
