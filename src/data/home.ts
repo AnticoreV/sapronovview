@@ -145,7 +145,7 @@ type HomeCase = {
   chips: readonly ReadoutId[];
 };
 
-/** Selected projects on the homepage, newest first (slugs in src/content/projects/). */
+/** Shipped work (the homepage case studies), newest first (slugs in src/content/projects/). */
 const caseText: Record<Locale, HomeCase[]> = {
   en: [
     {

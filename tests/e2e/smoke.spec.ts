@@ -345,7 +345,7 @@ test("homepage sections in the restructured order", async ({ page }) => {
     "What I do",
     "Tech stack",
     "Experience",
-    "Selected projects",
+    "Shipped work",
     "About me",
   ]);
   // "My own product" is off by default (siteConfig.homeSections.ownProduct).
@@ -359,6 +359,11 @@ test("homepage sections in the restructured order", async ({ page }) => {
   await expect(page.locator("#stack dt")).toHaveCount(10);
   await expect(page.locator('#stack ul[aria-label="Core"]').first()).toContainText("Kotlin");
   await expect(page.locator("#stack")).toContainText("AI & automation");
+  // Hover tips come from the experience entries; items no position lists get none.
+  const chip = (name: string) =>
+    page.locator("#stack li.chip", { hasText: new RegExp(`^${name}$`) });
+  await expect(chip("Kotlin")).toHaveAttribute("data-tip", "Used at CreativeDock, CCA Group");
+  await expect(chip("Terraform")).not.toHaveAttribute("data-tip", /.+/);
   for (const tool of ["Claude Code", "Codex", "AI CLIs", "AI agents", "Automation"])
     await expect(page.locator("#stack li", { hasText: tool }).first()).toBeVisible();
   await expect(page.locator("#experience ol > li")).toHaveCount(5);
@@ -408,7 +413,7 @@ test("wide screens use the full width (no text column beside empty space)", asyn
 
 test("about: heading, portrait switch, ProfilePage structured data", async ({ page }) => {
   await page.goto("/about");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Engineer and founder.");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Fullstack engineer in Prague.");
   await page.getByText("Black", { exact: true }).click();
   await expect(page.locator('[data-portrait="black"] img')).toBeVisible();
   await expect(page.locator('[data-portrait="turtleneck"] img')).toBeHidden();
@@ -482,7 +487,7 @@ test.describe("security headers (applied from _headers, as on Cloudflare Pages)"
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading);
     };
     await go('#projects a[href="/projects"]', /\/projects$/, "Projects");
-    await go('footer a[href="/about"]', /\/about$/, "Engineer and founder.");
+    await go('footer a[href="/about"]', /\/about$/, "Fullstack engineer in Prague.");
     // Styles of the swapped page apply (inline <style> under the policy).
     expect(await page.evaluate(() => getComputedStyle(document.body).fontFamily)).toMatch(
       /Schibsted/,
@@ -510,4 +515,23 @@ test.describe("security headers (applied from _headers, as on Cloudflare Pages)"
     expect(await page.evaluate(() => (window as unknown as { __csp: string[] }).__csp)).toEqual([]);
     expect(consoleCsp).toEqual([]);
   });
+});
+
+test("selected projects: the whole card opens its case study", async ({ page, isMobile }) => {
+  await page.goto("/");
+  const card = page.locator("#projects article").nth(1);
+  await card.scrollIntoViewIfNeeded();
+  await card.click({ position: { x: 160, y: isMobile ? 220 : 260 } });
+  await expect(page).toHaveURL(/\/projects\/self-service-menu-platform$/);
+});
+
+test("hobbies and about facts: real content, no placeholders", async ({ page }) => {
+  await page.goto("/hobbies");
+  await expect(page.locator("article[aria-labelledby$='-title']")).toHaveCount(4);
+  await expect(page.locator("main")).toContainText("BMW S 1000 R (2025)");
+  await expect(page.locator("main")).toContainText("Letňany Aero Club");
+  await expect(page.locator("main")).not.toContainText(/\[[A-Z][^\]]*\]/);
+  await page.goto("/about");
+  await expect(page.locator("main")).toContainText("15 hours so far, as a student pilot");
+  await expect(page.locator("main")).toContainText("D-grade via ferrata");
 });

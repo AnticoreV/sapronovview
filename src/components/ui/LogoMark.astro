@@ -1,5 +1,5 @@
 ---
-/** The 3-face isometric cube from the approved artboard (decorative). */
+/** Header mark: three stacked isometric slabs (front end, back end, infrastructure) in the clay terracotta, saffron and raspberry: the full stack. */
 interface Props {
   size?: number;
   class?: string;
@@ -15,7 +15,13 @@ const { size = 26, class: className } = Astro.props;
   focusable="false"
   class={className}
 >
-  <path d="M13 2 23 7.5 13 13 3 7.5Z" class="iso-blue"></path>
-  <path d="M3 7.5 13 13v11L3 18.5Z" class="iso-blue-l"></path>
-  <path d="M23 7.5 13 13v11l10-5.5Z" class="iso-blue-r"></path>
+  <path d="M13 13 22 17.5 13 22 4 17.5Z" fill="#d9708c" />
+  <path d="M4 17.5 13 22v2.4L4 19.9Z" fill="#bf6179" />
+  <path d="M22 17.5 13 22v2.4l9-4.5Z" fill="#9c4f63" />
+  <path d="M13 8 22 12.5 13 17 4 12.5Z" fill="#f0b941" />
+  <path d="M4 12.5 13 17v2.4L4 14.9Z" fill="#d6a33a" />
+  <path d="M22 12.5 13 17v2.4l9-4.5Z" fill="#b0862f" />
+  <path d="M13 3 22 7.5 13 12 4 7.5Z" fill="#e06b3f" />
+  <path d="M4 7.5 13 12v2.4L4 9.9Z" fill="#c15c36" />
+  <path d="M22 7.5 13 12v2.4l9-4.5Z" fill="#9d4b2c" />
 </svg>

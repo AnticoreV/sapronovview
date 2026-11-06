@@ -40,7 +40,7 @@ const products = projects.filter((p) => p.data.tagline);
 >
   <Hero />
   <Expertise />
-  <TechStack />
+  <TechStack positions={positions} />
   <ExperienceTimeline positions={positions} />
   <SelectedProjects projects={projects} />
   {siteConfig.homeSections.ownProduct && <Venture products={products} />}

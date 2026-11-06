@@ -56,7 +56,9 @@ test("English pages carry the English operator line", async ({ page }) => {
 
 test("Czech pages link within /cs and translate the chrome", async ({ page, isMobile }) => {
   await page.goto("/cs/about");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Inženýr a zakladatel.");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    /^Fullstack inženýr v\s+Praze\.$/,
+  );
   const footer = page.getByRole("contentinfo");
   await expect(footer.getByRole("link", { name: "Projekty" })).toHaveAttribute(
     "href",

@@ -4,6 +4,7 @@
  */
 import type { Locale } from "@/i18n/locales";
 import { typoDeep } from "@/i18n/typo";
+import { visitedCountryCount } from "@data/adventures";
 
 type AboutCopy = {
   /** Career story, one string per paragraph. */
@@ -69,12 +70,15 @@ const copy: Record<Locale, AboutCopy> = {
       },
     ],
     facts: [
-      { icon: "Plane", text: "I fly ultralight aircraft: [hours / licence status]." },
-      { icon: "Bike", text: "Current bike: [MAKE & MODEL]. Longest ride so far: [N km]." },
-      { icon: "Globe", text: "Countries visited: [N]. Next up: [COUNTRY]." },
-      { icon: "Dumbbell", text: "[Sport you practise], [N] sessions a week." },
-      { icon: "Cpu", text: "First program: [what it was and in which language]." },
-      { icon: "Heart", text: "[An interesting fact nobody would guess]." },
+      { icon: "Plane", text: "I fly ultralight aircraft: 15 hours so far, as a student pilot." },
+      { icon: "Bike", text: "Current bike: BMW S 1000 R (2025). About 15,000 km ridden so far." },
+      { icon: "Globe", text: `Countries visited: ${visitedCountryCount}.` },
+      { icon: "Dumbbell", text: "Gym three or four times a week, snowboarding in winter." },
+      {
+        icon: "Cpu",
+        text: "First program: a small Notion-like app in Java, on a servlet with a little HTML, CSS and JavaScript front end, for notes and handy system tools.",
+      },
+      { icon: "Heart", text: "I've made a parachute jump and completed a D-grade via ferrata." },
     ],
   },
   cs: {
@@ -133,12 +137,15 @@ const copy: Record<Locale, AboutCopy> = {
       },
     ],
     facts: [
-      { icon: "Plane", text: "Létám na ultralehkých letadlech: [hodiny / stav licence]." },
-      { icon: "Bike", text: "Aktuální motorka: [ZNAČKA A MODEL]. Nejdelší jízda: [N km]." },
-      { icon: "Globe", text: "Navštívené země: [N]. Další na řadě: [ZEMĚ]." },
-      { icon: "Dumbbell", text: "[Sport, který dělám], [N] tréninků týdně." },
-      { icon: "Cpu", text: "První program: [co to bylo a v jakém jazyce]." },
-      { icon: "Heart", text: "[Zajímavost, kterou by nikdo nehádal]." },
+      { icon: "Plane", text: "Létám na ultralehkých letadlech: zatím 15 hodin jako žák pilot." },
+      { icon: "Bike", text: "Aktuální motorka: BMW S 1000 R (2025). Najeto mám zhruba 15 000 km." },
+      { icon: "Globe", text: `Navštívené země: ${visitedCountryCount}.` },
+      { icon: "Dumbbell", text: "Posilovna třikrát až čtyřikrát týdně, v zimě snowboard." },
+      {
+        icon: "Cpu",
+        text: "První program: malá aplikace ve stylu Notionu v Javě na servletu s jednoduchým frontendem v HTML, CSS a JavaScriptu, na poznámky a užitečné systémové nástroje.",
+      },
+      { icon: "Heart", text: "Mám za sebou seskok padákem a ferratu obtížnosti D." },
     ],
   },
 };

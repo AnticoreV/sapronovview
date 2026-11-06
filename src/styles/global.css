@@ -436,48 +436,63 @@
     background: var(--hero-bg);
   }
 
-  /* What I do cards: hover lift, accent border, a gradient top bar and the icon tilting up
-     (pointer devices only); reduced motion keeps only the colour changes. */
-  .expertise-card {
+  /* Hover cards (link cards: Shipped work): on a real pointer the card lifts 4px,
+     takes an accent border, a gradient top bar fades in and a shadow layer fades in under
+     it. Only transform and opacity animate (compositor work, no repaint per frame): the
+     shadow sits on ::after and fades, rather than transitioning box-shadow. Keyboard
+     focus inside the card shows the same state without the lift; reduced motion keeps
+     only the colour changes. Touch screens get no hover state (no sticky lift). */
+  .hover-card {
     position: relative;
+    isolation: isolate;
     transition:
       transform var(--duration-base) var(--ease-out),
-      box-shadow var(--duration-base) var(--ease-out),
       border-color var(--duration-base) var(--ease-out);
   }
-  .expertise-card::before {
+  .hover-card::before,
+  .hover-card::after {
     content: "";
     position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--ease-out);
+  }
+  .hover-card::before {
+    z-index: 1;
     inset: -1px -1px auto;
     height: 4px;
     border-radius: var(--radius-md) var(--radius-md) 0 0;
     background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
-    opacity: 0;
-    transition: opacity var(--duration-base) var(--ease-out);
   }
-  .expertise-card.is-spotlight::before {
-    inset: -2px -2px auto;
+  .hover-card::after {
+    z-index: -1;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: var(--shadow-pop);
   }
-  .expertise-card > svg {
-    transition: transform var(--duration-base) var(--ease-out);
-    transform-origin: 50% 80%;
+  .hover-card:has(:focus-visible) {
+    border-color: var(--accent);
   }
-  @media (hover: hover) {
-    .expertise-card:hover {
+  .hover-card:has(:focus-visible)::before {
+    opacity: 1;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .hover-card:hover {
       transform: translateY(-4px);
-      box-shadow: var(--shadow-pop);
       border-color: var(--accent);
     }
-    .expertise-card:hover::before {
+    .hover-card:hover::before,
+    .hover-card:hover::after {
       opacity: 1;
     }
-    .expertise-card:hover > svg {
-      transform: translateY(-3px) rotate(-4deg) scale(1.06);
+    .hover-card:active {
+      transform: translateY(-2px);
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .expertise-card:hover,
-    .expertise-card:hover > svg {
+    .hover-card,
+    .hover-card:hover,
+    .hover-card:active {
       transform: none;
     }
   }
