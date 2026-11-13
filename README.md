@@ -479,8 +479,23 @@ disabled), success (`role="status"`, only after the endpoint answers OK), failur
   `PUBLIC_FORM_ACTION=https://formspree.io/f/<id>` (e.g. a Cloudflare Pages environment
   variable). The CSP already allows `https://formspree.io` for `connect-src` and
   `form-action`.
-- The site sets no cookies and runs no analytics, so there is no consent banner; the theme
-  choice lives in `localStorage` only.
+- The site sets no cookies, so there is no consent banner; the theme choice lives in
+  `localStorage` only. Visits are counted by self-hosted, cookieless Plausible (see
+  "Analytics").
+
+## Analytics
+
+Plausible CE runs on the home server (`~/plausible-ce` on the MacBook Air). Its dashboard is
+tailnet-only at <http://100.74.106.100:8000>. The public side is the Cloudflare tunnel
+`plausible` on `stats.ivansapronov.com`, which routes only `/js/*` (the tracker) and
+`/api/event` (pageviews) to Plausible and answers 404 for everything else. A `cloudflared`
+container in the compose override runs the tunnel with `TUNNEL_TOKEN` from `.env`.
+
+`BaseLayout.astro` loads the tracker only on `ivansapronov.com` and `www.`, so dev servers,
+the Playwright suite and `*.pages.dev` previews send nothing. It passes
+`endpoint: "https://stats.ivansapronov.com/api/event"` to `plausible.init()`, because the
+script itself is built with Plausible's tailnet `BASE_URL`. If the server is asleep or
+offline, the site still works and those visits go uncounted.
 
 ## SEO
 
@@ -552,8 +567,8 @@ Domain: **https://ivansapronov.com** (set as `site` in `astro.config.mjs` and in
 - a header-level **Content-Security-Policy**:
 
   ```text
-  default-src 'self'; script-src 'self' 'unsafe-inline' data:; style-src 'self' 'unsafe-inline';
-  img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://formspree.io;
+  default-src 'self'; script-src 'self' 'unsafe-inline' data: https://stats.ivansapronov.com; style-src 'self' 'unsafe-inline';
+  img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://formspree.io https://stats.ivansapronov.com;
   form-action 'self' https://formspree.io mailto:; frame-ancestors 'none'; base-uri 'self';
   object-src 'none'
   ```
