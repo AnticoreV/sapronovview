@@ -37,6 +37,26 @@ const { locale, t } = i18n(Astro);
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
+    {/* Plausible analytics: self-hosted and cookieless, reached through the
+        stats.ivansapronov.com tunnel. Only the real domain loads it, so local runs and
+        preview builds stay out of the stats. The tracker follows view-transition
+        navigations itself; the endpoint override replaces the tailnet address the
+        script was built with. */}
+    <script is:inline>
+      if (/^(www\.)?ivansapronov\.com$/.test(location.hostname) && !window.plausible) {
+        window.plausible = function (...args) {
+          (plausible.q = plausible.q || []).push(args);
+        };
+        plausible.init = function (i) {
+          plausible.o = i || {};
+        };
+        plausible.init({ endpoint: "https://stats.ivansapronov.com/api/event" });
+        const s = document.createElement("script");
+        s.async = true;
+        s.src = "https://stats.ivansapronov.com/js/pa-Hl58JcDyK-8JSMiUgkDa3.js";
+        document.head.append(s);
+      }
+    </script>
     {/* Theme bootstrap: runs before paint so there is no flash of the wrong theme.
         Stored choice wins; otherwise the OS preference decides. */}
     <script is:inline>

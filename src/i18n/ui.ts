@@ -279,7 +279,7 @@ const en = {
   "contactPage.privacyOn":
     "The form sends your name, email, topic and message to Formspree (formspree.io), which processes them on my behalf and forwards them to my inbox. I use them only to reply to you.",
   "contactPage.cookies":
-    "This site sets no cookies and runs no analytics. Your theme and language choices stay in your browser's local storage and never leave it.",
+    "This site sets no cookies. It counts visits with Plausible, self-hosted analytics that stores no personal data. Your theme and language choices stay in your browser's local storage and never leave it.",
   "form.title": "Send a message",
   "form.notConnected": "Form not connected yet",
   "form.notConnectedText": "email me at",
@@ -588,7 +588,7 @@ const cs: Record<UiKey, string> = {
   "contactPage.privacyOn":
     "Formulář posílá vaše jméno, e-mail, téma a zprávu službě Formspree (formspree.io), která je zpracuje mým jménem a přepošle do mé schránky. Používám je jen k tomu, abych vám odpověděl.",
   "contactPage.cookies":
-    "Tento web nepoužívá cookies ani analytiku. Volba režimu a jazyka zůstává jen v místním úložišti vašeho prohlížeče a nikam se neodesílá.",
+    "Tento web nepoužívá cookies. Návštěvy počítá přes Plausible, analytiku na vlastním serveru, která neukládá žádné osobní údaje. Volba režimu a jazyka zůstává jen v místním úložišti vašeho prohlížeče a nikam se neodesílá.",
   "form.title": "Napište zprávu",
   "form.notConnected": "Formulář zatím není připojený",
   "form.notConnectedText": "napište mi na",
