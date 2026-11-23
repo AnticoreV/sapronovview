@@ -32,7 +32,7 @@ export const siteConfig = {
    */
   operator: {
     ico: "23157852",
-    street: "Argentinská 1624/32",
+    street: "Argentinská",
     postalCode: "170 00",
     city: "Praha 7",
     cityEn: "Prague 7",

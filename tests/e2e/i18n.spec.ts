@@ -18,9 +18,9 @@ const csRoutes = [
 ];
 
 const OPERATOR_EN =
-  "Ivan Sapronov · IČO 23157852 · Argentinská 1624/32, 170 00 Prague 7, Czech Republic · Sole trader registered in the Czech Trade Register";
+  "Ivan Sapronov · IČO 23157852 · Argentinská, 170 00 Prague 7, Czech Republic · Sole trader registered in the Czech Trade Register";
 const OPERATOR_CS =
-  "Ivan Sapronov · IČO 23157852 · Argentinská 1624/32, 170 00 Praha 7 · Fyzická osoba zapsaná v živnostenském rejstříku";
+  "Ivan Sapronov · IČO 23157852 · Argentinská, 170 00 Praha 7 · Fyzická osoba zapsaná v živnostenském rejstříku";
 
 /** Text with non-breaking spaces read as plain spaces. */
 const plain = (s: string | null) => (s ?? "").replace(/ /g, " ").trim();
