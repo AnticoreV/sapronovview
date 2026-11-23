@@ -43,7 +43,7 @@ const en = {
   "footer.label": "Footer",
   "footer.city": "Prague",
   "footer.operator":
-    "Ivan Sapronov · IČO 23157852 · Argentinská, 170 00 Prague 7, Czech Republic · Sole trader registered in the Czech Trade Register",
+    "Ivan Sapronov · IČO 23157852 · Argentinská 1624, 170 00 Prague 7, Czech Republic · Sole trader registered in the Czech Trade Register",
   "breadcrumb.label": "Breadcrumb",
   "copy.button": "Copy",
   "copy.done": "Copied",
@@ -356,7 +356,7 @@ const cs: Record<UiKey, string> = {
   "footer.label": "Patička",
   "footer.city": "Praha",
   "footer.operator":
-    "Ivan Sapronov · IČO 23157852 · Argentinská, 170 00 Praha 7 · Fyzická osoba zapsaná v živnostenském rejstříku",
+    "Ivan Sapronov · IČO 23157852 · Argentinská 1624, 170 00 Praha 7 · Fyzická osoba zapsaná v živnostenském rejstříku",
   "breadcrumb.label": "Drobečková navigace",
   "copy.button": "Kopírovat",
   "copy.done": "Zkopírováno",
